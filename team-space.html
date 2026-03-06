@@ -5,45 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Space (CSSE)</title>
     <style>
+        * {
+            margin: 0 !important;
+            padding: 0 !important;
+            box-sizing: border-box !important;
+        }
+
         html, body {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            width: 100%;
-            height: 100%;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0d1b2a 100%) !important;
+            color: #e0e0ff !important;
+            overflow-x: hidden !important;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0d1b2a 100%);
-            color: #e0e0ff;
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            min-height: 100vh !important;
+            position: relative !important;
         }
 
         /* Animated starfield background */
         .stars {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 1 !important;
+            pointer-events: none !important;
         }
 
         .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 3s infinite;
+            position: absolute !important;
+            background: white !important;
+            border-radius: 50% !important;
+            animation: twinkle 3s infinite !important;
         }
 
         @keyframes twinkle {
@@ -53,73 +52,71 @@
 
         /* Main container */
         .container {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 60px 20px 40px 20px;
-            background: inherit;
+            position: relative !important;
+            z-index: 10 !important;
+            width: 100% !important;
+            min-height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 40px 20px !important;
         }
 
         /* Header */
         .header {
-            text-align: center;
-            margin-bottom: 60px;
-            animation: fadeInDown 1s ease-out;
-            margin-top: 20px;
+            text-align: center !important;
+            margin-bottom: 60px !important;
+            animation: fadeInDown 1s ease-out !important;
         }
 
         .header h1 {
-            font-size: 4rem;
-            margin-bottom: 10px;
-            color: #64b5f6;
-            letter-spacing: 3px;
-            text-shadow: 0 0 30px rgba(100, 181, 246, 0.6), 0 0 60px rgba(129, 212, 250, 0.4);
+            font-size: 4rem !important;
+            margin-bottom: 10px !important;
+            color: #64b5f6 !important;
+            letter-spacing: 3px !important;
+            text-shadow: 0 0 30px rgba(100, 181, 246, 0.6), 0 0 60px rgba(129, 212, 250, 0.4) !important;
         }
 
         .header p {
-            font-size: 1.3rem;
-            color: #81d4fa;
-            letter-spacing: 2px;
-            font-style: italic;
-            text-shadow: 0 0 20px rgba(129, 212, 250, 0.4);
+            font-size: 1.3rem !important;
+            color: #81d4fa !important;
+            letter-spacing: 2px !important;
+            font-style: italic !important;
+            text-shadow: 0 0 20px rgba(129, 212, 250, 0.4) !important;
         }
 
         .subtitle {
-            font-size: 0.9rem;
-            color: #90caf9;
-            margin-top: 15px;
-            opacity: 0.8;
+            font-size: 0.9rem !important;
+            color: #90caf9 !important;
+            margin-top: 15px !important;
+            opacity: 0.8 !important;
         }
 
         /* Galaxy clouds grid */
         .galaxy-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-            max-width: 1400px;
-            margin: 60px auto;
-            padding: 0 20px;
-            width: 100%;
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+            gap: 40px !important;
+            max-width: 1400px !important;
+            margin: 60px auto !important;
+            padding: 0 20px !important;
+            width: 100% !important;
         }
 
         /* Galaxy cloud card */
         .galaxy-cloud {
-            position: relative;
-            height: 350px;
-            cursor: pointer;
-            perspective: 1000px;
-            animation: float 6s ease-in-out infinite;
+            position: relative !important;
+            height: 350px !important;
+            cursor: pointer !important;
+            perspective: 1000px !important;
+            animation: float 6s ease-in-out infinite !important;
         }
 
-        .galaxy-cloud:nth-child(1) { animation-delay: 0s; }
-        .galaxy-cloud:nth-child(2) { animation-delay: 1s; }
-        .galaxy-cloud:nth-child(3) { animation-delay: 2s; }
-        .galaxy-cloud:nth-child(4) { animation-delay: 1.5s; }
+        .galaxy-cloud:nth-child(1) { animation-delay: 0s !important; }
+        .galaxy-cloud:nth-child(2) { animation-delay: 1s !important; }
+        .galaxy-cloud:nth-child(3) { animation-delay: 2s !important; }
+        .galaxy-cloud:nth-child(4) { animation-delay: 1.5s !important; }
 
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
@@ -127,80 +124,80 @@
         }
 
         .cloud-inner {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            transform-style: preserve-3d;
+            width: 100% !important;
+            height: 100% !important;
+            position: relative !important;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+            transform-style: preserve-3d !important;
         }
 
         .galaxy-cloud:hover .cloud-inner {
-            transform: scale(1.05) rotateY(5deg);
+            transform: scale(1.05) rotateY(5deg) !important;
         }
 
         /* Cloud background with glow effect */
         .cloud-background {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, rgba(100, 181, 246, 0.4), rgba(33, 150, 243, 0.2), transparent);
-            border: 2px solid rgba(129, 212, 250, 0.5);
+            position: absolute !important;
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50% !important;
+            background: radial-gradient(circle at 30% 30%, rgba(100, 181, 246, 0.4), rgba(33, 150, 243, 0.2), transparent) !important;
+            border: 2px solid rgba(129, 212, 250, 0.5) !important;
             box-shadow: 
                 0 0 30px rgba(100, 181, 246, 0.4),
                 inset 0 0 30px rgba(129, 212, 250, 0.2),
-                0 0 60px rgba(33, 150, 243, 0.3);
-            filter: blur(1px);
+                0 0 60px rgba(33, 150, 243, 0.3) !important;
+            filter: blur(1px) !important;
         }
 
         .galaxy-cloud:nth-child(1) .cloud-background {
-            background: radial-gradient(circle at 30% 30%, rgba(100, 181, 246, 0.4), rgba(33, 150, 243, 0.2), transparent);
+            background: radial-gradient(circle at 30% 30%, rgba(100, 181, 246, 0.4), rgba(33, 150, 243, 0.2), transparent) !important;
             box-shadow: 
                 0 0 30px rgba(100, 181, 246, 0.4),
                 inset 0 0 30px rgba(129, 212, 250, 0.2),
-                0 0 60px rgba(33, 150, 243, 0.3);
+                0 0 60px rgba(33, 150, 243, 0.3) !important;
         }
 
         .galaxy-cloud:nth-child(2) .cloud-background {
-            background: radial-gradient(circle at 30% 30%, rgba(156, 39, 176, 0.4), rgba(103, 58, 183, 0.2), transparent);
+            background: radial-gradient(circle at 30% 30%, rgba(156, 39, 176, 0.4), rgba(103, 58, 183, 0.2), transparent) !important;
             box-shadow: 
                 0 0 30px rgba(156, 39, 176, 0.4),
                 inset 0 0 30px rgba(171, 71, 188, 0.2),
-                0 0 60px rgba(103, 58, 183, 0.3);
+                0 0 60px rgba(103, 58, 183, 0.3) !important;
         }
 
         .galaxy-cloud:nth-child(3) .cloud-background {
-            background: radial-gradient(circle at 30% 30%, rgba(76, 175, 80, 0.4), rgba(56, 142, 60, 0.2), transparent);
+            background: radial-gradient(circle at 30% 30%, rgba(76, 175, 80, 0.4), rgba(56, 142, 60, 0.2), transparent) !important;
             box-shadow: 
                 0 0 30px rgba(76, 175, 80, 0.4),
                 inset 0 0 30px rgba(102, 187, 106, 0.2),
-                0 0 60px rgba(56, 142, 60, 0.3);
+                0 0 60px rgba(56, 142, 60, 0.3) !important;
         }
 
         .galaxy-cloud:nth-child(4) .cloud-background {
-            background: radial-gradient(circle at 30% 30%, rgba(255, 152, 0, 0.4), rgba(255, 111, 0, 0.2), transparent);
+            background: radial-gradient(circle at 30% 30%, rgba(255, 152, 0, 0.4), rgba(255, 111, 0, 0.2), transparent) !important;
             box-shadow: 
                 0 0 30px rgba(255, 152, 0, 0.4),
                 inset 0 0 30px rgba(255, 167, 38, 0.2),
-                0 0 60px rgba(255, 111, 0, 0.3);
+                0 0 60px rgba(255, 111, 0, 0.3) !important;
         }
 
         /* Animated particles inside cloud */
         .particles {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            overflow: hidden;
+            position: absolute !important;
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50% !important;
+            overflow: hidden !important;
         }
 
         .particle {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 50%;
-            animation: drift 15s infinite linear;
+            position: absolute !important;
+            width: 3px !important;
+            height: 3px !important;
+            background: rgba(255, 255, 255, 0.6) !important;
+            border-radius: 50% !important;
+            animation: drift 15s infinite linear !important;
         }
 
         @keyframes drift {
@@ -222,59 +219,54 @@
 
         /* Cloud content */
         .cloud-content {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 5;
+            position: absolute !important;
+            width: 100% !important;
+            height: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 5 !important;
         }
 
         .cloud-icon {
-            font-size: 4rem;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 0 10px rgba(100, 181, 246, 0.6));
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            font-size: 4rem !important;
+            margin-bottom: 15px !important;
+            filter: drop-shadow(0 0 10px rgba(100, 181, 246, 0.6)) !important;
+            animation: pulse 2s ease-in-out infinite !important;
         }
 
         .cloud-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 8px;
-            color: #ffffff;
-            text-shadow: 0 0 20px rgba(100, 181, 246, 0.5);
+            font-size: 1.8rem !important;
+            font-weight: 700 !important;
+            text-align: center !important;
+            margin-bottom: 8px !important;
+            color: #ffffff !important;
+            text-shadow: 0 0 20px rgba(100, 181, 246, 0.5) !important;
         }
 
         .cloud-description {
-            font-size: 0.9rem;
-            color: #b0bec5;
-            text-align: center;
-            opacity: 0.8;
+            font-size: 0.9rem !important;
+            color: #b0bec5 !important;
+            text-align: center !important;
+            opacity: 0.8 !important;
         }
 
         /* Instructions */
         .instructions {
-            position: relative;
-            text-align: center;
-            font-size: 0.95rem;
-            color: #90caf9;
-            opacity: 0.8;
-            margin-top: 40px;
-            animation: fadeInUp 1s ease-out 0.5s backwards;
+            position: relative !important;
+            text-align: center !important;
+            font-size: 0.95rem !important;
+            color: #90caf9 !important;
+            opacity: 0.8 !important;
+            margin-top: 40px !important;
+            animation: fadeInUp 1s ease-out 0.5s backwards !important;
         }
 
         .scroll-indicator {
-            display: inline-block;
-            margin-top: 10px;
-            animation: bounce 2s infinite;
+            display: inline-block !important;
+            margin-top: 10px !important;
+            animation: bounce 2s infinite !important;
         }
 
         @keyframes bounce {
@@ -307,35 +299,35 @@
         /* Responsive design */
         @media (max-width: 768px) {
             .header h1 {
-                font-size: 2.5rem;
+                font-size: 2.5rem !important;
             }
 
             .header p {
-                font-size: 1rem;
+                font-size: 1rem !important;
             }
 
             .galaxy-grid {
-                grid-template-columns: 1fr;
-                gap: 30px;
+                grid-template-columns: 1fr !important;
+                gap: 30px !important;
             }
 
             .galaxy-cloud {
-                height: 300px;
+                height: 300px !important;
             }
 
             .cloud-title {
-                font-size: 1.5rem;
+                font-size: 1.5rem !important;
             }
 
             .cloud-icon {
-                font-size: 3rem;
+                font-size: 3rem !important;
             }
         }
 
         /* Link styling */
         a {
-            text-decoration: none;
-            color: inherit;
+            text-decoration: none !important;
+            color: inherit !important;
             display: block;
         }
     </style>
