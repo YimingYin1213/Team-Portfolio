@@ -50,11 +50,11 @@ class GameLevelBasketball {
 
        const npcData1 = {
     id: 'NPC',
-    greeting: 'Hello!',
+    greeting: 'Yo let\'s 1v1',
     src: path + "/images/gamebuilder/sprites/LeBron.png",
     SCALE_FACTOR: 3,
     ANIMATION_RATE: 50,
-    INIT_POSITION: { x: 360, y: 166 },
+    INIT_POSITION: { x: 1250, y: 300 },
     pixels: { height: 1350, width: 1080 },
     orientation: { rows: 4, columns: 3 },
     down:      { row: 0, start: 0, columns: 1 },
@@ -67,7 +67,7 @@ class GameLevelBasketball {
     downLeft:  { row: 0, start: 0, columns: 1 },
     speed: 0,
     hitbox: { widthPercentage: 0.01, heightPercentage: 0.01 },
-    dialogues: ['Hello!'],
+    dialogues: ['Yo let\'s 1v1!'],
     reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
     interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }
 };
