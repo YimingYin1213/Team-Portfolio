@@ -2,4 +2,6 @@
   { "name": "Alien Planet", "src": "alien_planet.jpg" },
   { "name": "Sky kingdom", "src": "clouds.jpg" },
   { "name": "Basketball Court", "src": "Court.png" }
+  { "name": "Tag Playground", "src": "tagplayground.png" }
+  { "name": "Aquatic", "src": "Aquatic.png" }
 ]

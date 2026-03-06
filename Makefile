@@ -2,14 +2,26 @@ HOST ?= localhost
 PORT ?= 4599
 LOG_FILE = /tmp/jekyll$(PORT).log
 PYTHON := venv/bin/python3
+PIP := venv/bin/pip
+REQUIREMENTS := requirements.txt
 
 SHELL = /bin/bash -c
 .SHELLFLAGS = -e
 
+.PHONY: venv setup
+venv:
+	@echo "Ensuring python virtualenv exists..."
+	@test -d venv || python3 -m venv venv
+	@echo "Installing Python dependencies..."
+	@$(PIP) install -r $(REQUIREMENTS)
+
+setup: venv
+	@echo "Setup complete."
+
 NOTEBOOK_FILES := $(shell find _notebooks -name '*.ipynb')
 DESTINATION_DIRECTORY = _posts
 MARKDOWN_FILES := $(patsubst _notebooks/%.ipynb,$(DESTINATION_DIRECTORY)/%_IPYNB_2_.md,$(NOTEBOOK_FILES))
-default: serve-current
+default: venv serve-current
 	@touch /tmp/.notebook_watch_marker
 	@make watch-notebooks &
 	@make watch-files &
