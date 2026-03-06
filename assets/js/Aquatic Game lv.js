@@ -29,7 +29,7 @@ class GameLevelAstronautGame {
 
         const playerData = {
             id: 'playerData',
-            src: path + "/images/gamebuilder/sprites/astro.png",
+            src: path + "/images/scuba_diver_spritesheet.png",
             SCALE_FACTOR: 5,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,

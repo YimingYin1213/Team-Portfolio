@@ -1,0 +1,489 @@
+---
+layout: page
+title: Team Space (CSSE)
+permalink: /team-space/
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Space (CSSE)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0d1b2a 100%);
+            color: #e0e0ff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated starfield background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Main container */
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 80px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            font-size: 4rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #64b5f6, #81d4fa, #80deea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(100, 181, 246, 0.3);
+            letter-spacing: 3px;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            color: #b0bec5;
+            letter-spacing: 2px;
+            font-style: italic;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: #90caf9;
+            margin-top: 15px;
+            opacity: 0.8;
+        }
+
+        /* Galaxy clouds grid */
+        .galaxy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1400px;
+            margin: 60px auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        /* Galaxy cloud card */
+        .galaxy-cloud {
+            position: relative;
+            height: 350px;
+            cursor: pointer;
+            perspective: 1000px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .galaxy-cloud:nth-child(1) { animation-delay: 0s; }
+        .galaxy-cloud:nth-child(2) { animation-delay: 1s; }
+        .galaxy-cloud:nth-child(3) { animation-delay: 2s; }
+        .galaxy-cloud:nth-child(4) { animation-delay: 1.5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .cloud-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-style: preserve-3d;
+        }
+
+        .galaxy-cloud:hover .cloud-inner {
+            transform: scale(1.05) rotateY(5deg);
+        }
+
+        /* Cloud background with glow effect */
+        .cloud-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(100, 181, 246, 0.4), rgba(33, 150, 243, 0.2), transparent);
+            border: 2px solid rgba(129, 212, 250, 0.5);
+            box-shadow: 
+                0 0 30px rgba(100, 181, 246, 0.4),
+                inset 0 0 30px rgba(129, 212, 250, 0.2),
+                0 0 60px rgba(33, 150, 243, 0.3);
+            filter: blur(1px);
+        }
+
+        .galaxy-cloud:nth-child(1) .cloud-background {
+            background: radial-gradient(circle at 30% 30%, rgba(100, 181, 246, 0.4), rgba(33, 150, 243, 0.2), transparent);
+            box-shadow: 
+                0 0 30px rgba(100, 181, 246, 0.4),
+                inset 0 0 30px rgba(129, 212, 250, 0.2),
+                0 0 60px rgba(33, 150, 243, 0.3);
+        }
+
+        .galaxy-cloud:nth-child(2) .cloud-background {
+            background: radial-gradient(circle at 30% 30%, rgba(156, 39, 176, 0.4), rgba(103, 58, 183, 0.2), transparent);
+            box-shadow: 
+                0 0 30px rgba(156, 39, 176, 0.4),
+                inset 0 0 30px rgba(171, 71, 188, 0.2),
+                0 0 60px rgba(103, 58, 183, 0.3);
+        }
+
+        .galaxy-cloud:nth-child(3) .cloud-background {
+            background: radial-gradient(circle at 30% 30%, rgba(76, 175, 80, 0.4), rgba(56, 142, 60, 0.2), transparent);
+            box-shadow: 
+                0 0 30px rgba(76, 175, 80, 0.4),
+                inset 0 0 30px rgba(102, 187, 106, 0.2),
+                0 0 60px rgba(56, 142, 60, 0.3);
+        }
+
+        .galaxy-cloud:nth-child(4) .cloud-background {
+            background: radial-gradient(circle at 30% 30%, rgba(255, 152, 0, 0.4), rgba(255, 111, 0, 0.2), transparent);
+            box-shadow: 
+                0 0 30px rgba(255, 152, 0, 0.4),
+                inset 0 0 30px rgba(255, 167, 38, 0.2),
+                0 0 60px rgba(255, 111, 0, 0.3);
+        }
+
+        /* Animated particles inside cloud */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: drift 15s infinite linear;
+        }
+
+        @keyframes drift {
+            0% {
+                opacity: 0;
+                transform: translate(0, 0);
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty));
+            }
+        }
+
+        /* Cloud content */
+        .cloud-content {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+
+        .cloud-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px rgba(100, 181, 246, 0.6));
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .cloud-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 8px;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(100, 181, 246, 0.5);
+        }
+
+        .cloud-description {
+            font-size: 0.9rem;
+            color: #b0bec5;
+            text-align: center;
+            opacity: 0.8;
+        }
+
+        /* Instructions */
+        .instructions {
+            position: absolute;
+            bottom: 40px;
+            text-align: center;
+            font-size: 0.95rem;
+            color: #90caf9;
+            opacity: 0.7;
+            animation: fadeInUp 1s ease-out 0.5s backwards;
+        }
+
+        .scroll-indicator {
+            display: inline-block;
+            margin-top: 10px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .galaxy-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .galaxy-cloud {
+                height: 300px;
+            }
+
+            .cloud-title {
+                font-size: 1.5rem;
+            }
+
+            .cloud-icon {
+                font-size: 3rem;
+            }
+        }
+
+        /* Link styling */
+        a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Starfield background -->
+    <div class="stars" id="starfield"></div>
+
+    <!-- Main container -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>TEAM SPACE</h1>
+            <p>CSSE PORTFOLIO</p>
+            <div class="subtitle">Navigate through the galaxy of our projects and files</div>
+        </div>
+
+        <!-- Galaxy clouds grid -->
+        <div class="galaxy-grid" id="galaxyGrid">
+            <!-- Galaxy clouds will be populated here -->
+        </div>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <p>✨ Click on any galaxy to explore its contents ✨</p>
+            <div class="scroll-indicator">↓ Scroll to see more ↓</div>
+        </div>
+    </div>
+
+    <script>
+        // Generate starfield
+        function generateStars() {
+            const starfield = document.getElementById('starfield');
+            const starCount = 150;
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const size = Math.random() * 2 + 1;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const duration = Math.random() * 3 + 2;
+
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = x + '%';
+                star.style.top = y + '%';
+                star.style.animationDuration = duration + 's';
+                star.style.animationDelay = Math.random() * 3 + 's';
+
+                starfield.appendChild(star);
+            }
+        }
+
+        // Generate particles in galaxy clouds
+        function generateParticles(container) {
+            const particleCount = 15;
+            const particlesDiv = container.querySelector('.particles');
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+
+                const startX = Math.random() * 100;
+                const startY = Math.random() * 100;
+                const tx = (Math.random() - 0.5) * 200;
+                const ty = (Math.random() - 0.5) * 200;
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 10 + 15;
+
+                particle.style.left = startX + '%';
+                particle.style.top = startY + '%';
+                particle.style.setProperty('--tx', tx + 'px');
+                particle.style.setProperty('--ty', ty + 'px');
+                particle.style.animationDelay = delay + 's';
+                particle.style.animationDuration = duration + 's';
+
+                particlesDiv.appendChild(particle);
+            }
+        }
+
+        // Sample galaxies (to be customized)
+        const galaxies = [
+            {
+                title: 'Category 1',
+                description: 'Your first galaxy awaits',
+                icon: '🌌',
+                color: 'blue'
+            },
+            {
+                title: 'Category 2',
+                description: 'Explore more wonders',
+                icon: '🪐',
+                color: 'purple'
+            },
+            {
+                title: 'Category 3',
+                description: 'Discover hidden gems',
+                icon: '⭐',
+                color: 'green'
+            },
+            {
+                title: 'Category 4',
+                description: 'Adventures await',
+                icon: '🛸',
+                color: 'orange'
+            }
+        ];
+
+        // Populate galaxy grid
+        function populateGalaxies() {
+            const grid = document.getElementById('galaxyGrid');
+            
+            galaxies.forEach((galaxy, index) => {
+                const galaxyDiv = document.createElement('div');
+                galaxyDiv.className = 'galaxy-cloud';
+                galaxyDiv.innerHTML = `
+                    <div class="cloud-inner">
+                        <div class="cloud-background"></div>
+                        <div class="particles"></div>
+                        <div class="cloud-content">
+                            <div class="cloud-icon">${galaxy.icon}</div>
+                            <div class="cloud-title">${galaxy.title}</div>
+                            <div class="cloud-description">${galaxy.description}</div>
+                        </div>
+                    </div>
+                `;
+                
+                galaxyDiv.addEventListener('click', function() {
+                    handleGalaxyClick(galaxy.title, index);
+                });
+
+                grid.appendChild(galaxyDiv);
+                generateParticles(galaxyDiv);
+            });
+        }
+
+        // Handle galaxy click
+        function handleGalaxyClick(title, index) {
+            console.log(`Navigating to: ${title} (Index: ${index})`);
+            // This will be replaced with actual navigation logic
+            alert(`Welcome to ${title}!\n\nThis category page will be available soon.`);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            generateStars();
+            populateGalaxies();
+        });
+    </script>
+</body>
+</html>
