@@ -358,9 +358,18 @@
     </div>
 
     <script>
+        // Debug - log that the page is loaded
+        console.log('Team Space page loaded successfully');
+        console.log('Window dimensions:', window.innerWidth, 'x', window.innerHeight);
+        
         // Generate starfield
         function generateStars() {
+            console.log('Generating stars...');
             const starfield = document.getElementById('starfield');
+            if (!starfield) {
+                console.error('Starfield element not found!');
+                return;
+            }
             const starCount = 200;
 
             for (let i = 0; i < starCount; i++) {
@@ -381,6 +390,7 @@
 
                 starfield.appendChild(star);
             }
+            console.log('Stars generated: ' + starCount);
         }
 
         // Generate particles in galaxy clouds
@@ -440,7 +450,12 @@
 
         // Populate galaxy grid
         function populateGalaxies() {
+            console.log('Populating galaxies...');
             const grid = document.getElementById('galaxyGrid');
+            if (!grid) {
+                console.error('Galaxy grid element not found!');
+                return;
+            }
             
             galaxies.forEach((galaxy, index) => {
                 const galaxyDiv = document.createElement('div');
@@ -464,6 +479,7 @@
                 grid.appendChild(galaxyDiv);
                 generateParticles(galaxyDiv);
             });
+            console.log('Galaxies populated: ' + galaxies.length);
         }
 
         // Handle galaxy click
