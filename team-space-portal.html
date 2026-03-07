@@ -957,7 +957,46 @@ layout: null
                 title: 'Games',
                 description: 'Explore our interactive games and the engine we used to build them!',
                 icon: '🎮',
-                color: 'blue'
+                color: 'blue',
+                planets: [
+                    {
+                        title: 'Game Builder Engine',
+                        description: 'Interactive game creation platform with visual level editor',
+                        content: `
+                            <h3>Game Builder Engine Overview</h3>
+                            <p>A comprehensive game development platform that allows you to create interactive games with a visual level editor and no coding required. Perfect for rapid prototyping and game design.</p>
+
+                            <h3>Key Features</h3>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li><strong>Visual Level Editor:</strong> Drag-and-drop interface for game design</li>
+                                <li><strong>Sprite System:</strong> Configurable character animations and behavior</li>
+                                <li><strong>Background Assets:</strong> Extensive collection of game backgrounds</li>
+                                <li><strong>NPC Mechanics:</strong> Create interactive NPCs with dialogue systems</li>
+                                <li><strong>Collision Detection:</strong> Advanced hitbox and barrier systems</li>
+                                <li><strong>Player Control:</strong> WASD movement with customizable speed and physics</li>
+                            </ul>
+
+                            <h3>Core Components</h3>
+                            <p><strong>Player System:</strong> Configure sprite-based characters with STEP_FACTOR control for movement speed. Supports multiple animation states and seamless character control.</p>
+                            <p><strong>NPC System:</strong> Create interactive characters with idle animations, collision hitboxes, and dialogue triggers. Perfect for quest-givers and story elements.</p>
+                            <p><strong>Barrier System:</strong> Invisible collision walls that guide player movement and create engaging level design challenges.</p>
+                            <p><strong>Asset Management:</strong> Organize backgrounds and sprites in dedicated directories with automatic asset refreshing.</p>
+
+                            <h3>Game Library</h3>
+                            <p>Browse existing games created with this engine:</p>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li><a href="${window.location.origin}${window.location.pathname}" style="color: #81d4fa; text-decoration: underline;">Arjun's Mini Game Level</a> - Find Kirby in the playground</li>
+                                <li><a href="${window.location.origin}${window.location.pathname}" style="color: #81d4fa; text-decoration: underline;">Lance's Mini Game Basketball</a> - Navigate the court to meet LeBron</li>
+                            </ul>
+
+                            <h3>Getting Started</h3>
+                            <p>Access the Game Builder at <a href="/portfolio/gamebuilder" style="color: #81d4fa; text-decoration: underline;">/gamebuilder</a> to create your own interactive game. Upload custom assets, configure game mechanics, and export your game in minutes!</p>
+
+                            <h3>Technologies</h3>
+                            <p>Built with JavaScript ES6+, featuring modular architecture for easy customization and extension. Supports responsive design for both desktop and mobile gaming experiences.</p>
+                        `
+                    }
+                ]
             },
             {
                 title: 'Blogs',
