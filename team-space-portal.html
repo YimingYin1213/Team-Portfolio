@@ -1,0 +1,1446 @@
+---
+layout: null
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="author" content="Team Space">
+    <meta name="description" content="Team Space CSSE Portfolio Hub - Interactive galaxy navigation">
+    <title>Team Space (CSSE) - Portfolio Hub</title>
+    <style>
+        * {
+            margin: 0 !important;
+            padding: 0 !important;
+            box-sizing: border-box !important;
+        }
+
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0d1b2a 100%) !important;
+            color: #e0e0ff !important;
+            overflow-x: hidden !important;
+        }
+
+        body {
+            min-height: 100vh !important;
+            position: relative !important;
+        }
+
+        /* Animated starfield background */
+        .stars {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 1 !important;
+            pointer-events: none !important;
+        }
+
+        .star {
+            position: absolute !important;
+            background: white !important;
+            border-radius: 50% !important;
+            animation: twinkle 3s infinite !important;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Main container */
+        .container {
+            position: relative !important;
+            z-index: 10 !important;
+            width: 100% !important;
+            min-height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 40px 20px !important;
+        }
+
+        /* Header */
+        .header {
+            text-align: center !important;
+            margin-bottom: 60px !important;
+            animation: fadeInDown 1s ease-out !important;
+        }
+
+        .header h1 {
+            font-size: 4rem !important;
+            margin-bottom: 10px !important;
+            color: #64b5f6 !important;
+            letter-spacing: 3px !important;
+            text-shadow: 0 0 30px rgba(100, 181, 246, 0.6), 0 0 60px rgba(129, 212, 250, 0.4) !important;
+        }
+
+        .header p {
+            font-size: 1.3rem !important;
+            color: #81d4fa !important;
+            letter-spacing: 2px !important;
+            font-style: italic !important;
+            text-shadow: 0 0 20px rgba(129, 212, 250, 0.4) !important;
+        }
+
+        .subtitle {
+            font-size: 0.9rem !important;
+            color: #90caf9 !important;
+            margin-top: 15px !important;
+            opacity: 0.8 !important;
+        }
+
+        /* Galaxy clouds grid */
+        .galaxy-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+            gap: 40px !important;
+            max-width: 1400px !important;
+            margin: 60px auto !important;
+            padding: 0 20px !important;
+            width: 100% !important;
+        }
+
+        /* Galaxy cloud card */
+        .galaxy-cloud {
+            position: relative !important;
+            height: 350px !important;
+            cursor: pointer !important;
+            perspective: 1000px !important;
+            animation: float 6s ease-in-out infinite !important;
+        }
+
+        .galaxy-cloud:nth-child(1) { animation-delay: 0s !important; }
+        .galaxy-cloud:nth-child(2) { animation-delay: 1s !important; }
+        .galaxy-cloud:nth-child(3) { animation-delay: 2s !important; }
+        .galaxy-cloud:nth-child(4) { animation-delay: 1.5s !important; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .cloud-inner {
+            width: 100% !important;
+            height: 100% !important;
+            position: relative !important;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+            transform-style: preserve-3d !important;
+        }
+
+        .galaxy-cloud:hover .cloud-inner {
+            transform: scale(1.05) rotateY(5deg) !important;
+        }
+
+        /* Cloud background with glow effect */
+        .cloud-background {
+            position: absolute !important;
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50% !important;
+            background: radial-gradient(circle at 30% 30%, rgba(100, 181, 246, 0.4), rgba(33, 150, 243, 0.2), transparent) !important;
+            border: 2px solid rgba(129, 212, 250, 0.5) !important;
+            box-shadow: 
+                0 0 30px rgba(100, 181, 246, 0.4),
+                inset 0 0 30px rgba(129, 212, 250, 0.2),
+                0 0 60px rgba(33, 150, 243, 0.3) !important;
+            filter: blur(1px) !important;
+        }
+
+        .galaxy-cloud:nth-child(1) .cloud-background {
+            background: radial-gradient(circle at 30% 30%, rgba(100, 181, 246, 0.4), rgba(33, 150, 243, 0.2), transparent) !important;
+            box-shadow: 
+                0 0 30px rgba(100, 181, 246, 0.4),
+                inset 0 0 30px rgba(129, 212, 250, 0.2),
+                0 0 60px rgba(33, 150, 243, 0.3) !important;
+        }
+
+        .galaxy-cloud:nth-child(2) .cloud-background {
+            background: radial-gradient(circle at 30% 30%, rgba(156, 39, 176, 0.4), rgba(103, 58, 183, 0.2), transparent) !important;
+            box-shadow: 
+                0 0 30px rgba(156, 39, 176, 0.4),
+                inset 0 0 30px rgba(171, 71, 188, 0.2),
+                0 0 60px rgba(103, 58, 183, 0.3) !important;
+        }
+
+        .galaxy-cloud:nth-child(3) .cloud-background {
+            background: radial-gradient(circle at 30% 30%, rgba(76, 175, 80, 0.4), rgba(56, 142, 60, 0.2), transparent) !important;
+            box-shadow: 
+                0 0 30px rgba(76, 175, 80, 0.4),
+                inset 0 0 30px rgba(102, 187, 106, 0.2),
+                0 0 60px rgba(56, 142, 60, 0.3) !important;
+        }
+
+        .galaxy-cloud:nth-child(4) .cloud-background {
+            background: radial-gradient(circle at 30% 30%, rgba(255, 152, 0, 0.4), rgba(255, 111, 0, 0.2), transparent) !important;
+            box-shadow: 
+                0 0 30px rgba(255, 152, 0, 0.4),
+                inset 0 0 30px rgba(255, 167, 38, 0.2),
+                0 0 60px rgba(255, 111, 0, 0.3) !important;
+        }
+
+        /* Animated particles inside cloud */
+        .particles {
+            position: absolute !important;
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50% !important;
+            overflow: hidden !important;
+        }
+
+        .particle {
+            position: absolute !important;
+            width: 3px !important;
+            height: 3px !important;
+            background: rgba(255, 255, 255, 0.6) !important;
+            border-radius: 50% !important;
+            animation: drift 15s infinite linear !important;
+        }
+
+        @keyframes drift {
+            0% {
+                opacity: 0;
+                transform: translate(0, 0);
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty));
+            }
+        }
+
+        /* Cloud content */
+        .cloud-content {
+            position: absolute !important;
+            width: 100% !important;
+            height: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 5 !important;
+        }
+
+        .cloud-icon {
+            font-size: 4rem !important;
+            margin-bottom: 15px !important;
+            filter: drop-shadow(0 0 10px rgba(100, 181, 246, 0.6)) !important;
+            animation: pulse 2s ease-in-out infinite !important;
+        }
+
+        .cloud-title {
+            font-size: 1.8rem !important;
+            font-weight: 700 !important;
+            text-align: center !important;
+            margin-bottom: 8px !important;
+            color: #ffffff !important;
+            text-shadow: 0 0 20px rgba(100, 181, 246, 0.5) !important;
+        }
+
+        .cloud-description {
+            font-size: 0.9rem !important;
+            color: #b0bec5 !important;
+            text-align: center !important;
+            opacity: 0.8 !important;
+        }
+
+        /* Instructions */
+        .instructions {
+            position: relative !important;
+            text-align: center !important;
+            font-size: 0.95rem !important;
+            color: #90caf9 !important;
+            opacity: 0.8 !important;
+            margin-top: 40px !important;
+            animation: fadeInUp 1s ease-out 0.5s backwards !important;
+        }
+
+        .scroll-indicator {
+            display: inline-block !important;
+            margin-top: 10px !important;
+            animation: bounce 2s infinite !important;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Planet/Sub-item styles */
+        .planets-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+            gap: 50px !important;
+            margin-top: 40px !important;
+            padding: 20px !important;
+        }
+
+        .planet {
+            position: relative !important;
+            height: 300px !important;
+            cursor: pointer !important;
+            perspective: 1000px !important;
+            animation: float 6s ease-in-out infinite !important;
+        }
+
+        .planet:hover .planet-inner {
+            transform: scale(1.08) rotateY(-5deg) !important;
+        }
+
+        .planet-inner {
+            width: 100% !important;
+            height: 100% !important;
+            position: relative !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 20px !important;
+            text-align: center !important;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+            transform-style: preserve-3d !important;
+            overflow: hidden !important;
+        }
+
+        /* Detailed planet surface */
+        .planet-surface {
+            position: absolute !important;
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50% !important;
+            z-index: 1 !important;
+        }
+
+        /* Atmosphere glow effect */
+        .planet-atmosphere {
+            position: absolute !important;
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50% !important;
+            box-shadow: 
+                inset -20px -20px 60px rgba(0, 0, 0, 0.5),
+                inset 20px 20px 60px rgba(255, 255, 255, 0.1),
+                0 0 40px rgba(100, 181, 246, 0.6) !important;
+            z-index: 2 !important;
+        }
+
+        /* Planet rings */
+        .planet-ring {
+            position: absolute !important;
+            border-radius: 50% !important;
+            border: 3px solid rgba(255, 200, 100, 0.4) !important;
+            z-index: 0 !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) rotateX(75deg) !important;
+        }
+
+        /* Planet content overlay */
+        .planet-content {
+            position: relative !important;
+            z-index: 3 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 100% !important;
+        }
+
+        .planet-title {
+            font-size: 1.6rem !important;
+            font-weight: 700 !important;
+            color: #ffffff !important;
+            margin-bottom: 10px !important;
+            text-shadow: 
+                0 0 10px rgba(100, 181, 246, 0.8),
+                0 0 20px rgba(33, 150, 243, 0.6) !important;
+            z-index: 4 !important;
+            position: relative !important;
+        }
+
+        .planet-description {
+            font-size: 0.85rem !important;
+            color: #b0bec5 !important;
+            opacity: 0.95 !important;
+            z-index: 4 !important;
+            position: relative !important;
+        }
+
+        /* Planet type variations */
+        .planet-ice {
+            background: radial-gradient(circle at 30% 30%, #ffffff, #e3f2fd, #1565c0) !important;
+        }
+
+        .planet-lava {
+            background: radial-gradient(circle at 30% 30%, #ffeb3b, #ff6f00, #1a0000) !important;
+        }
+
+        .planet-gas {
+            background: radial-gradient(circle at 35% 35%, #ff9800, #ff7043, #4a235a) !important;
+        }
+
+        .planet-ocean {
+            background: radial-gradient(circle at 35% 35%, #4dd0e1, #00bcd4, #0d47a1) !important;
+        }
+
+        .planet-jungle {
+            background: radial-gradient(circle at 30% 30%, #66bb6a, #2e7d32, #1b5e20) !important;
+        }
+
+        /* Rocket styles */
+        .rocket-container {
+            position: fixed !important;
+            left: calc(100% - 100px) !important;
+            top: calc(100% - 150px) !important;
+            z-index: 999 !important;
+            user-select: none !important;
+            width: 60px !important;
+            height: 80px !important;
+        }
+
+        .rocket {
+            position: relative !important;
+            width: 60px !important;
+            height: 80px !important;
+            cursor: grab !important;
+            animation: rocketFloat 3s ease-in-out infinite !important;
+        }
+
+        .rocket:active {
+            cursor: grabbing !important;
+        }
+
+        .rocket-body {
+            position: absolute !important;
+            width: 40px !important;
+            height: 50px !important;
+            background: linear-gradient(90deg, #ff6b9d 0%, #ff8a80 50%, #ff6b9d 100%) !important;
+            border-radius: 10px 10px 20px 20px !important;
+            left: 10px !important;
+            top: 10px !important;
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.6) !important;
+        }
+
+        .rocket-window {
+            position: absolute !important;
+            width: 20px !important;
+            height: 20px !important;
+            background: radial-gradient(circle at 35% 35%, #ffffff, #64b5f6) !important;
+            border-radius: 50% !important;
+            left: 20px !important;
+            top: 15px !important;
+            box-shadow: inset 0 0 10px rgba(100, 181, 246, 0.5) !important;
+        }
+
+        .rocket-fins {
+            position: absolute !important;
+            bottom: 0px !important;
+            left: 10px !important;
+        }
+
+        .rocket-fin {
+            position: absolute !important;
+            width: 0 !important;
+            height: 0 !important;
+            border-left: 8px solid transparent !important;
+            border-right: 8px solid transparent !important;
+            border-bottom: 15px solid #ff6b9d !important;
+        }
+
+        .rocket-fin-left {
+            left: -5px !important;
+            transform: skewX(-10deg) !important;
+        }
+
+        .rocket-fin-right {
+            right: -5px !important;
+            transform: skewX(10deg) !important;
+        }
+
+        .rocket-flame {
+            position: absolute !important;
+            bottom: -20px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 20px !important;
+            height: 25px !important;
+            background: linear-gradient(180deg, #ffeb3b 0%, #ff9800 50%, transparent 100%) !important;
+            border-radius: 50% 50% 0 0 !important;
+            filter: blur(2px) !important;
+            animation: flame 0.3s ease-in-out infinite !important;
+        }
+
+        @keyframes rocketFloat {
+            0%, 100% { transform: translateY(0px) rotate(-15deg); }
+            50% { transform: translateY(-20px) rotate(-15deg); }
+        }
+
+        @keyframes flame {
+            0%, 100% { 
+                opacity: 0.7;
+                height: 25px;
+            }
+            50% { 
+                opacity: 1;
+                height: 35px;
+            }
+        }
+
+        .rocket-tooltip {
+            position: absolute !important;
+            bottom: 100px !important;
+            right: 0 !important;
+            background: rgba(0, 0, 0, 0.8) !important;
+            color: #81d4fa !important;
+            padding: 8px 12px !important;
+            border-radius: 5px !important;
+            white-space: nowrap !important;
+            font-size: 0.85rem !important;
+            opacity: 0 !important;
+            transition: opacity 0.3s !important;
+            border: 1px solid rgba(129, 212, 250, 0.6) !important;
+        }
+
+        .rocket-container:hover .rocket-tooltip {
+            opacity: 1 !important;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none !important;
+            position: fixed !important;
+            z-index: 1000 !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background-color: rgba(0, 0, 0, 0.8) !important;
+            animation: fadeIn 0.3s ease !important;
+        }
+
+        .modal.active {
+            display: block !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0d1b2a 100%) !important;
+            margin: 5% auto !important;
+            padding: 40px !important;
+            border: 2px solid rgba(129, 212, 250, 0.5) !important;
+            border-radius: 20px !important;
+            width: 90% !important;
+            max-width: 800px !important;
+            max-height: 80vh !important;
+            overflow-y: auto !important;
+            box-shadow: 
+                0 0 50px rgba(100, 181, 246, 0.4),
+                inset 0 0 30px rgba(129, 212, 250, 0.1) !important;
+            animation: slideIn 0.4s ease !important;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 30px !important;
+            border-bottom: 2px solid rgba(129, 212, 250, 0.3) !important;
+            padding-bottom: 20px !important;
+        }
+
+        .modal-title {
+            font-size: 2.2rem !important;
+            color: #64b5f6 !important;
+            text-shadow: 0 0 20px rgba(100, 181, 246, 0.5) !important;
+        }
+
+        .close-btn {
+            font-size: 2rem !important;
+            font-weight: bold !important;
+            color: #81d4fa !important;
+            cursor: pointer !important;
+            background: none !important;
+            border: none !important;
+            transition: color 0.3s !important;
+        }
+
+        .close-btn:hover {
+            color: #ff6b9d !important;
+        }
+
+        .modal-body {
+            color: #e0e0ff !important;
+            line-height: 1.8 !important;
+            font-size: 1.05rem !important;
+        }
+
+        .modal-body h3 {
+            color: #81d4fa !important;
+            margin-top: 25px !important;
+            margin-bottom: 15px !important;
+            font-size: 1.4rem !important;
+            text-shadow: 0 0 10px rgba(129, 212, 250, 0.4) !important;
+        }
+
+        .modal-body h3:first-child {
+            margin-top: 0 !important;
+        }
+
+        .modal-body p {
+            margin-bottom: 15px !important;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .planets-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .modal-content {
+                width: 95% !important;
+                padding: 20px !important;
+            }
+
+            .modal-title {
+                font-size: 1.6rem !important;
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem !important;
+            }
+
+            .header p {
+                font-size: 1rem !important;
+            }
+
+            .galaxy-grid {
+                grid-template-columns: 1fr !important;
+                gap: 30px !important;
+            }
+
+            .galaxy-cloud {
+                height: 300px !important;
+            }
+
+            .cloud-title {
+                font-size: 1.5rem !important;
+            }
+
+            .cloud-icon {
+                font-size: 3rem !important;
+            }
+        }
+
+        /* Link styling */
+        a {
+            text-decoration: none !important;
+            color: inherit !important;
+            display: block;
+        }
+
+        /* View toggle controls */
+        .view-toggle {
+            position: fixed !important;
+            bottom: 30px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            display: flex !important;
+            gap: 15px !important;
+            z-index: 998 !important;
+            background: rgba(0, 0, 0, 0.6) !important;
+            padding: 12px 20px !important;
+            border-radius: 30px !important;
+            border: 2px solid rgba(129, 212, 250, 0.5) !important;
+            backdrop-filter: blur(10px) !important;
+        }
+
+        .view-btn {
+            background: linear-gradient(135deg, rgba(100, 181, 246, 0.3), rgba(33, 150, 243, 0.2)) !important;
+            border: 2px solid rgba(129, 212, 250, 0.4) !important;
+            color: #81d4fa !important;
+            padding: 8px 18px !important;
+            border-radius: 20px !important;
+            cursor: pointer !important;
+            font-size: 0.95rem !important;
+            font-weight: 600 !important;
+            transition: all 0.3s !important;
+        }
+
+        .view-btn:hover {
+            background: linear-gradient(135deg, rgba(100, 181, 246, 0.5), rgba(33, 150, 243, 0.4)) !important;
+            box-shadow: 0 0 15px rgba(129, 212, 250, 0.6) !important;
+            transform: scale(1.05) !important;
+        }
+
+        .view-btn.active {
+            background: linear-gradient(135deg, rgba(100, 181, 246, 0.8), rgba(33, 150, 243, 0.6)) !important;
+            box-shadow: 0 0 25px rgba(129, 212, 250, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
+            border-color: rgba(129, 212, 250, 0.8) !important;
+        }
+
+        /* Traveler view styles */
+        .traveler-view {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            overflow: hidden !important;
+            perspective: 1000px !important;
+        }
+
+        .traveler-space {
+            position: absolute !important;
+            width: 200% !important;
+            height: 200% !important;
+            top: -50% !important;
+            left: -50% !important;
+        }
+
+        .galaxy-cloud-traveler {
+            position: absolute !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            cursor: pointer !important;
+        }
+
+        .planet-traveler {
+            position: absolute !important;
+            cursor: pointer !important;
+        }
+
+        .hud-display {
+            position: fixed !important;
+            top: 20px !important;
+            left: 20px !important;
+            background: rgba(0, 0, 0, 0.7) !important;
+            border: 2px solid rgba(129, 212, 250, 0.5) !important;
+            padding: 15px 25px !important;
+            border-radius: 10px !important;
+            color: #81d4fa !important;
+            z-index: 100 !important;
+            font-family: 'Courier New', monospace !important;
+            font-size: 0.9rem !important;
+            display: none !important;
+        }
+
+        .hud-display.active {
+            display: block !important;
+        }
+
+        .hud-display p {
+            margin: 5px 0 !important;
+            color: #81d4fa !important;
+        }
+
+        .hud-display .label {
+            color: #64b5f6 !important;
+            font-weight: bold !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Starfield background -->
+    <div class="stars" id="starfield"></div>
+
+    <!-- Main container -->
+    <div class="container" id="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>TEAM SPACE</h1>
+            <p>CSSE PORTFOLIO</p>
+            <div class="subtitle">Navigate through the galaxy of our projects and files</div>
+        </div>
+
+        <!-- Galaxy clouds grid -->
+        <div class="galaxy-grid" id="galaxyGrid">
+            <!-- Galaxy clouds will be populated here -->
+        </div>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <p>✨ Click on any galaxy to explore its contents ✨</p>
+            <div class="scroll-indicator">↓ Scroll to see more ↓</div>
+        </div>
+    </div>
+
+    <!-- View Toggle Controls -->
+    <div class="view-toggle" id="viewToggle">
+        <button class="view-btn active" id="listViewBtn" onclick="switchToListView()">📋 View as List</button>
+        <button class="view-btn" id="travelerViewBtn" onclick="switchToTravelerView()">🚀 View as Traveler</button>
+    </div>
+
+    <!-- Traveler View -->
+    <div class="traveler-view" id="travelerView" style="display: none;">
+        <div class="traveler-space" id="travelerSpace"></div>
+        <div class="hud-display" id="hudDisplay">
+            <p><span class="label">SECTOR SCAN:</span> <span id="hudCoords">0.0, 0.0</span></p>
+            <p><span class="label">DISTANCE:</span> <span id="hudDistance">N/A</span></p>
+        </div>
+    </div>
+
+    <!-- Controllable Rocket -->
+    <div class="rocket-container" id="rocketContainer">
+        <div class="rocket-tooltip">Use arrow keys or WASD to move the rocket!</div>
+        <div class="rocket" id="rocket">
+            <div class="rocket-body">
+                <div class="rocket-window"></div>
+            </div>
+            <div class="rocket-fins">
+                <div class="rocket-fin rocket-fin-left"></div>
+                <div class="rocket-fin rocket-fin-right"></div>
+            </div>
+            <div class="rocket-flame"></div>
+        </div>
+    </div>
+
+    <script>
+        // Debug - log that the page is loaded
+        console.log('Team Space page loaded successfully');
+        console.log('Window dimensions:', window.innerWidth, 'x', window.innerHeight);
+        
+        // Generate starfield
+        function generateStars() {
+            console.log('Generating stars...');
+            const starfield = document.getElementById('starfield');
+            if (!starfield) {
+                console.error('Starfield element not found!');
+                return;
+            }
+            const starCount = 200;
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const size = Math.random() * 2.5 + 0.5;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const duration = Math.random() * 3 + 2;
+
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = x + '%';
+                star.style.top = y + '%';
+                star.style.animationDuration = duration + 's';
+                star.style.animationDelay = Math.random() * 3 + 's';
+
+                starfield.appendChild(star);
+            }
+            console.log('Stars generated: ' + starCount);
+        }
+
+        // Generate particles in galaxy clouds
+        function generateParticles(container) {
+            const particleCount = 20;
+            const particlesDiv = container.querySelector('.particles');
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+
+                const startX = Math.random() * 100;
+                const startY = Math.random() * 100;
+                const tx = (Math.random() - 0.5) * 200;
+                const ty = (Math.random() - 0.5) * 200;
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 10 + 15;
+
+                particle.style.left = startX + '%';
+                particle.style.top = startY + '%';
+                particle.style.setProperty('--tx', tx + 'px');
+                particle.style.setProperty('--ty', ty + 'px');
+                particle.style.animationDelay = delay + 's';
+                particle.style.animationDuration = duration + 's';
+
+                particlesDiv.appendChild(particle);
+            }
+        }
+
+        // Sample galaxies (to be customized)
+        const galaxies = [
+            {
+                title: 'Games',
+                description: 'Explore our interactive games and the engine we used to build them!',
+                icon: '🎮',
+                color: 'blue'
+            },
+            {
+                title: 'Blogs',
+                description: 'Read our blogs to know about our development process and insights',
+                icon: '📝',
+                color: 'purple',
+                planets: [
+                    {
+                        title: "Arjun's Mini Game Level",
+                        description: 'Find Kirby hiding in the corner',
+                        content: `
+                            <h3>Game Concept</h3>
+                            <p>Find Kirby hiding in the corner of the map</p>
+
+                            <h3>Configured Objects</h3>
+                            <p><strong>Background:</strong> tagplayground.png — sets the retro indoor court scene</p>
+                            <p><strong>Player:</strong> Boy sprite — WASD-controlled, starts at left baseline</p>
+                            <p><strong>NPC:</strong> Kirby — idle at right top of map, triggers dialogue on interaction</p>
+                            <p><strong>Barriers:</strong> Multiple invisible walls blocking paths around the court</p>
+
+                            <h3>Key Configuration Decisions</h3>
+                            <p><strong>STEP_FACTOR:</strong> 400 — faster movement than default</p>
+                            <p><strong>Speed on NPC:</strong> 0 — prevents Kirby from moving</p>
+                            <p><strong>Columns on all NPC directions:</strong> 1 — freezes on single idle frame</p>
+                            <p><strong>Hitbox on NPC:</strong> 0.01 — allows player to walk close enough to interact</p>
+                        `
+                    },
+                    {
+                        title: "Lance's Mini Game Basketball",
+                        description: 'Navigate the court to reach LeBron James',
+                        content: `
+                            <h3>Game Concept</h3>
+                            <p>A basketball court mini game where the player navigates around barriers (trash can, benches, and hidden barriers) to reach LeBron James at the right side of the court and trigger dialogue.</p>
+
+                            <h3>Configured Objects</h3>
+                            <p><strong>Background:</strong> BasketballCourt/Court.png — sets the retro indoor court scene</p>
+                            <p><strong>Player:</strong> BasketballPlayer sprite — WASD-controlled, starts at left baseline</p>
+                            <p><strong>NPC:</strong> LeBron James — idle at right of court, triggers dialogue on interaction</p>
+                            <p><strong>Barriers:</strong> 4 invisible walls blocking paths around the court</p>
+
+                            <h3>Key Configuration Decisions</h3>
+                            <p><strong>STEP_FACTOR:</strong> 400 — faster movement than default</p>
+                            <p><strong>Speed on NPC:</strong> 0 — prevents LeBron from wandering</p>
+                            <p><strong>Columns on all NPC directions:</strong> 1 — freezes on single idle frame</p>
+                            <p><strong>Hitbox on NPC:</strong> 0.01 — allows player to walk close enough to interact</p>
+                        `
+                    }
+                ]
+            },
+            {
+                title: 'Individual Contribution',
+                description: 'Discover individual team member work',
+                icon: '👤',
+                color: 'green',
+                planets: [
+                    {
+                        title: "Yiming",
+                        description: 'Team member contributions and projects',
+                        content: `
+                            <h3>Yiming's Contributions</h3>
+                            <p>Coming soon - View Yiming's individual projects, code contributions, and team work.</p>
+                        `
+                    },
+                    {
+                        title: "Lance",
+                        description: 'Team member contributions and projects',
+                        content: `
+                            <h3>Lance's Contributions</h3>
+                            <p>Coming soon - View Lance's individual projects, code contributions, and team work.</p>
+                        `
+                    },
+                    {
+                        title: "Arjun",
+                        description: 'Team member contributions and projects',
+                        content: `
+                            <h3>Arjun's Contributions</h3>
+                            <p>Coming soon - View Arjun's individual projects, code contributions, and team work.</p>
+                        `
+                    }
+                ]
+            },
+            {
+                title: 'Trivia',
+                description: 'Unrelated topics/behind the scenes.',
+                icon: '🧠',
+                color: 'orange'
+            }
+        ];
+
+        // Populate galaxy grid
+        function populateGalaxies() {
+            console.log('Populating galaxies...');
+            const grid = document.getElementById('galaxyGrid');
+            if (!grid) {
+                console.error('Galaxy grid element not found!');
+                return;
+            }
+            
+            galaxies.forEach((galaxy, index) => {
+                const galaxyDiv = document.createElement('div');
+                galaxyDiv.className = 'galaxy-cloud';
+                galaxyDiv.innerHTML = `
+                    <div class="cloud-inner">
+                        <div class="cloud-background"></div>
+                        <div class="particles"></div>
+                        <div class="cloud-content">
+                            <div class="cloud-icon">${galaxy.icon}</div>
+                            <div class="cloud-title">${galaxy.title}</div>
+                            <div class="cloud-description">${galaxy.description}</div>
+                        </div>
+                    </div>
+                `;
+                
+                galaxyDiv.addEventListener('click', function() {
+                    handleGalaxyClick(galaxy.title, index);
+                });
+
+                grid.appendChild(galaxyDiv);
+                generateParticles(galaxyDiv);
+            });
+            console.log('Galaxies populated: ' + galaxies.length);
+        }
+
+        // Handle galaxy click
+        function handleGalaxyClick(title, index) {
+            console.log(`Navigating to: ${title} (Index: ${index})`);
+            const galaxy = galaxies[index];
+            
+            // If galaxy has planets, show them instead of alert
+            if (galaxy.planets && galaxy.planets.length > 0) {
+                showPlanets(galaxy);
+            } else {
+                alert(`Welcome to ${title}!\n\nThis category page will be available soon.`);
+            }
+        }
+
+        // Show planets for a galaxy
+        function showPlanets(galaxy) {
+            const container = document.getElementById('galaxyGrid');
+            const currentGalaxies = document.querySelectorAll('.galaxy-cloud');
+            
+            // Hide current galaxies
+            currentGalaxies.forEach(g => g.style.display = 'none');
+            
+            // Create planets container
+            const planetsContainer = document.createElement('div');
+            planetsContainer.id = 'planetsContainer';
+            planetsContainer.innerHTML = `
+                <div style="width: 100%; text-align: center; margin-bottom: 40px;">
+                    <button onclick="backToGalaxies()" style="
+                        background: linear-gradient(135deg, rgba(100, 181, 246, 0.3), rgba(33, 150, 243, 0.2));
+                        border: 2px solid rgba(129, 212, 250, 0.6);
+                        color: #81d4fa;
+                        padding: 10px 25px;
+                        font-size: 1rem;
+                        border-radius: 25px;
+                        cursor: pointer;
+                        transition: all 0.3s;
+                    " onmouseover="this.style.boxShadow='0 0 20px rgba(129, 212, 250, 0.6)'" onmouseout="this.style.boxShadow='none'">
+                        ← Back to Galaxies
+                    </button>
+                </div>
+                <h2 style="text-align: center; color: #81d4fa; font-size: 2rem; margin-bottom: 40px; text-shadow: 0 0 20px rgba(129, 212, 250, 0.5);">${galaxy.title}</h2>
+                <div class="planets-grid" id="planetsGrid"></div>
+            `;
+            
+            container.appendChild(planetsContainer);
+            
+            // Planet type colors
+            const planetTypes = ['ice', 'lava', 'gas', 'ocean', 'jungle'];
+            
+            // Create planet elements
+            const planetsGrid = document.getElementById('planetsGrid');
+            galaxy.planets.forEach((planet, index) => {
+                const planetDiv = document.createElement('div');
+                planetDiv.className = 'planet';
+                const planetType = planetTypes[index % planetTypes.length];
+                
+                planetDiv.innerHTML = `
+                    <div class="planet-inner">
+                        <div class="planet-surface planet-${planetType}"></div>
+                        <div class="planet-atmosphere"></div>
+                        <div class="planet-ring" style="width: 150px; height: 40px; border-width: 2px;"></div>
+                        <div class="planet-content">
+                            <div class="planet-title">${planet.title}</div>
+                            <div class="planet-description">${planet.description}</div>
+                        </div>
+                    </div>
+                `;
+                
+                planetDiv.addEventListener('click', () => {
+                    openPlanetModal(planet);
+                });
+                
+                planetsGrid.appendChild(planetDiv);
+            });
+        }
+
+        // Back to galaxies view
+        function backToGalaxies() {
+            const planetsContainer = document.getElementById('planetsContainer');
+            if (planetsContainer) {
+                planetsContainer.remove();
+            }
+            
+            const currentGalaxies = document.querySelectorAll('.galaxy-cloud');
+            currentGalaxies.forEach(g => g.style.display = 'block');
+        }
+
+        // Open planet modal
+        function openPlanetModal(planet) {
+            // Remove existing modal if any
+            const existingModal = document.getElementById('planetModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Create modal
+            const modal = document.createElement('div');
+            modal.id = 'planetModal';
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">${planet.title}</h2>
+                        <button class="close-btn" onclick="closePlanetModal()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        ${planet.content}
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Close modal on background click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closePlanetModal();
+                }
+            });
+        }
+
+        // Close planet modal
+        function closePlanetModal() {
+            const modal = document.getElementById('planetModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Rocket control system
+        const rocketState = {
+            x: window.innerWidth - 100,
+            y: window.innerHeight - 150,
+            vx: 0,
+            vy: 0,
+            speed: 5,
+            friction: 0.95
+        };
+
+        const keys = {};
+
+        // Handle rocket movement
+        function updateRocketPosition() {
+            const rocket = document.getElementById('rocket');
+            if (!rocket) return;
+
+            // Handle key presses
+            if (keys['ArrowLeft'] || keys['a'] || keys['A']) rocketState.vx -= rocketState.speed;
+            if (keys['ArrowRight'] || keys['d'] || keys['D']) rocketState.vx += rocketState.speed;
+            if (keys['ArrowUp'] || keys['w'] || keys['W']) rocketState.vy -= rocketState.speed;
+            if (keys['ArrowDown'] || keys['s'] || keys['S']) rocketState.vy += rocketState.speed;
+
+            // Apply friction
+            rocketState.vx *= rocketState.friction;
+            rocketState.vy *= rocketState.friction;
+
+            // Update position
+            rocketState.x += rocketState.vx;
+            rocketState.y += rocketState.vy;
+
+            // Boundary constraints
+            rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 70));
+            rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 110));
+
+            // Update rocket container position
+            const rocketContainer = document.getElementById('rocketContainer');
+            if (rocketContainer) {
+                rocketContainer.style.left = rocketState.x + 'px';
+                rocketContainer.style.top = rocketState.y + 'px';
+            }
+
+            requestAnimationFrame(updateRocketPosition);
+        }
+
+        // Mouse dragging for rocket
+        let isDraggingRocket = false;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+
+        // Rocket dragging
+        document.addEventListener('mousedown', (e) => {
+            const rocketContainer = document.getElementById('rocketContainer');
+            if (rocketContainer && rocketContainer.contains(e.target)) {
+                isDraggingRocket = true;
+                dragOffsetX = e.clientX - rocketState.x;
+                dragOffsetY = e.clientY - rocketState.y;
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDraggingRocket) {
+                rocketState.x = e.clientX - dragOffsetX;
+                rocketState.y = e.clientY - dragOffsetY;
+
+                // Boundary constraints
+                rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 70));
+                rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 110));
+
+                const rocketContainer = document.getElementById('rocketContainer');
+                if (rocketContainer) {
+                    rocketContainer.style.left = rocketState.x + 'px';
+                    rocketContainer.style.top = rocketState.y + 'px';
+                }
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDraggingRocket = false;
+        });
+
+        // View management system
+        let currentView = 'list';
+        let travelerGalaxies = [];
+
+        function switchToListView() {
+            currentView = 'list';
+            document.getElementById('container').style.display = 'flex';
+            document.getElementById('travelerView').style.display = 'none';
+            document.getElementById('listViewBtn').classList.add('active');
+            document.getElementById('travelerViewBtn').classList.remove('active');
+            document.getElementById('hudDisplay').classList.remove('active');
+        }
+
+        function switchToTravelerView() {
+            currentView = 'traveler';
+            document.getElementById('container').style.display = 'none';
+            document.getElementById('travelerView').style.display = 'block';
+            document.getElementById('listViewBtn').classList.remove('active');
+            document.getElementById('travelerViewBtn').classList.add('active');
+            document.getElementById('hudDisplay').classList.add('active');
+            
+            if (travelerGalaxies.length === 0) {
+                initializeTravelerView();
+            }
+        }
+
+        function initializeTravelerView() {
+            const travelerSpace = document.getElementById('travelerSpace');
+            travelerSpace.innerHTML = '';
+            travelerGalaxies = [];
+
+            // Generate random non-overlapping positions for galaxies
+            const positions = generateNonOverlappingPositions(galaxies.length, 250, 200, 1900, 1900);
+
+            galaxies.forEach((galaxy, index) => {
+                const pos = positions[index];
+                const galaxyDiv = document.createElement('div');
+                galaxyDiv.className = 'galaxy-cloud-traveler';
+                galaxyDiv.style.left = pos.x + 'px';
+                galaxyDiv.style.top = pos.y + 'px';
+                galaxyDiv.style.width = '200px';
+                galaxyDiv.style.height = '200px';
+                
+                galaxyDiv.innerHTML = `
+                    <div class="cloud-inner" style="width: 100%; height: 100%; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <div class="cloud-background" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 1;"></div>
+                        <div class="cloud-atmosphere" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 2;"></div>
+                        <div class="cloud-content" style="position: relative; z-index: 3; text-align: center;">
+                            <div class="cloud-icon" style="font-size: 3rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(100, 181, 246, 0.6));">${galaxy.icon}</div>
+                            <div class="cloud-title" style="font-size: 1.2rem; font-weight: 700; color: #ffffff; text-shadow: 0 0 10px rgba(100, 181, 246, 0.5);">${galaxy.title}</div>
+                        </div>
+                    </div>
+                `;
+
+                // Set galaxy-specific colors
+                const cloudBackground = galaxyDiv.querySelector('.cloud-background');
+                const cloudAtmosphere = galaxyDiv.querySelector('.cloud-atmosphere');
+                
+                if (galaxy.color === 'blue') {
+                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(100, 181, 246, 0.4), rgba(33, 150, 243, 0.2), transparent)';
+                    cloudBackground.style.boxShadow = '0 0 30px rgba(100, 181, 246, 0.4), inset 0 0 30px rgba(129, 212, 250, 0.2), 0 0 60px rgba(33, 150, 243, 0.3)';
+                } else if (galaxy.color === 'purple') {
+                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(156, 39, 176, 0.4), rgba(103, 58, 183, 0.2), transparent)';
+                    cloudBackground.style.boxShadow = '0 0 30px rgba(156, 39, 176, 0.4), inset 0 0 30px rgba(171, 71, 188, 0.2), 0 0 60px rgba(103, 58, 183, 0.3)';
+                } else if (galaxy.color === 'green') {
+                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(76, 175, 80, 0.4), rgba(56, 142, 60, 0.2), transparent)';
+                    cloudBackground.style.boxShadow = '0 0 30px rgba(76, 175, 80, 0.4), inset 0 0 30px rgba(102, 187, 106, 0.2), 0 0 60px rgba(56, 142, 60, 0.3)';
+                } else if (galaxy.color === 'orange') {
+                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(255, 152, 0, 0.4), rgba(255, 111, 0, 0.2), transparent)';
+                    cloudBackground.style.boxShadow = '0 0 30px rgba(255, 152, 0, 0.4), inset 0 0 30px rgba(255, 167, 38, 0.2), 0 0 60px rgba(255, 111, 0, 0.3)';
+                }
+
+                galaxyDiv.addEventListener('click', () => {
+                    handleGalaxyClick(galaxy.title, index);
+                });
+
+                travelerSpace.appendChild(galaxyDiv);
+                
+                // Add planets if they exist
+                if (galaxy.planets && galaxy.planets.length > 0) {
+                    const planetPositions = generateNonOverlappingPositions(galaxy.planets.length, 120, 100, pos.x + 300, pos.y + 300);
+                    const planetTypes = ['ice', 'lava', 'gas', 'ocean', 'jungle'];
+                    
+                    galaxy.planets.forEach((planet, pIndex) => {
+                        const pPos = planetPositions[pIndex];
+                        const planetDiv = document.createElement('div');
+                        planetDiv.className = 'planet-traveler';
+                        planetDiv.style.left = pPos.x + 'px';
+                        planetDiv.style.top = pPos.y + 'px';
+                        planetDiv.style.width = '100px';
+                        planetDiv.style.height = '100px';
+                        
+                        const planetType = planetTypes[pIndex % planetTypes.length];
+                        
+                        planetDiv.innerHTML = `
+                            <div class="planet-inner" style="width: 100%; height: 100%; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <div class="planet-surface planet-${planetType}" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 1;"></div>
+                                <div class="planet-atmosphere" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 2;"></div>
+                                <div class="planet-content" style="position: relative; z-index: 3; text-align: center;">
+                                    <div class="planet-title" style="font-size: 0.9rem; font-weight: 700; color: #ffffff; text-shadow: 0 0 10px rgba(100, 181, 246, 0.8);">${planet.title}</div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        planetDiv.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            openPlanetModal(planet);
+                        });
+                        
+                        travelerSpace.appendChild(planetDiv);
+                    });
+                }
+
+                travelerGalaxies.push({
+                    element: galaxyDiv,
+                    ...galaxy,
+                    position: pos
+                });
+            });
+        }
+
+        function generateNonOverlappingPositions(count, minSpacing, objectSize, maxWidth, maxHeight) {
+            const positions = [];
+            const maxAttempts = 100;
+            
+            for (let i = 0; i < count; i++) {
+                let position = null;
+                let attempts = 0;
+                
+                while (!position && attempts < maxAttempts) {
+                    const x = Math.random() * (maxWidth - objectSize);
+                    const y = Math.random() * (maxHeight - objectSize);
+                    
+                    // Check if this position overlaps with existing positions
+                    const overlaps = positions.some(pos => {
+                        const dx = pos.x - x;
+                        const dy = pos.y - y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        return distance < minSpacing;
+                    });
+                    
+                    if (!overlaps) {
+                        position = { x, y };
+                    }
+                    attempts++;
+                }
+                
+                if (position) {
+                    positions.push(position);
+                } else {
+                    // Fallback if we can't find a non-overlapping position
+                    positions.push({
+                        x: (i % 4) * (maxWidth / 4),
+                        y: Math.floor(i / 4) * (maxHeight / 4)
+                    });
+                }
+            }
+            
+            return positions;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            generateStars();
+            populateGalaxies();
+            updateRocketPosition();
+
+            // Force style refresh for GitHub Pages
+            const stylesheet = document.querySelector('style');
+            if (stylesheet) {
+                stylesheet.textContent = stylesheet.textContent;
+            }
+        });
+
+        // Prevent caching on GitHub Pages
+        window.addEventListener('load', function() {
+            // Force body background to be visible
+            document.body.style.cssText = 'background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0d1b2a 100%) !important; color: #e0e0ff !important; overflow-x: hidden !important;';
+        });
+    </script>
+</body>
+</html>
