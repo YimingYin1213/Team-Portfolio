@@ -692,6 +692,107 @@ layout: null
             color: inherit !important;
             display: block;
         }
+
+        /* View toggle controls */
+        .view-toggle {
+            position: fixed !important;
+            bottom: 30px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            display: flex !important;
+            gap: 15px !important;
+            z-index: 998 !important;
+            background: rgba(0, 0, 0, 0.6) !important;
+            padding: 12px 20px !important;
+            border-radius: 30px !important;
+            border: 2px solid rgba(129, 212, 250, 0.5) !important;
+            backdrop-filter: blur(10px) !important;
+        }
+
+        .view-btn {
+            background: linear-gradient(135deg, rgba(100, 181, 246, 0.3), rgba(33, 150, 243, 0.2)) !important;
+            border: 2px solid rgba(129, 212, 250, 0.4) !important;
+            color: #81d4fa !important;
+            padding: 8px 18px !important;
+            border-radius: 20px !important;
+            cursor: pointer !important;
+            font-size: 0.95rem !important;
+            font-weight: 600 !important;
+            transition: all 0.3s !important;
+        }
+
+        .view-btn:hover {
+            background: linear-gradient(135deg, rgba(100, 181, 246, 0.5), rgba(33, 150, 243, 0.4)) !important;
+            box-shadow: 0 0 15px rgba(129, 212, 250, 0.6) !important;
+            transform: scale(1.05) !important;
+        }
+
+        .view-btn.active {
+            background: linear-gradient(135deg, rgba(100, 181, 246, 0.8), rgba(33, 150, 243, 0.6)) !important;
+            box-shadow: 0 0 25px rgba(129, 212, 250, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
+            border-color: rgba(129, 212, 250, 0.8) !important;
+        }
+
+        /* Traveler view styles */
+        .traveler-view {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            overflow: hidden !important;
+            perspective: 1000px !important;
+        }
+
+        .traveler-space {
+            position: absolute !important;
+            width: 200% !important;
+            height: 200% !important;
+            top: -50% !important;
+            left: -50% !important;
+        }
+
+        .galaxy-cloud-traveler {
+            position: absolute !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            cursor: pointer !important;
+        }
+
+        .planet-traveler {
+            position: absolute !important;
+            cursor: pointer !important;
+        }
+
+        .hud-display {
+            position: fixed !important;
+            top: 20px !important;
+            left: 20px !important;
+            background: rgba(0, 0, 0, 0.7) !important;
+            border: 2px solid rgba(129, 212, 250, 0.5) !important;
+            padding: 15px 25px !important;
+            border-radius: 10px !important;
+            color: #81d4fa !important;
+            z-index: 100 !important;
+            font-family: 'Courier New', monospace !important;
+            font-size: 0.9rem !important;
+            display: none !important;
+        }
+
+        .hud-display.active {
+            display: block !important;
+        }
+
+        .hud-display p {
+            margin: 5px 0 !important;
+            color: #81d4fa !important;
+        }
+
+        .hud-display .label {
+            color: #64b5f6 !important;
+            font-weight: bold !important;
+        }
     </style>
 </head>
 <body>
@@ -699,7 +800,7 @@ layout: null
     <div class="stars" id="starfield"></div>
 
     <!-- Main container -->
-    <div class="container">
+    <div class="container" id="container">
         <!-- Header -->
         <div class="header">
             <h1>TEAM SPACE</h1>
@@ -716,6 +817,21 @@ layout: null
         <div class="instructions">
             <p>✨ Click on any galaxy to explore its contents ✨</p>
             <div class="scroll-indicator">↓ Scroll to see more ↓</div>
+        </div>
+    </div>
+
+    <!-- View Toggle Controls -->
+    <div class="view-toggle" id="viewToggle">
+        <button class="view-btn active" id="listViewBtn" onclick="switchToListView()">📋 View as List</button>
+        <button class="view-btn" id="travelerViewBtn" onclick="switchToTravelerView()">🚀 View as Traveler</button>
+    </div>
+
+    <!-- Traveler View -->
+    <div class="traveler-view" id="travelerView" style="display: none;">
+        <div class="traveler-space" id="travelerSpace"></div>
+        <div class="hud-display" id="hudDisplay">
+            <p><span class="label">SECTOR SCAN:</span> <span id="hudCoords">0.0, 0.0</span></p>
+            <p><span class="label">DISTANCE:</span> <span id="hudDistance">N/A</span></p>
         </div>
     </div>
 
@@ -1143,6 +1259,167 @@ layout: null
         document.addEventListener('mouseup', () => {
             isDraggingRocket = false;
         });
+
+        // View management system
+        let currentView = 'list';
+        let travelerGalaxies = [];
+
+        function switchToListView() {
+            currentView = 'list';
+            document.getElementById('container').style.display = 'flex';
+            document.getElementById('travelerView').style.display = 'none';
+            document.getElementById('listViewBtn').classList.add('active');
+            document.getElementById('travelerViewBtn').classList.remove('active');
+            document.getElementById('hudDisplay').classList.remove('active');
+        }
+
+        function switchToTravelerView() {
+            currentView = 'traveler';
+            document.getElementById('container').style.display = 'none';
+            document.getElementById('travelerView').style.display = 'block';
+            document.getElementById('listViewBtn').classList.remove('active');
+            document.getElementById('travelerViewBtn').classList.add('active');
+            document.getElementById('hudDisplay').classList.add('active');
+            
+            if (travelerGalaxies.length === 0) {
+                initializeTravelerView();
+            }
+        }
+
+        function initializeTravelerView() {
+            const travelerSpace = document.getElementById('travelerSpace');
+            travelerSpace.innerHTML = '';
+            travelerGalaxies = [];
+
+            // Generate random non-overlapping positions for galaxies
+            const positions = generateNonOverlappingPositions(galaxies.length, 250, 200, 1900, 1900);
+
+            galaxies.forEach((galaxy, index) => {
+                const pos = positions[index];
+                const galaxyDiv = document.createElement('div');
+                galaxyDiv.className = 'galaxy-cloud-traveler';
+                galaxyDiv.style.left = pos.x + 'px';
+                galaxyDiv.style.top = pos.y + 'px';
+                galaxyDiv.style.width = '200px';
+                galaxyDiv.style.height = '200px';
+                
+                galaxyDiv.innerHTML = `
+                    <div class="cloud-inner" style="width: 100%; height: 100%; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <div class="cloud-background" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 1;"></div>
+                        <div class="cloud-atmosphere" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 2;"></div>
+                        <div class="cloud-content" style="position: relative; z-index: 3; text-align: center;">
+                            <div class="cloud-icon" style="font-size: 3rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(100, 181, 246, 0.6));">${galaxy.icon}</div>
+                            <div class="cloud-title" style="font-size: 1.2rem; font-weight: 700; color: #ffffff; text-shadow: 0 0 10px rgba(100, 181, 246, 0.5);">${galaxy.title}</div>
+                        </div>
+                    </div>
+                `;
+
+                // Set galaxy-specific colors
+                const cloudBackground = galaxyDiv.querySelector('.cloud-background');
+                const cloudAtmosphere = galaxyDiv.querySelector('.cloud-atmosphere');
+                
+                if (galaxy.color === 'blue') {
+                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(100, 181, 246, 0.4), rgba(33, 150, 243, 0.2), transparent)';
+                    cloudBackground.style.boxShadow = '0 0 30px rgba(100, 181, 246, 0.4), inset 0 0 30px rgba(129, 212, 250, 0.2), 0 0 60px rgba(33, 150, 243, 0.3)';
+                } else if (galaxy.color === 'purple') {
+                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(156, 39, 176, 0.4), rgba(103, 58, 183, 0.2), transparent)';
+                    cloudBackground.style.boxShadow = '0 0 30px rgba(156, 39, 176, 0.4), inset 0 0 30px rgba(171, 71, 188, 0.2), 0 0 60px rgba(103, 58, 183, 0.3)';
+                } else if (galaxy.color === 'green') {
+                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(76, 175, 80, 0.4), rgba(56, 142, 60, 0.2), transparent)';
+                    cloudBackground.style.boxShadow = '0 0 30px rgba(76, 175, 80, 0.4), inset 0 0 30px rgba(102, 187, 106, 0.2), 0 0 60px rgba(56, 142, 60, 0.3)';
+                } else if (galaxy.color === 'orange') {
+                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(255, 152, 0, 0.4), rgba(255, 111, 0, 0.2), transparent)';
+                    cloudBackground.style.boxShadow = '0 0 30px rgba(255, 152, 0, 0.4), inset 0 0 30px rgba(255, 167, 38, 0.2), 0 0 60px rgba(255, 111, 0, 0.3)';
+                }
+
+                galaxyDiv.addEventListener('click', () => {
+                    handleGalaxyClick(galaxy.title, index);
+                });
+
+                travelerSpace.appendChild(galaxyDiv);
+                
+                // Add planets if they exist
+                if (galaxy.planets && galaxy.planets.length > 0) {
+                    const planetPositions = generateNonOverlappingPositions(galaxy.planets.length, 120, 100, pos.x + 300, pos.y + 300);
+                    const planetTypes = ['ice', 'lava', 'gas', 'ocean', 'jungle'];
+                    
+                    galaxy.planets.forEach((planet, pIndex) => {
+                        const pPos = planetPositions[pIndex];
+                        const planetDiv = document.createElement('div');
+                        planetDiv.className = 'planet-traveler';
+                        planetDiv.style.left = pPos.x + 'px';
+                        planetDiv.style.top = pPos.y + 'px';
+                        planetDiv.style.width = '100px';
+                        planetDiv.style.height = '100px';
+                        
+                        const planetType = planetTypes[pIndex % planetTypes.length];
+                        
+                        planetDiv.innerHTML = `
+                            <div class="planet-inner" style="width: 100%; height: 100%; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <div class="planet-surface planet-${planetType}" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 1;"></div>
+                                <div class="planet-atmosphere" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 2;"></div>
+                                <div class="planet-content" style="position: relative; z-index: 3; text-align: center;">
+                                    <div class="planet-title" style="font-size: 0.9rem; font-weight: 700; color: #ffffff; text-shadow: 0 0 10px rgba(100, 181, 246, 0.8);">${planet.title}</div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        planetDiv.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            openPlanetModal(planet);
+                        });
+                        
+                        travelerSpace.appendChild(planetDiv);
+                    });
+                }
+
+                travelerGalaxies.push({
+                    element: galaxyDiv,
+                    ...galaxy,
+                    position: pos
+                });
+            });
+        }
+
+        function generateNonOverlappingPositions(count, minSpacing, objectSize, maxWidth, maxHeight) {
+            const positions = [];
+            const maxAttempts = 100;
+            
+            for (let i = 0; i < count; i++) {
+                let position = null;
+                let attempts = 0;
+                
+                while (!position && attempts < maxAttempts) {
+                    const x = Math.random() * (maxWidth - objectSize);
+                    const y = Math.random() * (maxHeight - objectSize);
+                    
+                    // Check if this position overlaps with existing positions
+                    const overlaps = positions.some(pos => {
+                        const dx = pos.x - x;
+                        const dy = pos.y - y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        return distance < minSpacing;
+                    });
+                    
+                    if (!overlaps) {
+                        position = { x, y };
+                    }
+                    attempts++;
+                }
+                
+                if (position) {
+                    positions.push(position);
+                } else {
+                    // Fallback if we can't find a non-overlapping position
+                    positions.push({
+                        x: (i % 4) * (maxWidth / 4),
+                        y: Math.floor(i / 4) * (maxHeight / 4)
+                    });
+                }
+            }
+            
+            return positions;
+        }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
