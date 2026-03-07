@@ -305,21 +305,22 @@ layout: null
         /* Planet/Sub-item styles */
         .planets-grid {
             display: grid !important;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
-            gap: 30px !important;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+            gap: 50px !important;
             margin-top: 40px !important;
+            padding: 20px !important;
         }
 
         .planet {
             position: relative !important;
-            height: 280px !important;
+            height: 300px !important;
             cursor: pointer !important;
             perspective: 1000px !important;
             animation: float 6s ease-in-out infinite !important;
         }
 
-        .planet:hover {
-            transform: scale(1.05) !important;
+        .planet:hover .planet-inner {
+            transform: scale(1.08) rotateY(-5deg) !important;
         }
 
         .planet-inner {
@@ -327,31 +328,216 @@ layout: null
             height: 100% !important;
             position: relative !important;
             border-radius: 50% !important;
-            background: radial-gradient(circle at 35% 35%, rgba(100, 181, 246, 0.5), rgba(33, 150, 243, 0.3)) !important;
-            border: 2px solid rgba(129, 212, 250, 0.6) !important;
-            box-shadow: 
-                0 0 25px rgba(100, 181, 246, 0.5),
-                inset 0 0 25px rgba(129, 212, 250, 0.3) !important;
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
             padding: 20px !important;
             text-align: center !important;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+            transform-style: preserve-3d !important;
+            overflow: hidden !important;
+        }
+
+        /* Detailed planet surface */
+        .planet-surface {
+            position: absolute !important;
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50% !important;
+            z-index: 1 !important;
+        }
+
+        /* Atmosphere glow effect */
+        .planet-atmosphere {
+            position: absolute !important;
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50% !important;
+            box-shadow: 
+                inset -20px -20px 60px rgba(0, 0, 0, 0.5),
+                inset 20px 20px 60px rgba(255, 255, 255, 0.1),
+                0 0 40px rgba(100, 181, 246, 0.6) !important;
+            z-index: 2 !important;
+        }
+
+        /* Planet rings */
+        .planet-ring {
+            position: absolute !important;
+            border-radius: 50% !important;
+            border: 3px solid rgba(255, 200, 100, 0.4) !important;
+            z-index: 0 !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) rotateX(75deg) !important;
+        }
+
+        /* Planet content overlay */
+        .planet-content {
+            position: relative !important;
+            z-index: 3 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 100% !important;
         }
 
         .planet-title {
-            font-size: 1.4rem !important;
+            font-size: 1.6rem !important;
             font-weight: 700 !important;
             color: #ffffff !important;
             margin-bottom: 10px !important;
-            text-shadow: 0 0 10px rgba(100, 181, 246, 0.6) !important;
+            text-shadow: 
+                0 0 10px rgba(100, 181, 246, 0.8),
+                0 0 20px rgba(33, 150, 243, 0.6) !important;
+            z-index: 4 !important;
+            position: relative !important;
         }
 
         .planet-description {
-            font-size: 0.8rem !important;
+            font-size: 0.85rem !important;
             color: #b0bec5 !important;
-            opacity: 0.9 !important;
+            opacity: 0.95 !important;
+            z-index: 4 !important;
+            position: relative !important;
+        }
+
+        /* Planet type variations */
+        .planet-ice {
+            background: radial-gradient(circle at 30% 30%, #ffffff, #e3f2fd, #1565c0) !important;
+        }
+
+        .planet-lava {
+            background: radial-gradient(circle at 30% 30%, #ffeb3b, #ff6f00, #1a0000) !important;
+        }
+
+        .planet-gas {
+            background: radial-gradient(circle at 35% 35%, #ff9800, #ff7043, #4a235a) !important;
+        }
+
+        .planet-ocean {
+            background: radial-gradient(circle at 35% 35%, #4dd0e1, #00bcd4, #0d47a1) !important;
+        }
+
+        .planet-jungle {
+            background: radial-gradient(circle at 30% 30%, #66bb6a, #2e7d32, #1b5e20) !important;
+        }
+
+        /* Rocket styles */
+        .rocket-container {
+            position: fixed !important;
+            bottom: 30px !important;
+            right: 30px !important;
+            z-index: 999 !important;
+            user-select: none !important;
+        }
+
+        .rocket {
+            position: relative !important;
+            width: 60px !important;
+            height: 80px !important;
+            cursor: grab !important;
+            animation: rocketFloat 3s ease-in-out infinite !important;
+        }
+
+        .rocket:active {
+            cursor: grabbing !important;
+        }
+
+        .rocket-body {
+            position: absolute !important;
+            width: 40px !important;
+            height: 50px !important;
+            background: linear-gradient(90deg, #ff6b9d 0%, #ff8a80 50%, #ff6b9d 100%) !important;
+            border-radius: 10px 10px 20px 20px !important;
+            left: 10px !important;
+            top: 10px !important;
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.6) !important;
+        }
+
+        .rocket-window {
+            position: absolute !important;
+            width: 20px !important;
+            height: 20px !important;
+            background: radial-gradient(circle at 35% 35%, #ffffff, #64b5f6) !important;
+            border-radius: 50% !important;
+            left: 20px !important;
+            top: 15px !important;
+            box-shadow: inset 0 0 10px rgba(100, 181, 246, 0.5) !important;
+        }
+
+        .rocket-fins {
+            position: absolute !important;
+            bottom: 0px !important;
+            left: 10px !important;
+        }
+
+        .rocket-fin {
+            position: absolute !important;
+            width: 0 !important;
+            height: 0 !important;
+            border-left: 8px solid transparent !important;
+            border-right: 8px solid transparent !important;
+            border-bottom: 15px solid #ff6b9d !important;
+        }
+
+        .rocket-fin-left {
+            left: -5px !important;
+            transform: skewX(-10deg) !important;
+        }
+
+        .rocket-fin-right {
+            right: -5px !important;
+            transform: skewX(10deg) !important;
+        }
+
+        .rocket-flame {
+            position: absolute !important;
+            bottom: -20px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 20px !important;
+            height: 25px !important;
+            background: linear-gradient(180deg, #ffeb3b 0%, #ff9800 50%, transparent 100%) !important;
+            border-radius: 50% 50% 0 0 !important;
+            filter: blur(2px) !important;
+            animation: flame 0.3s ease-in-out infinite !important;
+        }
+
+        @keyframes rocketFloat {
+            0%, 100% { transform: translateY(0px) rotate(-15deg); }
+            50% { transform: translateY(-20px) rotate(-15deg); }
+        }
+
+        @keyframes flame {
+            0%, 100% { 
+                opacity: 0.7;
+                height: 25px;
+            }
+            50% { 
+                opacity: 1;
+                height: 35px;
+            }
+        }
+
+        .rocket-tooltip {
+            position: absolute !important;
+            bottom: 100px !important;
+            right: 0 !important;
+            background: rgba(0, 0, 0, 0.8) !important;
+            color: #81d4fa !important;
+            padding: 8px 12px !important;
+            border-radius: 5px !important;
+            white-space: nowrap !important;
+            font-size: 0.85rem !important;
+            opacity: 0 !important;
+            transition: opacity 0.3s !important;
+            border: 1px solid rgba(129, 212, 250, 0.6) !important;
+        }
+
+        .rocket-container:hover .rocket-tooltip {
+            opacity: 1 !important;
         }
 
         /* Modal styles */
@@ -528,6 +714,21 @@ layout: null
         <div class="instructions">
             <p>✨ Click on any galaxy to explore its contents ✨</p>
             <div class="scroll-indicator">↓ Scroll to see more ↓</div>
+        </div>
+    </div>
+
+    <!-- Controllable Rocket -->
+    <div class="rocket-container" id="rocketContainer">
+        <div class="rocket-tooltip">Use arrow keys or WASD to move the rocket!</div>
+        <div class="rocket" id="rocket">
+            <div class="rocket-body">
+                <div class="rocket-window"></div>
+            </div>
+            <div class="rocket-fins">
+                <div class="rocket-fin rocket-fin-left"></div>
+                <div class="rocket-fin rocket-fin-right"></div>
+            </div>
+            <div class="rocket-flame"></div>
         </div>
     </div>
 
@@ -769,15 +970,25 @@ layout: null
             
             container.appendChild(planetsContainer);
             
+            // Planet type colors
+            const planetTypes = ['ice', 'lava', 'gas', 'ocean', 'jungle'];
+            
             // Create planet elements
             const planetsGrid = document.getElementById('planetsGrid');
             galaxy.planets.forEach((planet, index) => {
                 const planetDiv = document.createElement('div');
                 planetDiv.className = 'planet';
+                const planetType = planetTypes[index % planetTypes.length];
+                
                 planetDiv.innerHTML = `
                     <div class="planet-inner">
-                        <div class="planet-title">🪐 ${planet.title}</div>
-                        <div class="planet-description">${planet.description}</div>
+                        <div class="planet-surface planet-${planetType}"></div>
+                        <div class="planet-atmosphere"></div>
+                        <div class="planet-ring" style="width: 150px; height: 40px; border-width: 2px;"></div>
+                        <div class="planet-content">
+                            <div class="planet-title">${planet.title}</div>
+                            <div class="planet-description">${planet.description}</div>
+                        </div>
                     </div>
                 `;
                 
@@ -842,10 +1053,95 @@ layout: null
             }
         }
 
+        // Rocket control system
+        const rocketState = {
+            x: window.innerWidth - 100,
+            y: window.innerHeight - 150,
+            vx: 0,
+            vy: 0,
+            speed: 5,
+            friction: 0.95
+        };
+
+        const keys = {};
+
+        // Handle rocket movement
+        function updateRocketPosition() {
+            const rocket = document.getElementById('rocket');
+            if (!rocket) return;
+
+            // Handle key presses
+            if (keys['ArrowLeft'] || keys['a'] || keys['A']) rocketState.vx -= rocketState.speed;
+            if (keys['ArrowRight'] || keys['d'] || keys['D']) rocketState.vx += rocketState.speed;
+            if (keys['ArrowUp'] || keys['w'] || keys['W']) rocketState.vy -= rocketState.speed;
+            if (keys['ArrowDown'] || keys['s'] || keys['S']) rocketState.vy += rocketState.speed;
+
+            // Apply friction
+            rocketState.vx *= rocketState.friction;
+            rocketState.vy *= rocketState.friction;
+
+            // Update position
+            rocketState.x += rocketState.vx;
+            rocketState.y += rocketState.vy;
+
+            // Boundary constraints
+            rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 70));
+            rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 110));
+
+            // Update rocket position
+            rocket.style.left = rocketState.x + 'px';
+            rocket.style.top = rocketState.y + 'px';
+
+            requestAnimationFrame(updateRocketPosition);
+        }
+
+        // Mouse dragging for rocket
+        let isDraggingRocket = false;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+
+        // Rocket dragging
+        document.addEventListener('mousedown', (e) => {
+            const rocket = document.getElementById('rocket');
+            if (rocket && rocket.contains(e.target)) {
+                isDraggingRocket = true;
+                dragOffsetX = e.clientX - rocketState.x;
+                dragOffsetY = e.clientY - rocketState.y;
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDraggingRocket) {
+                rocketState.x = e.clientX - dragOffsetX;
+                rocketState.y = e.clientY - dragOffsetY;
+
+                // Boundary constraints
+                rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 70));
+                rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 110));
+
+                const rocket = document.getElementById('rocket');
+                rocket.style.left = rocketState.x + 'px';
+                rocket.style.top = rocketState.y + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDraggingRocket = false;
+        });
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             generateStars();
             populateGalaxies();
+            updateRocketPosition();
         });
     </script>
 </body>
