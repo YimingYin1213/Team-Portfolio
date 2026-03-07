@@ -627,6 +627,26 @@ layout: null
                             <p><strong>Columns on all NPC directions:</strong> 1 — freezes on single idle frame</p>
                             <p><strong>Hitbox on NPC:</strong> 0.01 — allows player to walk close enough to interact</p>
                         `
+                    },
+                    {
+                        title: "Lance's Mini Game Basketball",
+                        description: 'Navigate the court to reach LeBron James',
+                        content: `
+                            <h3>Game Concept</h3>
+                            <p>A basketball court mini game where the player navigates around barriers (trash can, benches, and hidden barriers) to reach LeBron James at the right side of the court and trigger dialogue.</p>
+
+                            <h3>Configured Objects</h3>
+                            <p><strong>Background:</strong> BasketballCourt/Court.png — sets the retro indoor court scene</p>
+                            <p><strong>Player:</strong> BasketballPlayer sprite — WASD-controlled, starts at left baseline</p>
+                            <p><strong>NPC:</strong> LeBron James — idle at right of court, triggers dialogue on interaction</p>
+                            <p><strong>Barriers:</strong> 4 invisible walls blocking paths around the court</p>
+
+                            <h3>Key Configuration Decisions</h3>
+                            <p><strong>STEP_FACTOR:</strong> 400 — faster movement than default</p>
+                            <p><strong>Speed on NPC:</strong> 0 — prevents LeBron from wandering</p>
+                            <p><strong>Columns on all NPC directions:</strong> 1 — freezes on single idle frame</p>
+                            <p><strong>Hitbox on NPC:</strong> 0.01 — allows player to walk close enough to interact</p>
+                        `
                     }
                 ]
             },
