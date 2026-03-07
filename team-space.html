@@ -6,9 +6,11 @@ layout: null
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <meta name="author" content="Team Space">
+    <meta name="description" content="Team Space CSSE Portfolio Hub - Interactive galaxy navigation">
     <title>Team Space (CSSE) - Portfolio Hub</title>
     <style>
         * {
@@ -1426,6 +1428,18 @@ layout: null
             generateStars();
             populateGalaxies();
             updateRocketPosition();
+
+            // Force style refresh for GitHub Pages
+            const stylesheet = document.querySelector('style');
+            if (stylesheet) {
+                stylesheet.textContent = stylesheet.textContent;
+            }
+        });
+
+        // Prevent caching on GitHub Pages
+        window.addEventListener('load', function() {
+            // Force body background to be visible
+            document.body.style.cssText = 'background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0d1b2a 100%) !important; color: #e0e0ff !important; overflow-x: hidden !important;';
         });
     </script>
 </body>
