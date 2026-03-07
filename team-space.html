@@ -427,10 +427,12 @@ layout: null
         /* Rocket styles */
         .rocket-container {
             position: fixed !important;
-            bottom: 30px !important;
-            right: 30px !important;
+            left: calc(100% - 100px) !important;
+            top: calc(100% - 150px) !important;
             z-index: 999 !important;
             user-select: none !important;
+            width: 60px !important;
+            height: 80px !important;
         }
 
         .rocket {
@@ -1088,9 +1090,12 @@ layout: null
             rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 70));
             rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 110));
 
-            // Update rocket position
-            rocket.style.left = rocketState.x + 'px';
-            rocket.style.top = rocketState.y + 'px';
+            // Update rocket container position
+            const rocketContainer = document.getElementById('rocketContainer');
+            if (rocketContainer) {
+                rocketContainer.style.left = rocketState.x + 'px';
+                rocketContainer.style.top = rocketState.y + 'px';
+            }
 
             requestAnimationFrame(updateRocketPosition);
         }
@@ -1110,8 +1115,8 @@ layout: null
 
         // Rocket dragging
         document.addEventListener('mousedown', (e) => {
-            const rocket = document.getElementById('rocket');
-            if (rocket && rocket.contains(e.target)) {
+            const rocketContainer = document.getElementById('rocketContainer');
+            if (rocketContainer && rocketContainer.contains(e.target)) {
                 isDraggingRocket = true;
                 dragOffsetX = e.clientX - rocketState.x;
                 dragOffsetY = e.clientY - rocketState.y;
@@ -1127,9 +1132,11 @@ layout: null
                 rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 70));
                 rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 110));
 
-                const rocket = document.getElementById('rocket');
-                rocket.style.left = rocketState.x + 'px';
-                rocket.style.top = rocketState.y + 'px';
+                const rocketContainer = document.getElementById('rocketContainer');
+                if (rocketContainer) {
+                    rocketContainer.style.left = rocketState.x + 'px';
+                    rocketContainer.style.top = rocketState.y + 'px';
+                }
             }
         });
 
