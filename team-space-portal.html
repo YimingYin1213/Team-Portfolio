@@ -709,6 +709,22 @@ layout: null
             margin-bottom: 15px !important;
         }
 
+        .game-embed {
+            width: 100% !important;
+            height: 420px !important;
+            border-radius: 16px !important;
+            overflow: hidden !important;
+            border: 1px solid rgba(129, 212, 250, 0.4) !important;
+            box-shadow: inset 0 0 18px rgba(129, 212, 250, 0.1) !important;
+            background: #050814 !important;
+        }
+
+        .game-embed iframe {
+            width: 100% !important;
+            height: 100% !important;
+            border: 0 !important;
+        }
+
         /* Responsive design */
         @media (max-width: 768px) {
             .planets-grid {
@@ -1016,8 +1032,7 @@ layout: null
                             <h3>Game Library</h3>
                             <p>Browse existing games created with this engine:</p>
                             <ul style="text-align: left; display: inline-block;">
-                                <li><a href="${window.location.origin}${window.location.pathname}" style="color: #81d4fa; text-decoration: underline;">Arjun's Mini Game Level</a> - Find Kirby in the playground</li>
-                                <li><a href="${window.location.origin}${window.location.pathname}" style="color: #81d4fa; text-decoration: underline;">Lance's Mini Game Basketball</a> - Navigate the court to meet LeBron</li>
+                                <li><a href="{{ site.baseurl }}/games/aquatic" style="color: #81d4fa; text-decoration: underline;">Aquatic Game Level</a> - Explore the deep sea</li>
                             </ul>
 
                             <h3>Getting Started</h3>
@@ -1028,6 +1043,11 @@ layout: null
                                     Enter GameBuilder Portal
                                 </a>
                             </p>
+
+                            <h3>Play Now</h3>
+                            <div class="game-embed">
+                                <iframe src="{{ site.baseurl }}/games/aquatic" title="Aquatic Game Level"></iframe>
+                            </div>
 
                             <h3>Technologies</h3>
                             <p>Built with JavaScript ES6+, featuring modular architecture for easy customization and extension. Supports responsive design for both desktop and mobile gaming experiences.</p>

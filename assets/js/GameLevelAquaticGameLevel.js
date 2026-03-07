@@ -1,11 +1,11 @@
 // Adventure Game Custom Level
-// Exported from GameBuilder on 2026-03-04T18:20:20.024Z
+// Exported from GameBuilder on 2026-03-07T07:02:58.561Z
 // How to use this file:
-// 1) Save as assets/js/adventureGame/GameLevelAstronautGame.js in your repo.
+// 1) Save as assets/js/GameEnginev1/GameLevelAquaticGameLevel.js in your repo.
 // 2) Reference it in your runner or level selector. Examples:
-//    import GameLevelPlanets from '/assets/js/GameEnginev1/GameLevelPlanets.js';
-//    import GameLevelAstronautGame from '/assets/js/adventureGame/GameLevelAstronautGame.js';
-//    export const gameLevelClasses = [GameLevelPlanets, GameLevelAstronautGame];
+//    import GameLevelPlanets from '/Team-Portfolio/assets/js/GameEnginev1/GameLevelPlanets.js';
+//    import GameLevelAquaticGameLevel from '/Team-Portfolio/assets/js/GameEnginev1/GameLevelAquaticGameLevel.js';
+//    export const gameLevelClasses = [GameLevelPlanets, GameLevelAquaticGameLevel];
 //    // or pass it directly to your GameControl as the only level.
 // 3) Ensure images exist and paths resolve via 'path' provided by the engine.
 // 4) You can add more objects to this.classes inside the constructor.
@@ -15,7 +15,7 @@ import Player from '/assets/js/GameEnginev1/essentials/Player.js';
 import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
 import Barrier from '/assets/js/GameEnginev1/essentials/Barrier.js';
 
-class GameLevelAstronautGame {
+class GameLevelAquaticGameLevel {
     constructor(gameEnv) {
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
@@ -23,24 +23,24 @@ class GameLevelAstronautGame {
 
         const bgData = {
             name: "custom_bg",
-            src: path + "/images/gamebuilder/bg/alien_planet.jpg",
-            pixels: { height: 772, width: 1134 }
+            src: path + "/images/gamebuilder/bg/Aquatic.png",
+            pixels: { height: 1960, width: 2940 }
         };
 
         const playerData = {
             id: 'playerData',
-            src: path + "/images/scuba_diver_spritesheet.png",
+            src: path + "/images/gamebuilder/sprites/scubadiver.png",
             SCALE_FACTOR: 5,
             STEP_FACTOR: 1000,
             ANIMATION_RATE: 50,
             INIT_POSITION: { x: 100, y: 300 },
-            pixels: { height: 770, width: 513 },
-            orientation: { rows: 4, columns: 4 },
-            down: { row: 2, start: 0, columns: 3 },
+            pixels: { height: 948, width: 632 },
+            orientation: { rows: 4, columns: 3 },
+            down: { row: 0, start: 0, columns: 3 },
             downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI/16 },
             downLeft: { row: 0, start: 0, columns: 3, rotate: -Math.PI/16 },
-            left: { row: 0, start: 0, columns: 3 },
-            right: { row: 2, start: 0, columns: 3 },
+            left: { row: 2, start: 0, columns: 3 },
+            right: { row: 1, start: 0, columns: 3 },
             up: { row: 3, start: 0, columns: 3 },
             upLeft: { row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
             upRight: { row: 3, start: 0, columns: 3, rotate: -Math.PI/16 },
@@ -49,14 +49,14 @@ class GameLevelAstronautGame {
             };
 
         const npcData1 = {
-            id: 'NPC #1',
-            greeting: 'You found me! Congratulations.',
-            src: path + "/images/gamify/chillguy.png",
-            SCALE_FACTOR: 3,
+            id: 'Random Slime',
+            greeting: '^$%#^@&!^# (Slime Language) Did I see a human?',
+            src: path + "/images/gamebuilder/sprites/slime.png",
+            SCALE_FACTOR: 8,
             ANIMATION_RATE: 50,
-            INIT_POSITION: { x: 500, y: 110 },
-            pixels: { height: 512, width: 384 },
-            orientation: { rows: 4, columns: 3 },
+            INIT_POSITION: { x: 800, y: 128 },
+            pixels: { height: 225, width: 225 },
+            orientation: { rows: 4, columns: 4 },
             down: { row: 0, start: 0, columns: 3 },
             right: { row: Math.min(1, 4 - 1), start: 0, columns: 3 },
             left: { row: Math.min(2, 4 - 1), start: 0, columns: 3 },
@@ -66,24 +66,24 @@ class GameLevelAstronautGame {
             upLeft: { row: Math.min(2, 4 - 1), start: 0, columns: 3 },
             downLeft: { row: 0, start: 0, columns: 3 },
             hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-            dialogues: ['You found me! Congratulations.'],
+            dialogues: ['^$%#^@&!^# (Slime Language) Did I see a human?'],
             reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
             interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }
         };
         const dbarrier_1 = {
-            id: 'dbarrier_1', x: 137, y: 14, width: 40, height: 152, visible: false,
+            id: 'dbarrier_1', x: 67, y: 67, width: 380, height: 77, visible: false,
             hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
             fromOverlay: true
         };
 
         const dbarrier_2 = {
-            id: 'dbarrier_2', x: 201, y: 256, width: 196, height: 37, visible: false,
+            id: 'dbarrier_2', x: 434, y: 356, width: 85, height: 187, visible: false,
             hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
             fromOverlay: true
         };
 
         const dbarrier_3 = {
-            id: 'dbarrier_3', x: 388, y: 47, width: 179, height: 33, visible: false,
+            id: 'dbarrier_3', x: 754, y: 320, width: 325, height: 79, visible: false,
             hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
             fromOverlay: true
         };
@@ -99,4 +99,4 @@ this.classes = [      { class: GameEnvBackground, data: bgData },
     }
 }
 
-export default GameLevelAstronautGame;
+export default GameLevelAquaticGameLevel;

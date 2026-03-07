@@ -1,0 +1,73 @@
+---
+layout: null
+permalink: /games/aquatic
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aquatic Game Level</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background: #050814;
+      }
+      .game-shell {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #gameContainer {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="game-shell">
+      <div id="gameContainer"></div>
+    </div>
+
+    <script type="module">
+      const path = '{{ site.baseurl }}';
+      const baseUrl = window.location.origin + path;
+
+      async function boot() {
+        const [{ default: Game }, { default: GameLevelAquaticGameLevel }] = await Promise.all([
+          import(`${baseUrl}/assets/js/GameEnginev1/essentials/Game.js`),
+          import(`${baseUrl}/assets/js/GameLevelAquaticGameLevel.js`)
+        ]);
+
+        const container = document.getElementById('gameContainer');
+        const width = container.clientWidth || 800;
+        const height = container.clientHeight || 500;
+
+        const environment = {
+          path,
+          gameContainer: container,
+          gameCanvas: null,
+          gameLevelClasses: [GameLevelAquaticGameLevel],
+          innerWidth: width,
+          innerHeight: height,
+          disablePauseMenu: true,
+          pythonURI: baseUrl,
+          javaURI: baseUrl,
+          fetchOptions: { method: 'GET' }
+        };
+
+        const gameInstance = Game.main ? Game.main(environment) : Game(environment);
+        window.__aquaticGame = gameInstance;
+      }
+
+      boot().catch(err => console.error('Aquatic game failed to start:', err));
+    </script>
+  </body>
+</html>
