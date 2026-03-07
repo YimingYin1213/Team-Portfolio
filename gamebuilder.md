@@ -413,7 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const srcRel = item.src?.startsWith('/') ? item.src : (dir.replace(/\/$/, '') + '/' + (item.src || ''));
                     const src = SITE_BASE ? (SITE_BASE + srcRel) : srcRel;
                     const dims = (item.h && item.w) ? { h: item.h, w: item.w } : await ensureImageDims(srcRel);
-                    if (!assets.bg[key]) assets.bg[key] = { src, h: dims.h, w: dims.w };
+                    if (!assets.bg[key]) assets.bg[key] = { src: srcRel, h: dims.h, w: dims.w };
                     const opt = document.createElement('option'); opt.value = key; opt.textContent = name; ui.bg.appendChild(opt);
                 }
             } else {
@@ -423,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const name = base.replace(/\.[^.]+$/, '');
                     const key = sanitizeKey(name);
                     if (assets.bg[key]) continue;
-                    const relSrc = src.replace(SITE_BASE, '');
+                    const relSrc = src.startsWith(SITE_BASE) ? src.replace(SITE_BASE, '') : src;
                     const dims = await ensureImageDims(relSrc);
                     assets.bg[key] = { src: relSrc, h: dims.h, w: dims.w };
                     const opt = document.createElement('option'); opt.value = key; opt.textContent = name; ui.bg.appendChild(opt);
@@ -445,7 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const src = SITE_BASE ? (SITE_BASE + srcRel) : srcRel;
                     const dims = (item.h && item.w) ? { h: item.h, w: item.w } : await ensureImageDims(srcRel);
                     const rows = item.rows || 4; const cols = item.cols || 3;
-                    if (!assets.sprites[key]) assets.sprites[key] = { src, h: dims.h, w: dims.w, rows, cols };
+                    if (!assets.sprites[key]) assets.sprites[key] = { src: srcRel, h: dims.h, w: dims.w, rows, cols };
                     const opt = document.createElement('option'); opt.value = key; opt.textContent = name; ui.pSprite.appendChild(opt);
                     document.querySelectorAll('.npc-sprite').forEach(sel => {
                         const o = document.createElement('option'); o.value = key; o.textContent = name; sel.appendChild(o);
@@ -458,7 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const name = base.replace(/\.[^.]+$/, '');
                     const key = sanitizeKey(name);
                     if (assets.sprites[key]) continue;
-                    const relSrc = src.replace(SITE_BASE, '');
+                    const relSrc = src.startsWith(SITE_BASE) ? src.replace(SITE_BASE, '') : src;
                     const dims = await ensureImageDims(relSrc);
                     const rows = 4, cols = 3;
                     assets.sprites[key] = { src: relSrc, h: dims.h, w: dims.w, rows, cols };
