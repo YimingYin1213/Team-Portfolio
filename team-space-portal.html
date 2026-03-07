@@ -1052,6 +1052,26 @@ layout: null
                             <h3>Technologies</h3>
                             <p>Built with JavaScript ES6+, featuring modular architecture for easy customization and extension. Supports responsive design for both desktop and mobile gaming experiences.</p>
                         `
+                    },
+                    {
+                        title: 'Aquatic Game Level',
+                        description: 'Dive into the ocean adventure',
+                        link: '{{ site.baseurl }}/games/aquatic',
+                        content: `
+                            <h3>Aquatic Game Level</h3>
+                            <p>Explore the deep sea and interact with ocean creatures.</p>
+                            <p><a class="portal-button" href="{{ site.baseurl }}/games/aquatic"><span class="spark"></span>Teleport to Aquatic</a></p>
+                        `
+                    },
+                    {
+                        title: 'Basketball Game Level',
+                        description: 'Navigate the court and meet LeBron',
+                        link: '{{ site.baseurl }}/games/basketball',
+                        content: `
+                            <h3>Basketball Game Level</h3>
+                            <p>Challenge the court puzzle and reach LeBron.</p>
+                            <p><a class="portal-button" href="{{ site.baseurl }}/games/basketball"><span class="spark"></span>Teleport to Basketball</a></p>
+                        `
                     }
                 ]
             },
@@ -1297,6 +1317,10 @@ layout: null
                 `;
                 
                 planetDiv.addEventListener('click', () => {
+                    if (planet.link) {
+                        window.location.href = planet.link;
+                        return;
+                    }
                     openPlanetModal(planet);
                 });
                 
