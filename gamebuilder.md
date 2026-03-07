@@ -411,8 +411,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const name = item.name || item.key || item.src;
                     const key = sanitizeKey(name);
                     const srcRel = item.src?.startsWith('/') ? item.src : (dir.replace(/\/$/, '') + '/' + (item.src || ''));
-                    const src = srcRel;
-                    const dims = (item.h && item.w) ? { h: item.h, w: item.w } : await ensureImageDims(src);
+                    const src = SITE_BASE ? (SITE_BASE + srcRel) : srcRel;
+                    const dims = (item.h && item.w) ? { h: item.h, w: item.w } : await ensureImageDims(srcRel);
                     if (!assets.bg[key]) assets.bg[key] = { src, h: dims.h, w: dims.w };
                     const opt = document.createElement('option'); opt.value = key; opt.textContent = name; ui.bg.appendChild(opt);
                 }
@@ -442,8 +442,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const name = item.name || item.key || item.src;
                     const key = sanitizeKey(name);
                     const srcRel = item.src?.startsWith('/') ? item.src : (dir.replace(/\/$/, '') + '/' + (item.src || ''));
-                    const src = srcRel;
-                    const dims = (item.h && item.w) ? { h: item.h, w: item.w } : await ensureImageDims(src);
+                    const src = SITE_BASE ? (SITE_BASE + srcRel) : srcRel;
+                    const dims = (item.h && item.w) ? { h: item.h, w: item.w } : await ensureImageDims(srcRel);
                     const rows = item.rows || 4; const cols = item.cols || 3;
                     if (!assets.sprites[key]) assets.sprites[key] = { src, h: dims.h, w: dims.w, rows, cols };
                     const opt = document.createElement('option'); opt.value = key; opt.textContent = name; ui.pSprite.appendChild(opt);
