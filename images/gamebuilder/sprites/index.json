@@ -6,6 +6,6 @@
     { "name": "Ufos", "src": "ufos.png", "rows": 4, "cols": 3 },
     { "name": "Basketball Player", "src": "BasketballPlayer.png", "rows": 4, "cols": 3 },
     { "name": "LeBron", "src": "LeBron.png", "rows": 4, "cols": 3 },
-    { "name": "Scuba Diver", "src": "scubadiver.png", "rows": 4, "cols": 3 }
+    { "name": "Scuba Diver", "src": "scubadiver.png", "rows": 4, "cols": 3 },
     { "name": "Boy", "src": "boysprite.png", "rows": 4, "cols": 3 }
 ]
