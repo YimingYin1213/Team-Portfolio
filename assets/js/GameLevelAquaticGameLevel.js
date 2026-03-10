@@ -71,20 +71,20 @@ class GameLevelAquaticGameLevel {
             interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }
         };
         const dbarrier_1 = {
-            id: 'dbarrier_1', x: 67, y: 67, width: 380, height: 77, visible: false,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
+            id: 'dbarrier_1', x: 67, y: 86, width: 380, height: 40, visible: false,
+            hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
             fromOverlay: true
         };
 
         const dbarrier_2 = {
-            id: 'dbarrier_2', x: 434, y: 356, width: 85, height: 187, visible: false,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
+            id: 'dbarrier_2', x: 457, y: 356, width: 40, height: 187, visible: false,
+            hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
             fromOverlay: true
         };
 
         const dbarrier_3 = {
-            id: 'dbarrier_3', x: 754, y: 320, width: 325, height: 79, visible: false,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
+            id: 'dbarrier_3', x: 754, y: 340, width: 325, height: 40, visible: false,
+            hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
             fromOverlay: true
         };
 this.classes = [      { class: GameEnvBackground, data: bgData },
