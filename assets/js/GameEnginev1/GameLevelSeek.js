@@ -70,7 +70,13 @@ class GameLevelSeek {
             hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
             dialogues: ['oh you found me'],
             reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
-            interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }
+            interact: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } },
+            onDialogueClose: function() {
+                const gameControl = this.gameEnv?.gameControl;
+                if (gameControl?.currentLevel) {
+                    gameControl.currentLevel.continue = false;
+                }
+            }
         };
 
         const dbarrier_1 = {

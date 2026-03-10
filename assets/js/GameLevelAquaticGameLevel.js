@@ -72,6 +72,8 @@ class GameLevelAquaticGameLevel {
                 if (this.dialogueSystem) {
                     this.showReactionDialogue();
                 }
+            },
+            onDialogueClose: function() {
                 const gameControl = this.gameEnv?.gameControl;
                 if (gameControl?.currentLevel) {
                     gameControl.currentLevel.continue = false;

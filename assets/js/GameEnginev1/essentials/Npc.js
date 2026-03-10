@@ -17,11 +17,14 @@ class Npc extends Character {
         this.uniqueId = data?.id + "_" + Math.random().toString(36).substr(2, 9);
         
         // IMPORTANT: Create a local dialogue system for this NPC specifically
+        const onDialogueClose = data?.onDialogueClose;
+        const boundOnClose = typeof onDialogueClose === "function" ? onDialogueClose.bind(this) : null;
+
         if (data?.dialogues) {
             this.dialogueSystem = new DialogueSystem({
                 dialogues: data.dialogues,
-                
-                id: this.uniqueId
+                id: this.uniqueId,
+                onClose: boundOnClose
             });
         } else {
             // Create a default dialogue system with a greeting based on NPC data
@@ -33,7 +36,8 @@ class Npc extends Character {
                     "I've been standing here for quite some time."
                 ],
                 // Pass unique ID to prevent conflicts
-                id: this.uniqueId
+                id: this.uniqueId,
+                onClose: boundOnClose
             });
         }
         
