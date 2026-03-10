@@ -68,7 +68,15 @@ class GameLevelAquaticGameLevel {
             hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
             dialogues: ['^$%#^@&!^# (Slime Language) Did I see a human?'],
             reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
-            interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }
+            interact: function() {
+                if (this.dialogueSystem) {
+                    this.showReactionDialogue();
+                }
+                const gameControl = this.gameEnv?.gameControl;
+                if (gameControl?.currentLevel) {
+                    gameControl.currentLevel.continue = false;
+                }
+            }
         };
         const dbarrier_1 = {
             id: 'dbarrier_1', x: 67, y: 86, width: 380, height: 40, visible: false,
