@@ -71,29 +71,41 @@ class GameLevelBasketball {
     reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
     interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }
 };
-        const dbarrier_1 = {
-            id: 'dbarrier_1', x: 258, y: 281, width: 219, height: 104, visible: false,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            fromOverlay: true
-        };
+        // Left bench (skinny vertical barrier)
+const dbarrier_1 = {
+    id: 'dbarrier_1',
+    x: width * 0.18,
+    y: height * 0.55,
+    width: width * 0.06,
+    height: height * 0.08,
+    visible: false,
+    hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
+    fromOverlay: true
+};
 
-        const dbarrier_2 = {
-            id: 'dbarrier_2', x: 136, y: 195, width: 123, height: 229, visible: false,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            fromOverlay: true
-        };
+// Right bench (skinny vertical barrier)
+const dbarrier_2 = {
+    id: 'dbarrier_2',
+    x: width * 0.26,
+    y: height * 0.55,
+    width: width * 0.06,
+    height: height * 0.08,
+    visible: false,
+    hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
+    fromOverlay: true
+};
 
-        const dbarrier_3 = {
-            id: 'dbarrier_3', x: 488, y: 351, width: 54, height: 101, visible: false,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            fromOverlay: true
-        };
-
-        const dbarrier_4 = {
-            id: 'dbarrier_4', x: 555, y: 414, width: 48, height: 40, visible: false,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            fromOverlay: true
-        };
+// Gatorade jug (small square)
+const dbarrier_3 = {
+    id: 'dbarrier_3',
+    x: width * 0.46,
+    y: height * 0.60,
+    width: width * 0.03,
+    height: height * 0.08,
+    visible: false,
+    hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
+    fromOverlay: true
+};
 this.classes = [      { class: GameEnvBackground, data: bgData },
       { class: Player, data: playerData },
       { class: Npc, data: npcData1 },
