@@ -99,7 +99,7 @@ const dbarrier_2 = {
 const dbarrier_3 = {
     id: 'dbarrier_3',
     x: width * 0.46,
-    y: height * 0.60,
+    y: height * 0.30,
     width: width * 0.03,
     height: height * 0.08,
     visible: false,
@@ -111,8 +111,7 @@ this.classes = [      { class: GameEnvBackground, data: bgData },
       { class: Npc, data: npcData1 },
       { class: Barrier, data: dbarrier_1 },
       { class: Barrier, data: dbarrier_2 },
-      { class: Barrier, data: dbarrier_3 },
-      { class: Barrier, data: dbarrier_4 }
+      { class: Barrier, data: dbarrier_3 }
 ];
 
         
