@@ -183,9 +183,15 @@ class GameControl {
         // Call the gameOver callback if it exists
         if (this.gameOver) {
             this.gameOver();
-        } else {
+            return;
+        }
+
+        // Only advance if there is another level available
+        if (this.currentLevelIndex < this.levelClasses.length - 1) {
             this.currentLevelIndex++;
             this.transitionToLevel();
+        } else {
+            this.isPaused = true;
         }
     }
 
