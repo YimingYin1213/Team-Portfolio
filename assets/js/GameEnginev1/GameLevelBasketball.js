@@ -74,10 +74,10 @@ class GameLevelBasketball {
         // Left bench (skinny vertical barrier)
 const dbarrier_1 = {
     id: 'dbarrier_1',
-    x: width * 0.155,
-    y: height * 0.72,
-    width: width * 0.04,
-    height: height * 0.06,
+    x: width * 0.175,
+    y: height * 0.60,
+    width: width * 0.005,
+    height: height * 0.22,
     visible: true,
     hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
     fromOverlay: true
@@ -86,10 +86,10 @@ const dbarrier_1 = {
 // Right bench (skinny vertical barrier)
 const dbarrier_2 = {
     id: 'dbarrier_2',
-    x: width * 0.255,
-    y: height * 0.72,
-    width: width * 0.04,
-    height: height * 0.06,
+    x: width * 0.295,
+    y: height * 0.60,
+    width: width * 0.005,
+    height: height * 0.22,
     visible: true,
     hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
     fromOverlay: true
@@ -98,10 +98,10 @@ const dbarrier_2 = {
 // Gatorade jug (small square)
 const dbarrier_3 = {
     id: 'dbarrier_3',
-    x: width * 0.62,
-    y: height * 0.62,
-    width: width * 0.06,
-    height: height * 0.18,
+    x: width * 0.615,
+    y: height * 0.55,
+    width: width * 0.075,
+    height: height * 0.30,
     visible: true,
     hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
     fromOverlay: true
