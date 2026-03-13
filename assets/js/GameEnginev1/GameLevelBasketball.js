@@ -78,7 +78,7 @@ const dbarrier_1 = {
     y: height * 0.55,
     width: width * 0.06,
     height: height * 0.08,
-    visible: false,
+    visible: true,
     hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
     fromOverlay: true
 };
@@ -90,7 +90,7 @@ const dbarrier_2 = {
     y: height * 0.55,
     width: width * 0.06,
     height: height * 0.08,
-    visible: false,
+    visible: true,
     hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
     fromOverlay: true
 };
@@ -102,7 +102,7 @@ const dbarrier_3 = {
     y: height * 0.30,
     width: width * 0.03,
     height: height * 0.08,
-    visible: false,
+    visible: true,
     hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
     fromOverlay: true
 };
