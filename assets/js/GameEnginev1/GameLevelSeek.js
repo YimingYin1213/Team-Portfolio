@@ -54,7 +54,7 @@ class GameLevelSeek {
             src: path + "/images/gamebuilder/sprites/kirby.png",
             SCALE_FACTOR: 8,
             ANIMATION_RATE: 50,
-            INIT_POSITION: { x: 599, y: 88 },
+            INIT_POSITION: { x: 700, y: 40 },
             pixels: { height: 36, width: 569 },
             orientation: { rows: 1, columns: 13 },
             down: { row: 0, start: 0, columns: 3 },
