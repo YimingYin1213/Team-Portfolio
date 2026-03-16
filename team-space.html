@@ -1213,12 +1213,112 @@ return dx*dx + dy*dy < r*r;
                             <h3>Game Concept</h3>
                             <p>The player will play as a scuba diver and seek for the floating slime under the sea.</p>
 
+                            <h3>How It Works</h3>
+                            <p>You need a Game Builder on your website to load custom assets. You also need to put the correct asset path so the background and sprites load properly.</p>
+
                             <h3>Unique Assets</h3>
                             <ul style="text-align: left; display: inline-block;">
                                 <li>Added scuba diver spritesheet</li>
                                 <li>Added under sea background</li>
                                 <li>Collision walls to challenge the player</li>
                             </ul>
+
+                            <h3>Game Level Configuration</h3>
+                            <pre class="code-box"><code>class GameLevelAquaticGameLevel {
+    constructor(gameEnv) {
+        const path = gameEnv.path;
+        const width = gameEnv.innerWidth;
+        const height = gameEnv.innerHeight;
+
+        const bgData = {
+            name: "custom_bg",
+            src: path + "/images/gamebuilder/bg/Aquatic.png",
+            pixels: { height: 1960, width: 2940 }
+        };
+
+        const playerData = {
+            id: 'playerData',
+            src: path + "/images/gamebuilder/sprites/scubadiver.png",
+            SCALE_FACTOR: 5,
+            STEP_FACTOR: 1000,
+            ANIMATION_RATE: 50,
+            INIT_POSITION: { x: 100, y: 300 },
+            pixels: { height: 948, width: 632 },
+            orientation: { rows: 4, columns: 3 },
+            down: { row: 0, start: 0, columns: 3 },
+            downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI/16 },
+            downLeft: { row: 0, start: 0, columns: 3, rotate: -Math.PI/16 },
+            left: { row: 2, start: 0, columns: 3 },
+            right: { row: 1, start: 0, columns: 3 },
+            up: { row: 3, start: 0, columns: 3 },
+            upLeft: { row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
+            upRight: { row: 3, start: 0, columns: 3, rotate: -Math.PI/16 },
+            hitbox: { widthPercentage: 0, heightPercentage: 0 },
+            keypress: { up: 87, left: 65, down: 83, right: 68 }
+            };
+
+        const npcData1 = {
+            id: 'Random Slime',
+            greeting: '^$%#^@&!^# (Slime Language) Did I see a human?',
+            src: path + "/images/gamebuilder/sprites/slime.png",
+            SCALE_FACTOR: 8,
+            ANIMATION_RATE: 50,
+            INIT_POSITION: { x: 800, y: 128 },
+            pixels: { height: 225, width: 225 },
+            orientation: { rows: 4, columns: 4 },
+            down: { row: 0, start: 0, columns: 3 },
+            right: { row: Math.min(1, 4 - 1), start: 0, columns: 3 },
+            left: { row: Math.min(2, 4 - 1), start: 0, columns: 3 },
+            up: { row: Math.min(3, 4 - 1), start: 0, columns: 3 },
+            upRight: { row: Math.min(3, 4 - 1), start: 0, columns: 3 },
+            downRight: { row: Math.min(1, 4 - 1), start: 0, columns: 3 },
+            upLeft: { row: Math.min(2, 4 - 1), start: 0, columns: 3 },
+            downLeft: { row: 0, start: 0, columns: 3 },
+            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+            dialogues: ['^$%#^@&!^# (Slime Language) Did I see a human?'],
+            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
+            interact: function() {
+                if (this.dialogueSystem) {
+                    this.showReactionDialogue();
+                }
+            },
+            onDialogueClose: function() {
+                const gameControl = this.gameEnv?.gameControl;
+                if (gameControl?.currentLevel) {
+                    gameControl.currentLevel.continue = false;
+                }
+            }
+        };
+        const dbarrier_1 = {
+            id: 'dbarrier_1', x: 67, y: 86, width: 380, height: 40, visible: false,
+            hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
+            fromOverlay: true
+        };
+
+        const dbarrier_2 = {
+            id: 'dbarrier_2', x: 457, y: 356, width: 40, height: 187, visible: false,
+            hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
+            fromOverlay: true
+        };
+
+        const dbarrier_3 = {
+            id: 'dbarrier_3', x: 754, y: 340, width: 325, height: 40, visible: false,
+            hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
+            fromOverlay: true
+        };
+this.classes = [      { class: GameEnvBackground, data: bgData },
+      { class: Player, data: playerData },
+      { class: Npc, data: npcData1 },
+      { class: Barrier, data: dbarrier_1 },
+      { class: Barrier, data: dbarrier_2 },
+      { class: Barrier, data: dbarrier_3 }
+];
+
+        
+    }
+}
+
+export default GameLevelAquaticGameLevel;</code></pre>
 
                             <h3>Hardships</h3>
                             <p>While creating the game level, I priorly focused on manipulating the collision walls. They had quite big hitbox, sometimes when the player is unable to enter the crack of between the walls.</p>
