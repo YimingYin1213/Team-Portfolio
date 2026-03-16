@@ -1,133 +1,32 @@
-// Adventure Game Custom Level
-// Exported from GameBuilder on 2026-03-06T07:25:20.568Z
-// How to use this file:
-// 1) Save as assets/js/GameEnginev1/GameLevelBasketball.js in your repo.
-// 2) Reference it in your runner or level selector. Examples:
-//    import GameLevelPlanets from '/portfolio/assets/js/GameEnginev1/GameLevelPlanets.js';
+// Adventure Game Custom Level - Basketball Evasion
+// Fully self-contained — no external sprites or backgrounds required.
+//
+// How to use:
+// 1) Save as assets/js/GameEnginev1/GameLevelBasketball.js
+// 2) Import and add to your gameLevelClasses array:
 //    import GameLevelBasketball from '/portfolio/assets/js/GameEnginev1/GameLevelBasketball.js';
-//    export const gameLevelClasses = [GameLevelPlanets, GameLevelBasketball];
-// 3) Ensure images exist and paths resolve via 'path' provided by the engine.
-// 4) You can add more objects to this.classes inside the constructor.
+//    export const gameLevelClasses = [GameLevelBasketball];
 
 import GameEnvBackground from './essentials/GameEnvBackground.js';
-import Player from './essentials/Player.js';
-import Npc from './essentials/Npc.js';
-import Barrier from './essentials/Barrier.js';
 
 class GameLevelBasketball {
     constructor(gameEnv) {
-        const path = gameEnv.path;
-        const width = gameEnv.innerWidth;
-        const height = gameEnv.innerHeight;
+        // Minimal engine registration — no external assets needed
+        this.classes = [];
 
-        const bgData = {
-            name: "custom_bg",
-            src: path + "/images/gamebuilder/bg/Court.png",
-            pixels: { height: 768, width: 1377 }
-        };
+        const width  = gameEnv.innerWidth  || window.innerWidth;
+        const height = gameEnv.innerHeight || window.innerHeight;
 
-        const playerData = {
-            id: 'playerData',
-            src: path + "/images/gamebuilder/sprites/BasketballPlayer.png",
-            SCALE_FACTOR: 5,
-            STEP_FACTOR: 400,
-            ANIMATION_RATE: 50,
-            INIT_POSITION: { x: 100, y: 300 },
-            pixels: { height: 1350, width: 1080 },
-            orientation: { rows: 4, columns: 3 },
-            down:      { row: 0, start: 0, columns: 3 },
-            downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI/16 },
-            downLeft:  { row: 0, start: 0, columns: 3, rotate: -Math.PI/16 },
-            left:      { row: 2, start: 0, columns: 3 },
-            right:     { row: 1, start: 0, columns: 3 },
-            up:        { row: 3, start: 0, columns: 3 },
-            upLeft:    { row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
-            upRight:   { row: 3, start: 0, columns: 3, rotate: -Math.PI/16 },
-            hitbox: { widthPercentage: 0, heightPercentage: 0 },
-            keypress: { up: 87, left: 65, down: 83, right: 68 }
-        };
-
-        const npcData1 = {
-            id: 'NPC',
-            greeting: 'Yo let\'s 1v1',
-            src: path + "/images/gamebuilder/sprites/LeBron.png",
-            SCALE_FACTOR: 3,
-            ANIMATION_RATE: 50,
-            INIT_POSITION: { x: 1250, y: 300 },
-            pixels: { height: 1350, width: 1080 },
-            orientation: { rows: 4, columns: 3 },
-            down:      { row: 0, start: 0, columns: 1 },
-            right:     { row: 0, start: 0, columns: 1 },
-            left:      { row: 0, start: 0, columns: 1 },
-            up:        { row: 0, start: 0, columns: 1 },
-            upRight:   { row: 0, start: 0, columns: 1 },
-            downRight: { row: 0, start: 0, columns: 1 },
-            upLeft:    { row: 0, start: 0, columns: 1 },
-            downLeft:  { row: 0, start: 0, columns: 1 },
-            speed: 0,
-            hitbox: { widthPercentage: 0.01, heightPercentage: 0.01 },
-            dialogues: ['Yo let\'s 1v1!'],
-            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
-            interact: function() { if (this.dialogueSystem) { this.showRandomDialogue(); } }
-        };
-
-        // Left bench (skinny vertical barrier)
-        const dbarrier_1 = {
-            id: 'dbarrier_1',
-            x: width * 0.175,
-            y: height * 0.60,
-            width: width * 0.005,
-            height: height * 0.22,
-            visible: true,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            fromOverlay: true
-        };
-
-        // Right bench (skinny vertical barrier)
-        const dbarrier_2 = {
-            id: 'dbarrier_2',
-            x: width * 0.295,
-            y: height * 0.60,
-            width: width * 0.005,
-            height: height * 0.22,
-            visible: true,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            fromOverlay: true
-        };
-
-        // Gatorade jug (small square)
-        const dbarrier_3 = {
-            id: 'dbarrier_3',
-            x: width * 0.615,
-            y: height * 0.55,
-            width: width * 0.075,
-            height: height * 0.30,
-            visible: true,
-            hitbox: { widthPercentage: 0.0, heightPercentage: 0.0 },
-            fromOverlay: true
-        };
-
-        this.classes = [
-            { class: GameEnvBackground, data: bgData },
-            { class: Player, data: playerData },
-            { class: Npc, data: npcData1 },
-            { class: Barrier, data: dbarrier_1 },
-            { class: Barrier, data: dbarrier_2 },
-            { class: Barrier, data: dbarrier_3 }
-        ];
-
-        // ── EVASION GAME ──────────────────────────────────────────────────────
-        // Injects a canvas-based mini-game using the real sprite sheets.
-        // LeBron chases the player; survive as long as possible.
-        // Controls: WASD or Arrow Keys. Press R to restart after caught.
-        this._runEvasionGame(gameEnv, path, width, height);
+        // Boot the game after the engine has finished its own setup tick
+        setTimeout(() => this._boot(width, height), 200);
     }
 
-    _runEvasionGame(gameEnv, path, width, height) {
-        // ── Canvas setup ──────────────────────────────────────────────────
-        const W = width  || 1200;
-        const H = height || 680;
+    _boot(W, H) {
+        // ── Remove any leftover canvas from a previous load ────────────────
+        const old = document.getElementById('bball-evasion');
+        if (old) old.remove();
 
+        // ── Create fullscreen canvas ───────────────────────────────────────
         const canvas = document.createElement('canvas');
         canvas.id = 'bball-evasion';
         canvas.width  = W;
@@ -135,89 +34,91 @@ class GameLevelBasketball {
         canvas.setAttribute('tabindex', '0');
         canvas.style.cssText = `
             display: block;
-            position: absolute;
+            position: fixed;
             top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 10;
+            width: 100vw; height: 100vh;
+            z-index: 9999;
             outline: none;
         `;
-
-        // Insert over whatever container the engine uses
-        const container = document.querySelector('#gameContainer, #game, main, body');
-        if (container) {
-            container.style.position = 'relative';
-            container.appendChild(canvas);
-        } else {
-            document.body.appendChild(canvas);
-        }
-
-        const ctx = canvas.getContext('2d');
+        document.body.appendChild(canvas);
         canvas.focus();
 
-        // ── Sprite sheet math (mirrors playerData / npcData1 exactly) ────
-        // Player: 1080w × 1350h, 3 cols × 4 rows, scale 5
-        const P_FRAME_W  = 1080 / 3;           // 360
-        const P_FRAME_H  = 1350 / 4;           // 337.5
-        const P_RENDER_W = P_FRAME_W / 5;      // 72
-        const P_RENDER_H = P_FRAME_H / 5;      // 67.5
-        // row per direction (from playerData orientation)
-        const P_ROW = { down: 0, right: 1, left: 2, up: 3 };
+        const ctx = canvas.getContext('2d');
 
-        // LeBron: same sheet size, scale 3
-        const L_FRAME_W  = 1080 / 3;           // 360
-        const L_FRAME_H  = 1350 / 4;           // 337.5
-        const L_RENDER_W = L_FRAME_W / 3;      // 120
-        const L_RENDER_H = L_FRAME_H / 3;      // 112.5
-        // LeBron uses row 0 for every direction (from npcData1)
-        const L_ROW = { down: 0, right: 0, left: 0, up: 0 };
+        // ── Court colours ─────────────────────────────────────────────────
+        const C = {
+            floor:      '#C8843A',
+            floorDark:  '#B5722F',
+            line:       'rgba(255,255,255,0.85)',
+            paint:      'rgba(180,90,30,0.45)',
+            bench:      '#8B7355',
+            benchLeg:   '#6B5335',
+            gatorGreen: '#2E7D32',
+            gatorYellow:'#FDD835',
+            gatorRed:   '#C62828',
+            crowd:      '#455A64',
+            wall:       '#4E342E',
+            backboard:  '#ECEFF1',
+            rim:        '#E65100',
+            ball:       '#E65100',
+            ballLine:   '#1A1A1A',
+            sky:        '#1A237E',
+            // player colours
+            pSkin:  '#D4845A',
+            pJersey:'#E53935',
+            pShorts:'#1565C0',
+            pShoe:  '#212121',
+            // LeBron colours
+            lSkin:  '#8D5524',
+            lJersey:'#552583',  // Lakers purple
+            lShorts:'#552583',
+            lNumber:'#FDB927',  // Lakers gold
+            lShoe:  '#1A1A1A',
+        };
 
-        // ── Load sprites ──────────────────────────────────────────────────
-        const playerImg = new Image();
-        const lebronImg = new Image();
-        let loadedCount = 0;
-        playerImg.onload = () => loadedCount++;
-        lebronImg.onload = () => loadedCount++;
-        playerImg.src = path + "/images/gamebuilder/sprites/BasketballPlayer.png";
-        lebronImg.src = path + "/images/gamebuilder/sprites/LeBron.png";
-
-        // Also load the court background so the evasion canvas looks right
-        const bgImg = new Image();
-        bgImg.onload = () => loadedCount++;
-        bgImg.src = path + "/images/gamebuilder/bg/Court.png";
-
-        // ── Obstacles — same proportional positions as the barriers above ─
-        const OBS = [
-            { x: W*0.175, y: H*0.60, w: Math.max(W*0.005, 8), h: H*0.22 },
-            { x: W*0.295, y: H*0.60, w: Math.max(W*0.005, 8), h: H*0.22 },
-            { x: W*0.615, y: H*0.55, w: W*0.075,               h: H*0.30 },
-            // court boundary
-            { x: 0,   y: 0,   w: 1, h: H },
-            { x: W-1, y: 0,   w: 1, h: H },
-            { x: 0,   y: 0,   w: W, h: 1 },
-            { x: 0,   y: H-1, w: W, h: 1 },
+        // ── Obstacles (benches + Gatorade cart) ───────────────────────────
+        // Defined as {x, y, w, h} in absolute px — positioned to look natural
+        // on the court. Adjusted after W/H are known.
+        const makeObs = () => [
+            // Left bench
+            { x: W*0.18, y: H*0.55, w: W*0.12, h: H*0.10, type:'bench' },
+            // Right bench
+            { x: W*0.35, y: H*0.55, w: W*0.12, h: H*0.10, type:'bench' },
+            // Gatorade cart
+            { x: W*0.58, y: H*0.52, w: W*0.08, h: H*0.20, type:'gator' },
+            // Hard boundary walls (invisible, just prevent leaving)
+            { x: 0,      y: 0,      w: 2,       h: H,      type:'wall'  },
+            { x: W-2,    y: 0,      w: 2,       h: H,      type:'wall'  },
+            { x: 0,      y: 0,      w: W,       h: 2,      type:'wall'  },
+            { x: 0,      y: H-2,    w: W,       h: 2,      type:'wall'  },
         ];
 
+        let OBS = makeObs();
+
         // ── Game constants ────────────────────────────────────────────────
-        const PLAYER_SPEED   = 3.5;
-        const LEBRON_SPEED_0 = 1.8;   // starting chase speed
-        const LEBRON_SPEED_MAX = 4.5; // cap
-        const CATCH_RADIUS   = (P_RENDER_W + L_RENDER_W) * 0.30;
+        const P_R       = 14;   // player radius (collision circle)
+        const L_R       = 18;   // LeBron radius
+        const P_SPEED   = 3.8;
+        const L_SPEED_0 = 1.6;  // LeBron starts slow
+        const L_SPEED_X = 4.2;  // LeBron max speed (ramps over time)
+        const CATCH_R   = P_R + L_R + 2;
 
-        // ── Game state ────────────────────────────────────────────────────
-        let player, lebron, keys, gameOver, caught, startTime, elapsed, bestTime, tickN;
+        // ── State ─────────────────────────────────────────────────────────
+        let player, lebron, keys, gameOver, caught, startTime, elapsed, bestTime, tick;
+        bestTime = 0;
 
-        function initState() {
-            player    = { x: 120,     y: H / 2, dir: 'down', frame: 0 };
-            lebron    = { x: W - 160, y: H / 2, dir: 'left', frame: 0 };
+        const reset = () => {
+            player    = { x: W*0.10, y: H*0.50, dir:'right', frame:0, moving:false };
+            lebron    = { x: W*0.88, y: H*0.50, dir:'left',  frame:0 };
             keys      = {};
             gameOver  = false;
             caught    = false;
             startTime = Date.now();
             elapsed   = 0;
-            tickN     = 0;
-        }
-        bestTime = 0;
-        initState();
+            tick      = 0;
+            OBS       = makeObs();
+        };
+        reset();
 
         // ── Input ─────────────────────────────────────────────────────────
         window.addEventListener('keydown', e => {
@@ -227,185 +128,354 @@ class GameLevelBasketball {
         });
         window.addEventListener('keyup', e => {
             keys[e.key.toLowerCase()] = false;
-            if (e.key.toLowerCase() === 'r' && gameOver) initState();
+            if (e.key.toLowerCase() === 'r' && gameOver) reset();
         });
 
-        // ── Collision ─────────────────────────────────────────────────────
-        function hits(cx, cy, hw, hh) {
-            for (const o of OBS) {
-                if (cx - hw < o.x + o.w && cx + hw > o.x &&
-                    cy - hh < o.y + o.h && cy + hh > o.y) return true;
-            }
-            return false;
-        }
+        // ── Collision: circle vs axis-aligned rect ─────────────────────────
+        const circleHitsRect = (cx, cy, r, rx, ry, rw, rh) => {
+            const nearX = Math.max(rx, Math.min(cx, rx + rw));
+            const nearY = Math.max(ry, Math.min(cy, ry + rh));
+            const dx = cx - nearX, dy = cy - nearY;
+            return dx*dx + dy*dy < r*r;
+        };
+        const anyHit = (cx, cy, r) =>
+            OBS.some(o => circleHitsRect(cx, cy, r, o.x, o.y, o.w, o.h));
 
-        // ── Draw one sprite frame centered on (cx, cy) ────────────────────
-        function drawSprite(img, frameW, frameH, renderW, renderH, rowMap, cx, cy, dir, frame) {
-            if (!img.complete || img.naturalWidth === 0) return;
-            const row = rowMap[dir] ?? 0;
-            const col = frame % 3;
-            ctx.drawImage(
-                img,
-                col * frameW, row * frameH, frameW, frameH,
-                cx - renderW / 2, cy - renderH / 2, renderW, renderH
-            );
-        }
+        // ── Draw helpers ──────────────────────────────────────────────────
+
+        // Pixelart-style person: cx/cy = foot-centre
+        // jersey, shorts, skin, number string, hat colour
+        const drawPerson = (cx, cy, facingRight, jersey, shorts, skin, numStr, hatCol, r) => {
+            const s = r / 14; // scale factor (r=14 → s=1)
+            const fx = facingRight ? 1 : -1;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+
+            // Shoes
+            ctx.fillStyle = C.pShoe;
+            ctx.fillRect(fx*2*s - 8*s, -4*s,  8*s, 4*s);
+            ctx.fillRect(fx*2*s,        -4*s,  8*s, 4*s);
+
+            // Legs / shorts
+            ctx.fillStyle = shorts;
+            ctx.fillRect(-8*s, -20*s, 16*s, 16*s);
+
+            // Body / jersey
+            ctx.fillStyle = jersey;
+            ctx.fillRect(-10*s, -38*s, 20*s, 18*s);
+
+            // Arms
+            ctx.fillStyle = skin;
+            ctx.fillRect(-16*s, -37*s, 6*s, 12*s);
+            ctx.fillRect( 10*s, -37*s, 6*s, 12*s);
+
+            // Jersey number
+            ctx.fillStyle = '#fff';
+            ctx.font = `bold ${Math.round(8*s)}px monospace`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(numStr, 0, -29*s);
+
+            // Head
+            ctx.fillStyle = skin;
+            ctx.beginPath();
+            ctx.arc(0, -48*s, 10*s, 0, Math.PI*2);
+            ctx.fill();
+
+            // Hat / headband
+            ctx.fillStyle = hatCol;
+            ctx.fillRect(-10*s, -56*s, 20*s, 5*s);
+
+            // Eyes
+            ctx.fillStyle = '#111';
+            ctx.fillRect(fx*3*s, -50*s, 3*s, 3*s);
+
+            ctx.restore();
+        };
+
+        // Basketball (bounces with a sine offset)
+        const drawBall = (cx, cy, bounceOffset) => {
+            const r = 10;
+            ctx.save();
+            ctx.translate(cx, cy + bounceOffset);
+            ctx.fillStyle = C.ball;
+            ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2); ctx.fill();
+            ctx.strokeStyle = C.ballLine; ctx.lineWidth = 1.2;
+            // seam lines
+            ctx.beginPath(); ctx.moveTo(-r, 0); ctx.lineTo(r, 0); ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(0, 0, r, 0, Math.PI, false);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(0, -r); ctx.lineTo(0, r); ctx.stroke();
+            ctx.restore();
+        };
+
+        // Court background
+        const drawCourt = () => {
+            // Floor planks
+            ctx.fillStyle = C.floor;
+            ctx.fillRect(0, 0, W, H);
+            ctx.fillStyle = C.floorDark;
+            for (let x = 0; x < W; x += W/28) {
+                ctx.fillRect(x, 0, W/56, H);
+            }
+
+            // Back wall
+            ctx.fillStyle = C.wall;
+            ctx.fillRect(0, 0, W, H * 0.38);
+
+            // Crowd silhouettes (simple row of heads)
+            ctx.fillStyle = C.crowd;
+            for (let i = 0; i < 22; i++) {
+                const bx = W * 0.08 + i * (W * 0.84 / 21);
+                const by = H * 0.10 + (i % 3) * (H * 0.03);
+                ctx.beginPath();
+                ctx.arc(bx, by, W * 0.018, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillRect(bx - W*0.009, by, W*0.018, H*0.05);
+            }
+
+            // Court lines
+            ctx.strokeStyle = C.line;
+            ctx.lineWidth = 2;
+            // Outer boundary
+            ctx.strokeRect(W*0.04, H*0.40, W*0.92, H*0.56);
+            // Centre circle
+            ctx.beginPath();
+            ctx.arc(W/2, H*0.68, W*0.09, 0, Math.PI*2);
+            ctx.stroke();
+            // Centre line
+            ctx.beginPath();
+            ctx.moveTo(W/2, H*0.40);
+            ctx.lineTo(W/2, H*0.96);
+            ctx.stroke();
+            // Left paint
+            ctx.fillStyle = C.paint;
+            ctx.fillRect(W*0.04, H*0.55, W*0.14, H*0.27);
+            ctx.strokeRect(W*0.04, H*0.55, W*0.14, H*0.27);
+            // Right paint
+            ctx.fillStyle = C.paint;
+            ctx.fillRect(W*0.82, H*0.55, W*0.14, H*0.27);
+            ctx.strokeRect(W*0.82, H*0.55, W*0.14, H*0.27);
+            // Free-throw arcs
+            ctx.beginPath(); ctx.arc(W*0.18, H*0.68, W*0.06, Math.PI*0.5, Math.PI*1.5); ctx.stroke();
+            ctx.beginPath(); ctx.arc(W*0.82, H*0.68, W*0.06, Math.PI*1.5, Math.PI*0.5); ctx.stroke();
+
+            // Hoops
+            const drawHoop = (x, y) => {
+                // Backboard
+                ctx.fillStyle = C.backboard;
+                ctx.fillRect(x - 2, y - H*0.04, 4, H*0.10);
+                ctx.strokeStyle = '#555'; ctx.lineWidth = 1;
+                ctx.strokeRect(x - 2, y - H*0.04, 4, H*0.10);
+                // Rim
+                ctx.strokeStyle = C.rim; ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(x + (x < W/2 ? 1 : -1) * W*0.03, y + H*0.01, W*0.028, 0, Math.PI*2);
+                ctx.stroke();
+                // Net lines
+                ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 1;
+                for (let i = -3; i <= 3; i++) {
+                    ctx.beginPath();
+                    const rx = x + (x < W/2 ? 1 : -1) * W*0.028 + i * W*0.009;
+                    ctx.moveTo(rx, y + H*0.01);
+                    ctx.lineTo(rx + i * W*0.004, y + H*0.06);
+                    ctx.stroke();
+                }
+                ctx.beginPath();
+                ctx.moveTo(x + (x < W/2 ? 1 : -1) * W*0.003, y + H*0.04);
+                ctx.lineTo(x + (x < W/2 ? 1 : -1) * W*0.055, y + H*0.04);
+                ctx.stroke();
+            };
+            drawHoop(W*0.04, H*0.55);
+            drawHoop(W*0.96, H*0.55);
+
+            // HOOPS centre text
+            ctx.fillStyle = 'rgba(255,255,255,0.18)';
+            ctx.font = `bold ${Math.round(W*0.055)}px monospace`;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('HOOPS', W/2, H*0.68);
+        };
+
+        // Obstacles (benches + Gatorade)
+        const drawObstacles = () => {
+            OBS.forEach(o => {
+                if (o.type === 'bench') {
+                    // Bench seat
+                    ctx.fillStyle = C.bench;
+                    ctx.fillRect(o.x, o.y, o.w, o.h * 0.4);
+                    // Legs
+                    ctx.fillStyle = C.benchLeg;
+                    ctx.fillRect(o.x + o.w*0.08, o.y + o.h*0.4, o.w*0.12, o.h*0.55);
+                    ctx.fillRect(o.x + o.w*0.80, o.y + o.h*0.4, o.w*0.12, o.h*0.55);
+                }
+                if (o.type === 'gator') {
+                    // Barrel body
+                    ctx.fillStyle = C.gatorGreen;
+                    ctx.beginPath();
+                    ctx.roundRect(o.x, o.y + o.h*0.2, o.w, o.h*0.75, 6);
+                    ctx.fill();
+                    // Gatorade bolt
+                    ctx.fillStyle = C.gatorYellow;
+                    ctx.font = `bold ${Math.round(o.w*0.55)}px monospace`;
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText('G', o.x + o.w/2, o.y + o.h*0.58);
+                    // Cups on top
+                    ctx.fillStyle = C.gatorRed;
+                    ctx.fillRect(o.x + o.w*0.1, o.y + o.h*0.08, o.w*0.28, o.h*0.14);
+                    ctx.fillRect(o.x + o.w*0.5, o.y + o.h*0.05, o.w*0.28, o.h*0.17);
+                    // Wheels
+                    ctx.fillStyle = '#333';
+                    ctx.beginPath(); ctx.arc(o.x + o.w*0.25, o.y + o.h*0.96, o.w*0.12, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(o.x + o.w*0.75, o.y + o.h*0.96, o.w*0.12, 0, Math.PI*2); ctx.fill();
+                }
+            });
+        };
 
         // ── Update ────────────────────────────────────────────────────────
-        function update() {
+        const update = () => {
             if (gameOver) return;
             elapsed = (Date.now() - startTime) / 1000;
-            tickN++;
+            tick++;
 
-            // — Player —
+            // Player
             let dx = 0, dy = 0;
-            if (keys['w'] || keys['arrowup'])    { dy = -PLAYER_SPEED; player.dir = 'up';    }
-            if (keys['s'] || keys['arrowdown'])  { dy =  PLAYER_SPEED; player.dir = 'down';  }
-            if (keys['a'] || keys['arrowleft'])  { dx = -PLAYER_SPEED; player.dir = 'left';  }
-            if (keys['d'] || keys['arrowright']) { dx =  PLAYER_SPEED; player.dir = 'right'; }
+            if (keys['w'] || keys['arrowup'])    { dy = -P_SPEED; player.dir = 'up';    }
+            if (keys['s'] || keys['arrowdown'])  { dy =  P_SPEED; player.dir = 'down';  }
+            if (keys['a'] || keys['arrowleft'])  { dx = -P_SPEED; player.dir = 'left';  }
+            if (keys['d'] || keys['arrowright']) { dx =  P_SPEED; player.dir = 'right'; }
+            player.moving = !!(dx || dy);
 
-            const phw = P_RENDER_W * 0.35;
-            const phh = P_RENDER_H * 0.35;
-            if (!hits(player.x + dx, player.y, phw, phh)) player.x += dx;
-            if (!hits(player.x, player.y + dy, phw, phh)) player.y += dy;
-            if ((dx !== 0 || dy !== 0) && tickN % 6 === 0) player.frame++;
+            if (!anyHit(player.x + dx, player.y, P_R)) player.x += dx;
+            if (!anyHit(player.x, player.y + dy, P_R)) player.y += dy;
+            if (player.moving && tick % 7 === 0) player.frame++;
 
-            // — LeBron chase —
-            const lspeed = Math.min(LEBRON_SPEED_0 + elapsed * 0.04, LEBRON_SPEED_MAX);
+            // LeBron chase
+            const spd = Math.min(L_SPEED_0 + elapsed * 0.04, L_SPEED_X);
             const ddx = player.x - lebron.x;
             const ddy = player.y - lebron.y;
-            const dist = Math.sqrt(ddx * ddx + ddy * ddy);
+            const dist = Math.sqrt(ddx*ddx + ddy*ddy);
 
             if (dist > 2) {
-                const nx = (ddx / dist) * lspeed;
-                const ny = (ddy / dist) * lspeed;
+                const nx = (ddx/dist) * spd;
+                const ny = (ddy/dist) * spd;
+                lebron.dir = Math.abs(ddx) > Math.abs(ddy)
+                    ? (ddx > 0 ? 'right' : 'left')
+                    : (ddy > 0 ? 'down'  : 'up');
 
-                if (Math.abs(ddx) > Math.abs(ddy))
-                    lebron.dir = ddx > 0 ? 'right' : 'left';
-                else
-                    lebron.dir = ddy > 0 ? 'down' : 'up';
-
-                const lhw = L_RENDER_W * 0.35;
-                const lhh = L_RENDER_H * 0.35;
-
-                if      (!hits(lebron.x + nx, lebron.y,      lhw, lhh)) lebron.x += nx;
-                else if (!hits(lebron.x,      lebron.y + ny, lhw, lhh)) lebron.y += ny;
+                if      (!anyHit(lebron.x + nx, lebron.y, L_R)) lebron.x += nx;
+                else if (!anyHit(lebron.x, lebron.y + ny, L_R)) lebron.y += ny;
                 else {
-                    // slide along corner
-                    for (const s of [{ x: -ny, y: nx }, { x: ny, y: -nx }]) {
-                        if (!hits(lebron.x + s.x * 0.9, lebron.y + s.y * 0.9, lhw, lhh)) {
-                            lebron.x += s.x * 0.9;
-                            lebron.y += s.y * 0.9;
-                            break;
+                    for (const s of [{ x:-ny, y:nx }, { x:ny, y:-nx }]) {
+                        if (!anyHit(lebron.x + s.x*0.9, lebron.y + s.y*0.9, L_R)) {
+                            lebron.x += s.x*0.9; lebron.y += s.y*0.9; break;
                         }
                     }
                 }
-                if (tickN % 6 === 0) lebron.frame++;
+                if (tick % 7 === 0) lebron.frame++;
             }
 
-            // — Catch check —
-            if (dist < CATCH_RADIUS) {
-                caught   = true;
-                gameOver = true;
+            if (dist < CATCH_R) {
+                caught = gameOver = true;
                 if (elapsed > bestTime) bestTime = elapsed;
             }
-        }
+        };
 
         // ── Render ────────────────────────────────────────────────────────
-        function render() {
+        const render = () => {
             ctx.clearRect(0, 0, W, H);
+            drawCourt();
+            drawObstacles();
 
-            // Background
-            if (bgImg.complete && bgImg.naturalWidth > 0) {
-                ctx.drawImage(bgImg, 0, 0, W, H);
-            } else {
-                // Fallback solid court color while bg loads
-                ctx.fillStyle = '#c8833a';
-                ctx.fillRect(0, 0, W, H);
-            }
+            // Ball bounces near the player's feet
+            const bounce = Math.sin(tick * 0.25) * 5;
+            drawBall(player.x + (player.dir === 'left' ? -20 : 20), player.y - 10, bounce);
 
-            // Sprites (or loading message)
-            if (loadedCount < 3) {
-                ctx.fillStyle = 'rgba(0,0,0,0.55)';
-                ctx.beginPath();
-                ctx.roundRect(W/2 - 90, H/2 - 18, 180, 36, 8);
-                ctx.fill();
-                ctx.fillStyle = '#fff';
-                ctx.font = '14px monospace';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('Loading sprites…', W/2, H/2);
-            } else {
-                drawSprite(playerImg, P_FRAME_W, P_FRAME_H, P_RENDER_W, P_RENDER_H,
-                           P_ROW, player.x, player.y, player.dir, player.frame);
-                drawSprite(lebronImg, L_FRAME_W, L_FRAME_H, L_RENDER_W, L_RENDER_H,
-                           L_ROW, lebron.x, lebron.y, lebron.dir, lebron.frame);
-            }
+            // Draw player (red jersey #11)
+            drawPerson(
+                player.x, player.y,
+                player.dir !== 'left',
+                C.pJersey, C.pShorts, C.pSkin,
+                '11', C.pJersey, P_R
+            );
 
-            // HUD — timer bar
+            // Draw LeBron (purple jersey #23)
+            drawPerson(
+                lebron.x, lebron.y,
+                lebron.dir !== 'left',
+                C.lJersey, C.lShorts, C.lSkin,
+                '23', C.lNumber, L_R
+            );
+
+            // HUD bar
             ctx.save();
-            ctx.fillStyle = 'rgba(0,0,0,0.65)';
+            ctx.fillStyle = 'rgba(0,0,0,0.68)';
             ctx.beginPath();
-            ctx.roundRect(W/2 - 150, 10, 300, 36, 8);
+            ctx.roundRect(W/2 - 160, 10, 320, 38, 9);
             ctx.fill();
             ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 16px monospace';
+            ctx.font = `bold ${Math.round(W*0.013)}px monospace`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(`⏱  ${elapsed.toFixed(1)}s     Best: ${bestTime.toFixed(1)}s`, W/2, 28);
+            ctx.fillText(`⏱  ${elapsed.toFixed(1)}s     Best: ${bestTime.toFixed(1)}s`, W/2, 29);
             ctx.restore();
+
+            // Speed warning (LeBron getting faster)
+            const spd = Math.min(L_SPEED_0 + elapsed * 0.04, L_SPEED_X);
+            if (spd > 3.0) {
+                ctx.save();
+                ctx.fillStyle = `rgba(220,50,50,${Math.min((spd-3.0)*0.4, 0.7)})`;
+                ctx.font = `bold ${Math.round(W*0.012)}px monospace`;
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText("⚡ LeBron is heating up!", W/2, 60);
+                ctx.restore();
+            }
 
             // Controls hint
             ctx.save();
-            ctx.fillStyle = 'rgba(0,0,0,0.45)';
-            ctx.beginPath();
-            ctx.roundRect(8, H - 28, 232, 20, 4);
-            ctx.fill();
-            ctx.fillStyle = '#cccccc';
+            ctx.fillStyle = 'rgba(0,0,0,0.48)';
+            ctx.beginPath(); ctx.roundRect(8, H-28, 270, 20, 4); ctx.fill();
+            ctx.fillStyle = '#ccc';
             ctx.font = '11px monospace';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('Move: WASD / Arrow Keys', 14, H - 18);
+            ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+            ctx.fillText('Move: WASD / Arrow Keys   |   R = restart', 14, H-18);
             ctx.restore();
 
             // Caught screen
             if (caught) {
                 ctx.save();
-                ctx.fillStyle = 'rgba(0,0,0,0.72)';
+                ctx.fillStyle = 'rgba(0,0,0,0.75)';
                 ctx.fillRect(0, 0, W, H);
 
-                const cw = 420, ch = 230;
-                const cx = (W - cw) / 2;
-                const cy = (H - ch) / 2;
+                const bw = Math.min(460, W*0.7), bh = 240;
+                const bx = (W-bw)/2, by = (H-bh)/2;
                 ctx.fillStyle = '#1a1a2e';
-                ctx.strokeStyle = '#ffd700';
+                ctx.strokeStyle = '#FDB927';
                 ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.roundRect(cx, cy, cw, ch, 14);
-                ctx.fill();
-                ctx.stroke();
+                ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 16); ctx.fill(); ctx.stroke();
 
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
 
-                ctx.fillStyle = '#ffd700';
-                ctx.font = 'bold 24px monospace';
-                ctx.fillText('🏀  LeBron stole the ball!', W/2, cy + 55);
+                ctx.fillStyle = '#FDB927';
+                ctx.font = `bold ${Math.round(W*0.025)}px monospace`;
+                ctx.fillText('🏀  LeBron stole the ball!', W/2, by+55);
 
                 ctx.fillStyle = '#ff6600';
-                ctx.font = 'bold 19px monospace';
-                ctx.fillText(`You survived  ${elapsed.toFixed(1)}s`, W/2, cy + 100);
+                ctx.font = `bold ${Math.round(W*0.020)}px monospace`;
+                ctx.fillText(`You survived  ${elapsed.toFixed(1)}s`, W/2, by+105);
 
-                ctx.fillStyle = '#aaaaaa';
-                ctx.font = '14px monospace';
-                ctx.fillText(`Best: ${bestTime.toFixed(1)}s`, W/2, cy + 142);
+                ctx.fillStyle = '#aaa';
+                ctx.font = `${Math.round(W*0.014)}px monospace`;
+                ctx.fillText(`Best: ${bestTime.toFixed(1)}s`, W/2, by+148);
 
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '13px monospace';
-                ctx.fillText('Press  R  to play again', W/2, cy + 178);
+                ctx.fillStyle = '#fff';
+                ctx.font = `${Math.round(W*0.013)}px monospace`;
+                ctx.fillText('Press  R  to play again', W/2, by+185);
                 ctx.restore();
             }
-        }
+        };
 
         // ── Loop ──────────────────────────────────────────────────────────
         (function loop() {
