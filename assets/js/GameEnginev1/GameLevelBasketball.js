@@ -1,5 +1,5 @@
 // Adventure Game Custom Level - Basketball Evasion
-// Fully self-contained — no external sprites or backgrounds required.
+// Save as assets/js/GameEnginev1/GameLevelBasketball.js
 //
 // How to use:
 // 1) Save as assets/js/GameEnginev1/GameLevelBasketball.js
@@ -11,112 +11,65 @@ import GameEnvBackground from './essentials/GameEnvBackground.js';
 
 class GameLevelBasketball {
     constructor(gameEnv) {
-        // Minimal engine registration — no external assets needed
         this.classes = [];
-
-        const width  = gameEnv.innerWidth  || window.innerWidth;
-        const height = gameEnv.innerHeight || window.innerHeight;
-
-        // Boot the game after the engine has finished its own setup tick
-        setTimeout(() => this._boot(width, height), 200);
+        const W = gameEnv.innerWidth  || window.innerWidth;
+        const H = gameEnv.innerHeight || window.innerHeight;
+        setTimeout(() => this._boot(W, H), 200);
     }
 
     _boot(W, H) {
-        // ── Remove any leftover canvas from a previous load ────────────────
         const old = document.getElementById('bball-evasion');
         if (old) old.remove();
 
-        // ── Create fullscreen canvas ───────────────────────────────────────
         const canvas = document.createElement('canvas');
         canvas.id = 'bball-evasion';
         canvas.width  = W;
         canvas.height = H;
         canvas.setAttribute('tabindex', '0');
         canvas.style.cssText = `
-            display: block;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 9999;
-            outline: none;
+            display:block; position:fixed; top:0; left:0;
+            width:100vw; height:100vh; z-index:9999; outline:none;
         `;
         document.body.appendChild(canvas);
         canvas.focus();
-
         const ctx = canvas.getContext('2d');
 
-        // ── Court colours ─────────────────────────────────────────────────
-        const C = {
-            floor:      '#C8843A',
-            floorDark:  '#B5722F',
-            line:       'rgba(255,255,255,0.85)',
-            paint:      'rgba(180,90,30,0.45)',
-            bench:      '#8B7355',
-            benchLeg:   '#6B5335',
-            gatorGreen: '#2E7D32',
-            gatorYellow:'#FDD835',
-            gatorRed:   '#C62828',
-            crowd:      '#455A64',
-            wall:       '#4E342E',
-            backboard:  '#ECEFF1',
-            rim:        '#E65100',
-            ball:       '#E65100',
-            ballLine:   '#1A1A1A',
-            sky:        '#1A237E',
-            // player colours
-            pSkin:  '#D4845A',
-            pJersey:'#E53935',
-            pShorts:'#1565C0',
-            pShoe:  '#212121',
-            // LeBron colours
-            lSkin:  '#8D5524',
-            lJersey:'#552583',  // Lakers purple
-            lShorts:'#552583',
-            lNumber:'#FDB927',  // Lakers gold
-            lShoe:  '#1A1A1A',
-        };
-
-        // ── Obstacles (benches + Gatorade cart) ───────────────────────────
-        // Defined as {x, y, w, h} in absolute px — positioned to look natural
-        // on the court. Adjusted after W/H are known.
-        const makeObs = () => [
-            // Left bench
-            { x: W*0.18, y: H*0.55, w: W*0.12, h: H*0.10, type:'bench' },
-            // Right bench
-            { x: W*0.35, y: H*0.55, w: W*0.12, h: H*0.10, type:'bench' },
-            // Gatorade cart
-            { x: W*0.58, y: H*0.52, w: W*0.08, h: H*0.20, type:'gator' },
-            // Hard boundary walls (invisible, just prevent leaving)
-            { x: 0,      y: 0,      w: 2,       h: H,      type:'wall'  },
-            { x: W-2,    y: 0,      w: 2,       h: H,      type:'wall'  },
-            { x: 0,      y: 0,      w: W,       h: 2,      type:'wall'  },
-            { x: 0,      y: H-2,    w: W,       h: 2,      type:'wall'  },
+        // ── Obstacles: randomly scattered but reproducible ─────────────────
+        // Each is {x,y,w,h,type}. We keep a margin from spawn points.
+        const MARGIN = 80;
+        const obstacles = [
+            // Fixed obstacles so layout is always fair
+            { x: W*0.28, y: H*0.30, w: W*0.10, h: H*0.06, type:'bench'  },
+            { x: W*0.55, y: H*0.58, w: W*0.10, h: H*0.06, type:'bench'  },
+            { x: W*0.38, y: H*0.62, w: W*0.08, h: H*0.06, type:'bench'  },
+            { x: W*0.20, y: H*0.64, w: W*0.07, h: H*0.18, type:'gator'  },
+            { x: W*0.65, y: H*0.28, w: W*0.07, h: H*0.18, type:'gator'  },
+            { x: W*0.46, y: H*0.38, w: W*0.06, h: H*0.14, type:'cone'   },
+            // boundary walls
+            { x:0,    y:0,    w:4,  h:H, type:'wall' },
+            { x:W-4,  y:0,    w:4,  h:H, type:'wall' },
+            { x:0,    y:0,    w:W,  h:4, type:'wall' },
+            { x:0,    y:H-4,  w:W,  h:4, type:'wall' },
         ];
 
-        let OBS = makeObs();
-
-        // ── Game constants ────────────────────────────────────────────────
-        const P_R       = 14;   // player radius (collision circle)
-        const L_R       = 18;   // LeBron radius
-        const P_SPEED   = 3.8;
-        const L_SPEED_0 = 1.6;  // LeBron starts slow
-        const L_SPEED_X = 4.2;  // LeBron max speed (ramps over time)
-        const CATCH_R   = P_R + L_R + 2;
+        // ── Sizes ─────────────────────────────────────────────────────────
+        const PR = 13;   // player collision radius
+        const LR = 16;   // LeBron collision radius
 
         // ── State ─────────────────────────────────────────────────────────
         let player, lebron, keys, gameOver, caught, startTime, elapsed, bestTime, tick;
         bestTime = 0;
 
         const reset = () => {
-            player    = { x: W*0.10, y: H*0.50, dir:'right', frame:0, moving:false };
-            lebron    = { x: W*0.88, y: H*0.50, dir:'left',  frame:0 };
+            // Player spawns left side, LeBron spawns right side
+            player    = { x: W*0.08, y: H*0.50, dir:'right', frame:0, moving:false };
+            lebron    = { x: W*0.90, y: H*0.50, dir:'left',  frame:0 };
             keys      = {};
             gameOver  = false;
             caught    = false;
             startTime = Date.now();
             elapsed   = 0;
             tick      = 0;
-            OBS       = makeObs();
         };
         reset();
 
@@ -131,353 +84,483 @@ class GameLevelBasketball {
             if (e.key.toLowerCase() === 'r' && gameOver) reset();
         });
 
-        // ── Collision: circle vs axis-aligned rect ─────────────────────────
-        const circleHitsRect = (cx, cy, r, rx, ry, rw, rh) => {
-            const nearX = Math.max(rx, Math.min(cx, rx + rw));
-            const nearY = Math.max(ry, Math.min(cy, ry + rh));
+        // ── Collision: circle vs AABB ──────────────────────────────────────
+        const circVsRect = (cx, cy, r, rx, ry, rw, rh) => {
+            const nearX = Math.max(rx, Math.min(cx, rx+rw));
+            const nearY = Math.max(ry, Math.min(cy, ry+rh));
             const dx = cx - nearX, dy = cy - nearY;
             return dx*dx + dy*dy < r*r;
         };
-        const anyHit = (cx, cy, r) =>
-            OBS.some(o => circleHitsRect(cx, cy, r, o.x, o.y, o.w, o.h));
+        const blocked = (cx, cy, r) =>
+            obstacles.some(o => circVsRect(cx, cy, r, o.x, o.y, o.w, o.h));
 
-        // ── Draw helpers ──────────────────────────────────────────────────
-
-        // Pixelart-style person: cx/cy = foot-centre
-        // jersey, shorts, skin, number string, hat colour
-        const drawPerson = (cx, cy, facingRight, jersey, shorts, skin, numStr, hatCol, r) => {
-            const s = r / 14; // scale factor (r=14 → s=1)
-            const fx = facingRight ? 1 : -1;
-
-            ctx.save();
-            ctx.translate(cx, cy);
-
-            // Shoes
-            ctx.fillStyle = C.pShoe;
-            ctx.fillRect(fx*2*s - 8*s, -4*s,  8*s, 4*s);
-            ctx.fillRect(fx*2*s,        -4*s,  8*s, 4*s);
-
-            // Legs / shorts
-            ctx.fillStyle = shorts;
-            ctx.fillRect(-8*s, -20*s, 16*s, 16*s);
-
-            // Body / jersey
-            ctx.fillStyle = jersey;
-            ctx.fillRect(-10*s, -38*s, 20*s, 18*s);
-
-            // Arms
-            ctx.fillStyle = skin;
-            ctx.fillRect(-16*s, -37*s, 6*s, 12*s);
-            ctx.fillRect( 10*s, -37*s, 6*s, 12*s);
-
-            // Jersey number
-            ctx.fillStyle = '#fff';
-            ctx.font = `bold ${Math.round(8*s)}px monospace`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(numStr, 0, -29*s);
-
-            // Head
-            ctx.fillStyle = skin;
-            ctx.beginPath();
-            ctx.arc(0, -48*s, 10*s, 0, Math.PI*2);
-            ctx.fill();
-
-            // Hat / headband
-            ctx.fillStyle = hatCol;
-            ctx.fillRect(-10*s, -56*s, 20*s, 5*s);
-
-            // Eyes
-            ctx.fillStyle = '#111';
-            ctx.fillRect(fx*3*s, -50*s, 3*s, 3*s);
-
-            ctx.restore();
-        };
-
-        // Basketball (bounces with a sine offset)
-        const drawBall = (cx, cy, bounceOffset) => {
-            const r = 10;
-            ctx.save();
-            ctx.translate(cx, cy + bounceOffset);
-            ctx.fillStyle = C.ball;
-            ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2); ctx.fill();
-            ctx.strokeStyle = C.ballLine; ctx.lineWidth = 1.2;
-            // seam lines
-            ctx.beginPath(); ctx.moveTo(-r, 0); ctx.lineTo(r, 0); ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(0, 0, r, 0, Math.PI, false);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(0, -r); ctx.lineTo(0, r); ctx.stroke();
-            ctx.restore();
-        };
-
-        // Court background
+        // ── Draw: court ────────────────────────────────────────────────────
         const drawCourt = () => {
-            // Floor planks
-            ctx.fillStyle = C.floor;
+            // Dark background / arena
+            ctx.fillStyle = '#1a1a2a';
             ctx.fillRect(0, 0, W, H);
-            ctx.fillStyle = C.floorDark;
-            for (let x = 0; x < W; x += W/28) {
-                ctx.fillRect(x, 0, W/56, H);
+
+            // Court surface — rich hardwood
+            const woodGrad = ctx.createLinearGradient(0, 0, W, 0);
+            woodGrad.addColorStop(0,   '#b5651d');
+            woodGrad.addColorStop(0.5, '#cd853f');
+            woodGrad.addColorStop(1,   '#b5651d');
+            ctx.fillStyle = woodGrad;
+            ctx.fillRect(0, 0, W, H);
+
+            // Wood plank lines
+            ctx.strokeStyle = 'rgba(100,50,0,0.25)';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < W; x += W/32) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
             }
 
-            // Back wall
-            ctx.fillStyle = C.wall;
-            ctx.fillRect(0, 0, W, H * 0.38);
+            // ── Court markings ─────────────────────────────────────────────
+            ctx.strokeStyle = 'rgba(255,255,255,0.80)';
+            ctx.lineWidth = 2.5;
 
-            // Crowd silhouettes (simple row of heads)
-            ctx.fillStyle = C.crowd;
-            for (let i = 0; i < 22; i++) {
-                const bx = W * 0.08 + i * (W * 0.84 / 21);
-                const by = H * 0.10 + (i % 3) * (H * 0.03);
-                ctx.beginPath();
-                ctx.arc(bx, by, W * 0.018, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillRect(bx - W*0.009, by, W*0.018, H*0.05);
-            }
-
-            // Court lines
-            ctx.strokeStyle = C.line;
-            ctx.lineWidth = 2;
             // Outer boundary
-            ctx.strokeRect(W*0.04, H*0.40, W*0.92, H*0.56);
+            const pad = 30;
+            ctx.strokeRect(pad, pad, W - pad*2, H - pad*2);
+
+            // Half-court line
+            ctx.beginPath();
+            ctx.moveTo(W/2, pad);
+            ctx.lineTo(W/2, H - pad);
+            ctx.stroke();
+
             // Centre circle
             ctx.beginPath();
-            ctx.arc(W/2, H*0.68, W*0.09, 0, Math.PI*2);
+            ctx.arc(W/2, H/2, Math.min(W, H)*0.12, 0, Math.PI*2);
             ctx.stroke();
-            // Centre line
+
+            // Three-point arcs (left + right)
+            const arcR = Math.min(W, H) * 0.30;
             ctx.beginPath();
-            ctx.moveTo(W/2, H*0.40);
-            ctx.lineTo(W/2, H*0.96);
+            ctx.arc(pad, H/2, arcR, -Math.PI*0.45, Math.PI*0.45);
             ctx.stroke();
-            // Left paint
-            ctx.fillStyle = C.paint;
-            ctx.fillRect(W*0.04, H*0.55, W*0.14, H*0.27);
-            ctx.strokeRect(W*0.04, H*0.55, W*0.14, H*0.27);
-            // Right paint
-            ctx.fillStyle = C.paint;
-            ctx.fillRect(W*0.82, H*0.55, W*0.14, H*0.27);
-            ctx.strokeRect(W*0.82, H*0.55, W*0.14, H*0.27);
-            // Free-throw arcs
-            ctx.beginPath(); ctx.arc(W*0.18, H*0.68, W*0.06, Math.PI*0.5, Math.PI*1.5); ctx.stroke();
-            ctx.beginPath(); ctx.arc(W*0.82, H*0.68, W*0.06, Math.PI*1.5, Math.PI*0.5); ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(W - pad, H/2, arcR, Math.PI*0.55, Math.PI*1.45);
+            ctx.stroke();
 
-            // Hoops
-            const drawHoop = (x, y) => {
-                // Backboard
-                ctx.fillStyle = C.backboard;
-                ctx.fillRect(x - 2, y - H*0.04, 4, H*0.10);
-                ctx.strokeStyle = '#555'; ctx.lineWidth = 1;
-                ctx.strokeRect(x - 2, y - H*0.04, 4, H*0.10);
-                // Rim
-                ctx.strokeStyle = C.rim; ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(x + (x < W/2 ? 1 : -1) * W*0.03, y + H*0.01, W*0.028, 0, Math.PI*2);
-                ctx.stroke();
-                // Net lines
-                ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 1;
-                for (let i = -3; i <= 3; i++) {
-                    ctx.beginPath();
-                    const rx = x + (x < W/2 ? 1 : -1) * W*0.028 + i * W*0.009;
-                    ctx.moveTo(rx, y + H*0.01);
-                    ctx.lineTo(rx + i * W*0.004, y + H*0.06);
-                    ctx.stroke();
-                }
-                ctx.beginPath();
-                ctx.moveTo(x + (x < W/2 ? 1 : -1) * W*0.003, y + H*0.04);
-                ctx.lineTo(x + (x < W/2 ? 1 : -1) * W*0.055, y + H*0.04);
-                ctx.stroke();
-            };
-            drawHoop(W*0.04, H*0.55);
-            drawHoop(W*0.96, H*0.55);
+            // Paint boxes (left + right)
+            const pW = W * 0.14, pH = H * 0.38;
+            ctx.fillStyle = 'rgba(180,80,20,0.25)';
+            ctx.fillRect(pad, H/2 - pH/2, pW, pH);
+            ctx.strokeRect(pad, H/2 - pH/2, pW, pH);
+            ctx.fillRect(W - pad - pW, H/2 - pH/2, pW, pH);
+            ctx.strokeRect(W - pad - pW, H/2 - pH/2, pW, pH);
 
-            // HOOPS centre text
-            ctx.fillStyle = 'rgba(255,255,255,0.18)';
-            ctx.font = `bold ${Math.round(W*0.055)}px monospace`;
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillText('HOOPS', W/2, H*0.68);
+            // Free-throw circles
+            ctx.beginPath();
+            ctx.arc(pad + pW, H/2, pH*0.25, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(W - pad - pW, H/2, pH*0.25, 0, Math.PI*2);
+            ctx.stroke();
+
+            // ── Hoops ──────────────────────────────────────────────────────
+            drawHoop(pad + 8, H/2, 1);   // left hoop, facing right
+            drawHoop(W - pad - 8, H/2, -1); // right hoop, facing left
         };
 
-        // Obstacles (benches + Gatorade)
+        const drawHoop = (bx, by, dir) => {
+            const rimR   = Math.min(W, H) * 0.032;
+            const rimX   = bx + dir * rimR * 2.2;
+
+            // Backboard
+            ctx.fillStyle = '#e8e8e8';
+            ctx.fillRect(bx - 3, by - H*0.09, 6, H*0.18);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(bx - 3, by - H*0.09, 6, H*0.18);
+
+            // Inner box on backboard
+            ctx.strokeStyle = '#e53935';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(bx - 3, by - H*0.04, 6, H*0.08);
+
+            // Support arm
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(bx, by);
+            ctx.lineTo(rimX, by);
+            ctx.stroke();
+
+            // Rim (circle, orange)
+            ctx.strokeStyle = '#e65100';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(rimX, by, rimR, 0, Math.PI*2);
+            ctx.stroke();
+
+            // Net — 8 strings hanging down
+            ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+            ctx.lineWidth = 1;
+            const netH = rimR * 1.8;
+            for (let i = 0; i <= 8; i++) {
+                const angle = (i / 8) * Math.PI * 2;
+                const topX  = rimX + Math.cos(angle) * rimR;
+                const topY  = by   + Math.sin(angle) * rimR * 0.4;
+                ctx.beginPath();
+                ctx.moveTo(topX, topY);
+                ctx.lineTo(rimX + Math.cos(angle)*rimR*0.3, by + netH);
+                ctx.stroke();
+            }
+            // Net bottom ring
+            ctx.beginPath();
+            ctx.arc(rimX, by + netH*0.85, rimR*0.35, 0, Math.PI*2);
+            ctx.stroke();
+        };
+
+        // ── Draw: obstacles ────────────────────────────────────────────────
         const drawObstacles = () => {
-            OBS.forEach(o => {
+            obstacles.forEach(o => {
+                if (o.type === 'wall') return;
+
                 if (o.type === 'bench') {
-                    // Bench seat
-                    ctx.fillStyle = C.bench;
-                    ctx.fillRect(o.x, o.y, o.w, o.h * 0.4);
+                    // Shadow
+                    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+                    ctx.fillRect(o.x+4, o.y+4, o.w, o.h*0.45);
+                    // Seat
+                    ctx.fillStyle = '#8d6e4a';
+                    ctx.fillRect(o.x, o.y, o.w, o.h*0.38);
+                    ctx.fillStyle = '#a0825a';
+                    ctx.fillRect(o.x+2, o.y+2, o.w-4, 4);
                     // Legs
-                    ctx.fillStyle = C.benchLeg;
-                    ctx.fillRect(o.x + o.w*0.08, o.y + o.h*0.4, o.w*0.12, o.h*0.55);
-                    ctx.fillRect(o.x + o.w*0.80, o.y + o.h*0.4, o.w*0.12, o.h*0.55);
+                    ctx.fillStyle = '#5d4037';
+                    const lw = o.w*0.1, lh = o.h*0.6;
+                    ctx.fillRect(o.x + o.w*0.08, o.y + o.h*0.38, lw, lh);
+                    ctx.fillRect(o.x + o.w*0.50, o.y + o.h*0.38, lw, lh);
+                    ctx.fillRect(o.x + o.w*0.82, o.y + o.h*0.38, lw, lh);
                 }
+
                 if (o.type === 'gator') {
-                    // Barrel body
-                    ctx.fillStyle = C.gatorGreen;
-                    ctx.beginPath();
-                    ctx.roundRect(o.x, o.y + o.h*0.2, o.w, o.h*0.75, 6);
-                    ctx.fill();
-                    // Gatorade bolt
-                    ctx.fillStyle = C.gatorYellow;
-                    ctx.font = `bold ${Math.round(o.w*0.55)}px monospace`;
+                    // Shadow
+                    ctx.fillStyle = 'rgba(0,0,0,0.20)';
+                    ctx.beginPath(); ctx.ellipse(o.x+o.w/2+4, o.y+o.h+4, o.w*0.45, o.h*0.07, 0, 0, Math.PI*2); ctx.fill();
+                    // Body
+                    ctx.fillStyle = '#2e7d32';
+                    ctx.beginPath(); ctx.roundRect(o.x, o.y, o.w, o.h*0.80, 8); ctx.fill();
+                    // Stripe
+                    ctx.fillStyle = '#1b5e20';
+                    ctx.fillRect(o.x, o.y + o.h*0.35, o.w, o.h*0.12);
+                    // G logo
+                    ctx.fillStyle = '#fdd835';
+                    ctx.font = `bold ${Math.round(o.w*0.55)}px Arial`;
                     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                    ctx.fillText('G', o.x + o.w/2, o.y + o.h*0.58);
+                    ctx.fillText('G', o.x+o.w/2, o.y+o.h*0.42);
                     // Cups on top
-                    ctx.fillStyle = C.gatorRed;
-                    ctx.fillRect(o.x + o.w*0.1, o.y + o.h*0.08, o.w*0.28, o.h*0.14);
-                    ctx.fillRect(o.x + o.w*0.5, o.y + o.h*0.05, o.w*0.28, o.h*0.17);
+                    ctx.fillStyle = '#ef5350';
+                    ctx.fillRect(o.x+o.w*0.08, o.y - o.h*0.12, o.w*0.30, o.h*0.14);
+                    ctx.fillRect(o.x+o.w*0.52, o.y - o.h*0.16, o.w*0.30, o.h*0.18);
                     // Wheels
-                    ctx.fillStyle = '#333';
-                    ctx.beginPath(); ctx.arc(o.x + o.w*0.25, o.y + o.h*0.96, o.w*0.12, 0, Math.PI*2); ctx.fill();
-                    ctx.beginPath(); ctx.arc(o.x + o.w*0.75, o.y + o.h*0.96, o.w*0.12, 0, Math.PI*2); ctx.fill();
+                    ctx.fillStyle = '#212121';
+                    ctx.beginPath(); ctx.arc(o.x+o.w*0.22, o.y+o.h*0.86, o.w*0.13, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(o.x+o.w*0.78, o.y+o.h*0.86, o.w*0.13, 0, Math.PI*2); ctx.fill();
+                    ctx.fillStyle = '#555';
+                    ctx.beginPath(); ctx.arc(o.x+o.w*0.22, o.y+o.h*0.86, o.w*0.06, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(o.x+o.w*0.78, o.y+o.h*0.86, o.w*0.06, 0, Math.PI*2); ctx.fill();
+                }
+
+                if (o.type === 'cone') {
+                    // Shadow
+                    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+                    ctx.beginPath(); ctx.ellipse(o.x+o.w/2+3, o.y+o.h+3, o.w*0.5, o.h*0.08, 0, 0, Math.PI*2); ctx.fill();
+                    // Pole
+                    ctx.fillStyle = '#bdbdbd';
+                    ctx.fillRect(o.x+o.w*0.44, o.y, o.w*0.12, o.h*0.92);
+                    // Horizontal bars
+                    ctx.fillStyle = '#ff6f00';
+                    ctx.fillRect(o.x, o.y + o.h*0.10, o.w, o.h*0.12);
+                    ctx.fillRect(o.x, o.y + o.h*0.38, o.w, o.h*0.12);
+                    ctx.fillRect(o.x, o.y + o.h*0.66, o.w, o.h*0.12);
+                    // Base
+                    ctx.fillStyle = '#e65100';
+                    ctx.fillRect(o.x, o.y + o.h*0.88, o.w, o.h*0.14);
                 }
             });
         };
 
-        // ── Update ────────────────────────────────────────────────────────
+        // ── Draw: person ───────────────────────────────────────────────────
+        // cx/cy = centre of sprite, s = scale (based on radius)
+        const drawPerson = (cx, cy, facingRight, jersey, shorts, skin, numStr, headband, r) => {
+            const s  = r / 13;
+            const fx = facingRight ? 1 : -1;
+            ctx.save();
+            ctx.translate(Math.round(cx), Math.round(cy));
+
+            // Shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.22)';
+            ctx.beginPath(); ctx.ellipse(0, 2*s, r*0.9, r*0.25, 0, 0, Math.PI*2); ctx.fill();
+
+            // Shoes
+            ctx.fillStyle = '#212121';
+            ctx.fillRect(-9*s, -5*s,  9*s, 5*s);
+            ctx.fillRect( 1*s, -5*s,  9*s, 5*s);
+
+            // Socks
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(-8*s, -10*s, 7*s, 5*s);
+            ctx.fillRect( 1*s, -10*s, 7*s, 5*s);
+
+            // Shorts
+            ctx.fillStyle = shorts;
+            ctx.fillRect(-10*s, -24*s, 20*s, 14*s);
+
+            // Jersey body
+            ctx.fillStyle = jersey;
+            ctx.fillRect(-11*s, -42*s, 22*s, 18*s);
+
+            // Arms
+            ctx.fillStyle = skin;
+            ctx.fillRect(-17*s, -41*s, 6*s, 14*s);
+            ctx.fillRect( 11*s, -41*s, 6*s, 14*s);
+
+            // Jersey number
+            ctx.fillStyle = 'rgba(255,255,255,0.9)';
+            ctx.font = `bold ${Math.round(9*s)}px monospace`;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(numStr, 0, -33*s);
+
+            // Neck
+            ctx.fillStyle = skin;
+            ctx.fillRect(-4*s, -46*s, 8*s, 5*s);
+
+            // Head
+            ctx.fillStyle = skin;
+            ctx.beginPath(); ctx.arc(0, -55*s, 11*s, 0, Math.PI*2); ctx.fill();
+
+            // Headband
+            ctx.fillStyle = headband;
+            ctx.fillRect(-11*s, -62*s, 22*s, 5*s);
+
+            // Eyes
+            ctx.fillStyle = '#111';
+            ctx.fillRect(fx*2*s, -57*s, 3*s, 3*s);
+
+            // Mouth (tiny)
+            ctx.fillStyle = '#111';
+            ctx.fillRect(-2*s, -50*s, 4*s, 1.5*s);
+
+            ctx.restore();
+        };
+
+        // ── Draw: basketball ───────────────────────────────────────────────
+        const drawBall = (cx, cy) => {
+            const r = 11;
+            const bounce = Math.sin(tick * 0.22) * 6;
+            ctx.save();
+            ctx.translate(Math.round(cx), Math.round(cy + bounce));
+            // Shadow (stays on floor)
+            ctx.fillStyle = 'rgba(0,0,0,0.20)';
+            ctx.beginPath(); ctx.ellipse(0, 14 - bounce*0.4, r*0.8, r*0.22, 0, 0, Math.PI*2); ctx.fill();
+            // Ball
+            ctx.fillStyle = '#e65100';
+            ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2); ctx.fill();
+            ctx.strokeStyle = '#bf360c';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2); ctx.stroke();
+            // Seams
+            ctx.strokeStyle = '#1a1a1a';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath(); ctx.moveTo(-r, 0); ctx.lineTo(r, 0); ctx.stroke();
+            ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(0, -r); ctx.lineTo(0, r); ctx.stroke();
+            ctx.restore();
+        };
+
+        // ── Update ─────────────────────────────────────────────────────────
         const update = () => {
             if (gameOver) return;
             elapsed = (Date.now() - startTime) / 1000;
             tick++;
 
-            // Player
+            // — Player movement —
             let dx = 0, dy = 0;
-            if (keys['w'] || keys['arrowup'])    { dy = -P_SPEED; player.dir = 'up';    }
-            if (keys['s'] || keys['arrowdown'])  { dy =  P_SPEED; player.dir = 'down';  }
-            if (keys['a'] || keys['arrowleft'])  { dx = -P_SPEED; player.dir = 'left';  }
-            if (keys['d'] || keys['arrowright']) { dx =  P_SPEED; player.dir = 'right'; }
-            player.moving = !!(dx || dy);
+            if (keys['w'] || keys['arrowup'])    dy = -3.8;
+            if (keys['s'] || keys['arrowdown'])  dy =  3.8;
+            if (keys['a'] || keys['arrowleft'])  dx = -3.8;
+            if (keys['d'] || keys['arrowright']) dx =  3.8;
 
-            if (!anyHit(player.x + dx, player.y, P_R)) player.x += dx;
-            if (!anyHit(player.x, player.y + dy, P_R)) player.y += dy;
+            // Normalise diagonal so speed is consistent
+            if (dx !== 0 && dy !== 0) { dx *= 0.707; dy *= 0.707; }
+
+            if (dx < 0) player.dir = 'left';
+            if (dx > 0) player.dir = 'right';
+
+            player.moving = !!(dx || dy);
+            if (!blocked(player.x + dx, player.y,      PR)) player.x += dx;
+            if (!blocked(player.x,      player.y + dy, PR)) player.y += dy;
             if (player.moving && tick % 7 === 0) player.frame++;
 
-            // LeBron chase
-            const spd = Math.min(L_SPEED_0 + elapsed * 0.04, L_SPEED_X);
+            // — LeBron chase AI —
+            // Full 2-D vector chase: always moves toward player on BOTH axes.
+            const spd = Math.min(1.6 + elapsed * 0.04, 4.2);
             const ddx = player.x - lebron.x;
             const ddy = player.y - lebron.y;
             const dist = Math.sqrt(ddx*ddx + ddy*ddy);
 
-            if (dist > 2) {
-                const nx = (ddx/dist) * spd;
-                const ny = (ddy/dist) * spd;
-                lebron.dir = Math.abs(ddx) > Math.abs(ddy)
-                    ? (ddx > 0 ? 'right' : 'left')
-                    : (ddy > 0 ? 'down'  : 'up');
+            if (dist > 1) {
+                // Normalised direction toward player
+                const nx = ddx / dist;
+                const ny = ddy / dist;
 
-                if      (!anyHit(lebron.x + nx, lebron.y, L_R)) lebron.x += nx;
-                else if (!anyHit(lebron.x, lebron.y + ny, L_R)) lebron.y += ny;
-                else {
-                    for (const s of [{ x:-ny, y:nx }, { x:ny, y:-nx }]) {
-                        if (!anyHit(lebron.x + s.x*0.9, lebron.y + s.y*0.9, L_R)) {
-                            lebron.x += s.x*0.9; lebron.y += s.y*0.9; break;
+                const mx = nx * spd;
+                const my = ny * spd;
+
+                // Try full movement first
+                const fullOk = !blocked(lebron.x + mx, lebron.y + my, LR);
+                if (fullOk) {
+                    lebron.x += mx;
+                    lebron.y += my;
+                } else {
+                    // Try each axis independently so LeBron slides along walls
+                    const xOk = !blocked(lebron.x + mx, lebron.y, LR);
+                    const yOk = !blocked(lebron.x, lebron.y + my, LR);
+                    if (xOk) lebron.x += mx;
+                    if (yOk) lebron.y += my;
+
+                    // If completely stuck, try perpendicular nudges to escape corners
+                    if (!xOk && !yOk) {
+                        for (const s of [{ x:-ny*spd, y:nx*spd }, { x:ny*spd, y:-nx*spd }]) {
+                            if (!blocked(lebron.x + s.x, lebron.y + s.y, LR)) {
+                                lebron.x += s.x * 0.7;
+                                lebron.y += s.y * 0.7;
+                                break;
+                            }
                         }
                     }
                 }
+
+                // Face direction of travel
+                lebron.dir = ddx >= 0 ? 'right' : 'left';
                 if (tick % 7 === 0) lebron.frame++;
             }
 
-            if (dist < CATCH_R) {
+            // — Catch —
+            if (dist < PR + LR + 2) {
                 caught = gameOver = true;
                 if (elapsed > bestTime) bestTime = elapsed;
             }
         };
 
-        // ── Render ────────────────────────────────────────────────────────
+        // ── Render ─────────────────────────────────────────────────────────
         const render = () => {
             ctx.clearRect(0, 0, W, H);
             drawCourt();
             drawObstacles();
 
-            // Ball bounces near the player's feet
-            const bounce = Math.sin(tick * 0.25) * 5;
-            drawBall(player.x + (player.dir === 'left' ? -20 : 20), player.y - 10, bounce);
+            // Ball dribbles beside player
+            const ballOffX = player.dir === 'left' ? -22 : 22;
+            drawBall(player.x + ballOffX, player.y - 12);
 
-            // Draw player (red jersey #11)
+            // Player: red #11
             drawPerson(
                 player.x, player.y,
                 player.dir !== 'left',
-                C.pJersey, C.pShorts, C.pSkin,
-                '11', C.pJersey, P_R
+                '#e53935', '#1565c0', '#d4845a',
+                '11', '#e53935', PR
             );
 
-            // Draw LeBron (purple jersey #23)
+            // LeBron: Lakers purple #23
             drawPerson(
                 lebron.x, lebron.y,
                 lebron.dir !== 'left',
-                C.lJersey, C.lShorts, C.lSkin,
-                '23', C.lNumber, L_R
+                '#552583', '#552583', '#8d5524',
+                '23', '#fdb927', LR
             );
 
-            // HUD bar
+            // ── HUD ──────────────────────────────────────────────────────
+            // Scoreboard-style panel
             ctx.save();
-            ctx.fillStyle = 'rgba(0,0,0,0.68)';
-            ctx.beginPath();
-            ctx.roundRect(W/2 - 160, 10, 320, 38, 9);
-            ctx.fill();
+            ctx.fillStyle = 'rgba(10,10,20,0.82)';
+            ctx.beginPath(); ctx.roundRect(W/2-170, 8, 340, 40, 10); ctx.fill();
+
+            // Left label
+            ctx.fillStyle = '#e53935';
+            ctx.font = 'bold 13px monospace';
+            ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+            ctx.fillText('YOU #11', W/2-158, 28);
+
+            // Timer
             ctx.fillStyle = '#ffffff';
-            ctx.font = `bold ${Math.round(W*0.013)}px monospace`;
+            ctx.font = `bold ${Math.round(W*0.016)}px monospace`;
             ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(`⏱  ${elapsed.toFixed(1)}s     Best: ${bestTime.toFixed(1)}s`, W/2, 29);
+            ctx.fillText(`⏱  ${elapsed.toFixed(1)}s`, W/2, 28);
+
+            // Best
+            ctx.fillStyle = '#fdb927';
+            ctx.font = 'bold 13px monospace';
+            ctx.textAlign = 'right';
+            ctx.fillText(`Best: ${bestTime.toFixed(1)}s`, W/2+158, 28);
             ctx.restore();
 
-            // Speed warning (LeBron getting faster)
-            const spd = Math.min(L_SPEED_0 + elapsed * 0.04, L_SPEED_X);
-            if (spd > 3.0) {
+            // Speed warning
+            const spd = Math.min(1.6 + elapsed * 0.04, 4.2);
+            if (spd > 2.8) {
+                const alpha = Math.min((spd - 2.8) * 0.5, 0.9);
                 ctx.save();
-                ctx.fillStyle = `rgba(220,50,50,${Math.min((spd-3.0)*0.4, 0.7)})`;
+                ctx.fillStyle = `rgba(230,50,50,${alpha})`;
                 ctx.font = `bold ${Math.round(W*0.012)}px monospace`;
                 ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText("⚡ LeBron is heating up!", W/2, 60);
+                ctx.fillText('⚡ LeBron is heating up!', W/2, 60);
                 ctx.restore();
             }
 
-            // Controls hint
+            // Controls
             ctx.save();
-            ctx.fillStyle = 'rgba(0,0,0,0.48)';
-            ctx.beginPath(); ctx.roundRect(8, H-28, 270, 20, 4); ctx.fill();
-            ctx.fillStyle = '#ccc';
+            ctx.fillStyle = 'rgba(0,0,0,0.50)';
+            ctx.beginPath(); ctx.roundRect(8, H-26, 290, 18, 4); ctx.fill();
+            ctx.fillStyle = '#bbb';
             ctx.font = '11px monospace';
             ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-            ctx.fillText('Move: WASD / Arrow Keys   |   R = restart', 14, H-18);
+            ctx.fillText('Move: WASD / Arrow Keys   |   R = restart', 14, H-17);
             ctx.restore();
 
-            // Caught screen
+            // ── Caught screen ─────────────────────────────────────────────
             if (caught) {
                 ctx.save();
-                ctx.fillStyle = 'rgba(0,0,0,0.75)';
+                ctx.fillStyle = 'rgba(0,0,0,0.78)';
                 ctx.fillRect(0, 0, W, H);
 
-                const bw = Math.min(460, W*0.7), bh = 240;
+                const bw = Math.min(480, W*0.72), bh = 250;
                 const bx = (W-bw)/2, by = (H-bh)/2;
-                ctx.fillStyle = '#1a1a2e';
-                ctx.strokeStyle = '#FDB927';
+
+                // Card
+                ctx.fillStyle = '#0d0d1a';
+                ctx.strokeStyle = '#fdb927';
                 ctx.lineWidth = 3;
-                ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 16); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 18); ctx.fill(); ctx.stroke();
+
+                // Gold top strip
+                ctx.fillStyle = '#fdb927';
+                ctx.beginPath(); ctx.roundRect(bx, by, bw, 8, [18,18,0,0]); ctx.fill();
 
                 ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
 
-                ctx.fillStyle = '#FDB927';
-                ctx.font = `bold ${Math.round(W*0.025)}px monospace`;
-                ctx.fillText('🏀  LeBron stole the ball!', W/2, by+55);
+                ctx.fillStyle = '#fdb927';
+                ctx.font = `bold ${Math.round(bw*0.072)}px monospace`;
+                ctx.fillText('🏀 LeBron stole the ball!', W/2, by + 70);
 
-                ctx.fillStyle = '#ff6600';
-                ctx.font = `bold ${Math.round(W*0.020)}px monospace`;
-                ctx.fillText(`You survived  ${elapsed.toFixed(1)}s`, W/2, by+105);
+                ctx.fillStyle = '#ff6f00';
+                ctx.font = `bold ${Math.round(bw*0.055)}px monospace`;
+                ctx.fillText(`You survived  ${elapsed.toFixed(1)}s`, W/2, by + 125);
 
-                ctx.fillStyle = '#aaa';
-                ctx.font = `${Math.round(W*0.014)}px monospace`;
-                ctx.fillText(`Best: ${bestTime.toFixed(1)}s`, W/2, by+148);
+                ctx.fillStyle = '#888';
+                ctx.font = `${Math.round(bw*0.038)}px monospace`;
+                ctx.fillText(`Best: ${bestTime.toFixed(1)}s`, W/2, by + 170);
 
-                ctx.fillStyle = '#fff';
-                ctx.font = `${Math.round(W*0.013)}px monospace`;
-                ctx.fillText('Press  R  to play again', W/2, by+185);
+                ctx.fillStyle = '#ddd';
+                ctx.font = `${Math.round(bw*0.036)}px monospace`;
+                ctx.fillText('Press  R  to play again', W/2, by + 210);
+
                 ctx.restore();
             }
         };
 
-        // ── Loop ──────────────────────────────────────────────────────────
+        // ── Loop ───────────────────────────────────────────────────────────
         (function loop() {
             update();
             render();
