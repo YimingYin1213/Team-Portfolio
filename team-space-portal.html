@@ -878,6 +878,23 @@ layout: null
             color: #64b5f6 !important;
             font-weight: bold !important;
         }
+
+        .code-box {
+            background: rgba(0, 0, 0, 0.65) !important;
+            border: 1px solid rgba(129, 212, 250, 0.35) !important;
+            border-radius: 10px !important;
+            padding: 12px 14px !important;
+            overflow-x: auto !important;
+            color: #e3f2fd !important;
+            box-shadow: 0 0 18px rgba(33, 150, 243, 0.15) !important;
+        }
+
+        .code-box code {
+            color: inherit !important;
+            font-family: "Courier New", monospace !important;
+            font-size: 0.85rem !important;
+            line-height: 1.4 !important;
+        }
     </style>
 </head>
 <body>
@@ -1150,7 +1167,7 @@ layout: null
 
                             <h3>Configured Game Objects and Roles</h3>
                             <p><strong>Background:</strong> Custom basketball court canvas due to Game Builder errors. Court markings include the paint and three point arc.</p>
-                            <pre><code>const canvas = document.createElement('canvas');
+                            <pre class="code-box"><code>const canvas = document.createElement('canvas');
 canvas.id = 'bball-evasion';
 canvas.width = W;
 canvas.height = H;
@@ -1172,7 +1189,7 @@ ctx.fillRect(0, 0, W, H);
 };</code></pre>
 
                             <p><strong>Player:</strong> Basketball Player 11 — user-controlled with WASD or arrow keys.</p>
-                            <pre><code>player = {
+                            <pre class="code-box"><code>player = {
 x: W0.08,
 y: H0.50,
 dir:'right',
@@ -1187,10 +1204,10 @@ if (keys['a'] || keys['arrowleft']) dx = -3.8;
 if (keys['d'] || keys['arrowright']) dx = 3.8;</code></pre>
 
                             <h3>Collision</h3>
-                            <pre><code>if (!blocked(player.x + dx, player.y, PR)) player.x += dx;
+                            <pre class="code-box"><code>if (!blocked(player.x + dx, player.y, PR)) player.x += dx;
 if (!blocked(player.x, player.y + dy, PR)) player.y += dy;</code></pre>
                             <p><strong>Character Render:</strong></p>
-                            <pre><code>drawPerson(
+                            <pre class="code-box"><code>drawPerson(
 player.x, player.y,
 player.dir !== 'left',
 '#e53935', '#1565c0', '#d4845a',
@@ -1199,7 +1216,7 @@ player.dir !== 'left',
 
                             <h3>NPC</h3>
                             <p><strong>LeBron:</strong> Chases the user constantly.</p>
-                            <pre><code>const spd = Math.min(1.6 + elapsed * 0.04, 4.2);
+                            <pre class="code-box"><code>const spd = Math.min(1.6 + elapsed * 0.04, 4.2);
 
 const ddx = player.x - lebron.x;
 const ddy = player.y - lebron.y;
@@ -1214,7 +1231,7 @@ const my = ny * spd;</code></pre>
 
                             <h3>Barriers</h3>
                             <p>Objects placed along the court to block movement and make navigation more difficult (walls, bench, gatorade coolers).</p>
-                            <pre><code>const obstacles = [
+                            <pre class="code-box"><code>const obstacles = [
 
 { x: W0.28, y: H0.30, w: W0.10, h: H0.06, type:'bench' },
 
@@ -1229,7 +1246,7 @@ const my = ny * spd;</code></pre>
 ];</code></pre>
 
                             <h3>Rendering</h3>
-                            <pre><code>const drawObstacles = () => {
+                            <pre class="code-box"><code>const drawObstacles = () => {
 obstacles.forEach(o => {
 
     if (o.type === 'bench') {
@@ -1253,7 +1270,7 @@ obstacles.forEach(o => {
 };</code></pre>
 
                             <h3>Collision Helper</h3>
-                            <pre><code>const circVsRect = (cx, cy, r, rx, ry, rw, rh) => {
+                            <pre class="code-box"><code>const circVsRect = (cx, cy, r, rx, ry, rw, rh) => {
 
 const nearX = Math.max(rx, Math.min(cx, rx+rw));
 const nearY = Math.max(ry, Math.min(cy, ry+rh));
