@@ -1061,6 +1061,133 @@ layout: null
                             <p><strong>Columns on all NPC directions:</strong> 1 — freezes on single idle frame</p>
                             <p><strong>Hitbox on NPC:</strong> 0.01 — allows player to walk close enough to interact</p>
                         `
+                    },
+                    {
+                        title: "Lance's Basketball Game V2",
+                        description: 'Dribble evasion game against LeBron',
+                        content: `
+                            <h3>Game Concept</h3>
+                            <p>A basketball "evasion" game where the player must dribble around a basketball court while avoiding being caught by LeBron. The longer a player survives the higher their score.</p>
+
+                            <h3>Configured Game Objects and Roles</h3>
+                            <p><strong>Background:</strong> Custom basketball court canvas due to Game Builder errors. Court markings include the paint and three point arc.</p>
+                            <pre><code>const canvas = document.createElement('canvas');
+canvas.id = 'bball-evasion';
+canvas.width = W;
+canvas.height = H;
+
+document.body.appendChild(canvas);
+
+const ctx = canvas.getContext('2d');
+const drawCourt = () => {
+ctx.fillStyle = '#1a1a2a';
+ctx.fillRect(0, 0, W, H);
+
+const woodGrad = ctx.createLinearGradient(0, 0, W, 0);
+woodGrad.addColorStop(0,   '#b5651d');
+woodGrad.addColorStop(0.5, '#cd853f');
+woodGrad.addColorStop(1,   '#b5651d');
+
+ctx.fillStyle = woodGrad;
+ctx.fillRect(0, 0, W, H);
+};</code></pre>
+
+                            <p><strong>Player:</strong> Basketball Player 11 — user-controlled with WASD or arrow keys.</p>
+                            <pre><code>player = {
+x: W0.08,
+y: H0.50,
+dir:'right',
+frame:0,
+moving:false
+
+Movement
+};
+if (keys['w'] || keys['arrowup']) dy = -3.8;
+if (keys['s'] || keys['arrowdown']) dy = 3.8;
+if (keys['a'] || keys['arrowleft']) dx = -3.8;
+if (keys['d'] || keys['arrowright']) dx = 3.8;</code></pre>
+
+                            <h3>Collision</h3>
+                            <pre><code>if (!blocked(player.x + dx, player.y, PR)) player.x += dx;
+if (!blocked(player.x, player.y + dy, PR)) player.y += dy;</code></pre>
+                            <p><strong>Character Render:</strong></p>
+                            <pre><code>drawPerson(
+player.x, player.y,
+player.dir !== 'left',
+'#e53935', '#1565c0', '#d4845a',
+'11', '#e53935', PR
+);</code></pre>
+
+                            <h3>NPC</h3>
+                            <p><strong>LeBron:</strong> Chases the user constantly.</p>
+                            <pre><code>const spd = Math.min(1.6 + elapsed * 0.04, 4.2);
+
+const ddx = player.x - lebron.x;
+const ddy = player.y - lebron.y;
+
+const dist = Math.sqrt(ddxddx + ddyddy);
+
+const nx = ddx / dist;
+const ny = ddy / dist;
+
+const mx = nx * spd;
+const my = ny * spd;</code></pre>
+
+                            <h3>Barriers</h3>
+                            <p>Objects placed along the court to block movement and make navigation more difficult (walls, bench, gatorade coolers).</p>
+                            <pre><code>const obstacles = [
+
+{ x: W0.28, y: H0.30, w: W0.10, h: H0.06, type:'bench' },
+
+{ x: W0.55, y: H0.58, w: W0.10, h: H0.06, type:'bench' },
+
+{ x: W0.20, y: H0.64, w: W0.07, h: H0.18, type:'gator' },
+
+{ x: W0.46, y: H0.38, w: W0.06, h: H0.14, type:'cone' },
+
+{ x:0, y:0, w:4, h:H, type:'wall' }
+
+];</code></pre>
+
+                            <h3>Rendering</h3>
+                            <pre><code>const drawObstacles = () => {
+obstacles.forEach(o => {
+
+    if (o.type === 'bench') {
+        ctx.fillStyle = '#8d6e4a';
+        ctx.fillRect(o.x, o.y, o.w, o.h*0.38);
+    }
+
+    if (o.type === 'gator') {
+        ctx.fillStyle = '#2e7d32';
+        ctx.beginPath();
+        ctx.roundRect(o.x, o.y, o.w, o.h*0.80, 8);
+        ctx.fill();
+    }
+
+    if (o.type === 'cone') {
+        ctx.fillStyle = '#ff6f00';
+        ctx.fillRect(o.x, o.y + o.h*0.10, o.w, o.h*0.12);
+    }
+
+});
+};</code></pre>
+
+                            <h3>Collision Helper</h3>
+                            <pre><code>const circVsRect = (cx, cy, r, rx, ry, rw, rh) => {
+
+const nearX = Math.max(rx, Math.min(cx, rx+rw));
+const nearY = Math.max(ry, Math.min(cy, ry+rh));
+
+const dx = cx - nearX;
+const dy = cy - nearY;
+
+return dx*dx + dy*dy < r*r;
+};</code></pre>
+
+                            <h3>JavaScript Configuration File</h3>
+                            <p><code>assets/js/GameEnginev1/GameLevelBasketball.js</code></p>
+                        `
                     }
                 ]
             },
