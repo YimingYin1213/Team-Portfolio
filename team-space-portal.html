@@ -1122,20 +1122,94 @@ layout: null
                         title: "Arjun's Mini Game Level",
                         description: 'Find Kirby hiding in the corner',
                         content: `
-                            <h3>Game Concept</h3>
-                            <p>Find Kirby hiding in the corner of the map</p>
+                            <h3>Background</h3>
+                            <p><strong>Playground Environment:</strong> The background uses a custom playground image to create the game setting.</p>
+                            <p><strong>Configuration:</strong></p>
+                            <pre class="code-box"><code>const bgData = {
+name: "custom_bg",
+src: path + "/images/gamebuilder/bg/tagplayground.png",
+pixels: { height: 400, width: 560 }
+};</code></pre>
+                            <p><strong>Role:</strong></p>
+                            <p>✅ Provides the visual environment</p>
+                            <p>✅ Defines the playable space</p>
+                            <p>✅ Establishes theme (outdoor playground)</p>
 
-                            <h3>Configured Objects</h3>
-                            <p><strong>Background:</strong> tagplayground.png — sets the retro indoor court scene</p>
-                            <p><strong>Player:</strong> Boy sprite — WASD-controlled, starts at left baseline</p>
-                            <p><strong>NPC:</strong> Kirby — idle at right top of map, triggers dialogue on interaction</p>
-                            <p><strong>Barriers:</strong> Multiple invisible walls blocking paths around the court</p>
+                            <h3>Player</h3>
+                            <p><strong>User-Controlled Character:</strong> The player controls a boy sprite that can move freely around the map using keyboard input.</p>
+                            <p><strong>Controls:</strong> W → Move up, A → Move left, S → Move down, D → Move right</p>
+                            <p><strong>Configuration:</strong></p>
+                            <pre class="code-box"><code>keypress: { up: 87, left: 65, down: 83, right: 68 }</code></pre>
+                            <p><strong>Movement Setup:</strong> INIT_POSITION: { x: 32, y: 300 }, SCALE_FACTOR: 5, STEP_FACTOR: 1000, ANIMATION_RATE: 50</p>
+                            <p><strong>Sprite Animation:</strong> Supports movement in 8 directions: Up, Down, Left, Right, Diagonals (upLeft, upRight, etc.)</p>
+                            <p><strong>Role:</strong></p>
+                            <p>✅ Main playable character</p>
+                            <p>✅ Explores the environment</p>
+                            <p>✅ Searches for the hidden NPC</p>
 
-                            <h3>Key Configuration Decisions</h3>
-                            <p><strong>STEP_FACTOR:</strong> 400 — faster movement than default</p>
-                            <p><strong>Speed on NPC:</strong> 0 — prevents Kirby from moving</p>
-                            <p><strong>Columns on all NPC directions:</strong> 1 — freezes on single idle frame</p>
-                            <p><strong>Hitbox on NPC:</strong> 0.01 — allows player to walk close enough to interact</p>
+                            <h3>NPC (Non-Playable Character)</h3>
+                            <p><strong>Hidden Character — Kirby:</strong> Kirby acts as the target the player must find.</p>
+                            <p><strong>Configuration:</strong></p>
+                            <pre class="code-box"><code>const npcData1 = {
+id: 'NPC',
+greeting: 'Oh you found me',
+INIT_POSITION: { x: 599, y: 88 },
+SCALE_FACTOR: 8
+};</code></pre>
+                            <p><strong>Interaction Behavior:</strong> When the player interacts with Kirby, dialogue appears, reaction is triggered, and the level ends after dialogue closes.</p>
+                            <p><strong>Reaction Function:</strong></p>
+                            <pre class="code-box"><code>reaction: function() {
+if (this.dialogueSystem) {
+this.showReactionDialogue();
+} else {
+console.log(this.greeting);
+}
+}</code></pre>
+                            <p><strong>Level Completion:</strong></p>
+                            <pre class="code-box"><code>onDialogueClose: function() {
+const gameControl = this.gameEnv?.gameControl;
+if (gameControl?.currentLevel) {
+gameControl.currentLevel.continue = false;
+}
+}</code></pre>
+                            <p><strong>Role:</strong></p>
+                            <p>Objective of the level</p>
+                            <p>Encourages exploration</p>
+                            <p>🏁 Triggers level completion</p>
+
+                            <h3>Barriers (Obstacles)</h3>
+                            <p>Invisible objects placed around the playground to restrict movement and shape the map.</p>
+                            <p><strong>Example:</strong></p>
+                            <pre class="code-box"><code>const dbarrier_1 = {
+x: 232, y: 218,
+width: 83, height: 78,
+visible: false
+};</code></pre>
+                            <p><strong>Count:</strong> There are 8 barriers total.</p>
+                            <p><strong>Characteristics:</strong> Invisible to the player, prevent walking through certain areas, imported from overlay collision map.</p>
+                            <p><strong>Collision Role:</strong></p>
+                            <p>✅ Create walls and blocked zones</p>
+                            <p>✅ Prevent leaving intended play area</p>
+                            <p>✅ Add challenge to navigation</p>
+
+                            <h3>Level Object Setup</h3>
+                            <p>All objects are registered into the game using:</p>
+                            <pre class="code-box"><code>this.classes = [
+{ class: GameEnvBackground, data: bgData },
+{ class: Player, data: playerData },
+{ class: Npc, data: npcData1 },
+{ class: Barrier, data: dbarrier_1 },
+...
+];</code></pre>
+                            <p>This tells the game engine which objects to spawn and manage.</p>
+
+                            <h3>Gameplay Summary</h3>
+                            <p>✔ Player spawns in playground</p>
+                            <p>✔ Moves using WASD</p>
+                            <p>✔ Explores while avoiding blocked areas</p>
+                            <p>✔ Searches for hidden Kirby</p>
+                            <p>✔ Interacts to trigger dialogue</p>
+                            <p>✔ Level ends after discovery</p>
                         `
                     },
                     {
