@@ -37,8 +37,8 @@ class GameLevelBasketball {
         // ── Obstacles: randomly scattered but reproducible ─────────────────
         // Each is {x,y,w,h,type}. We keep a margin from spawn points.
         const MARGIN = 80;
-        const obstacles = [
-            // Fixed obstacles so layout is always fair
+        const obstacles = [ //
+            // Fixed obstacles so layout is always fair -> arrays
             { x: W*0.28, y: H*0.30, w: W*0.10, h: H*0.06, type:'bench'  },
             { x: W*0.55, y: H*0.58, w: W*0.10, h: H*0.06, type:'bench'  },
             { x: W*0.38, y: H*0.62, w: W*0.08, h: H*0.06, type:'bench'  },
@@ -350,7 +350,7 @@ class GameLevelBasketball {
         // ── Draw: basketball ───────────────────────────────────────────────
         const drawBall = (cx, cy) => {
             const r = 11;
-            const bounce = Math.sin(tick * 0.22) * 6;
+            const bounce = Math.sin(tick * 0.22) * 6; // sine function allows a constant oscilating movement for a ball to dribble
             ctx.save();
             ctx.translate(Math.round(cx), Math.round(cy + bounce));
             // Shadow (stays on floor)
@@ -374,7 +374,7 @@ class GameLevelBasketball {
         // ── Update ─────────────────────────────────────────────────────────
         const update = () => {
             if (gameOver) return;
-            elapsed = (Date.now() - startTime) / 1000;
+            elapsed = (Date.now() - startTime) / 1000; // 
             tick++;
 
             // — Player movement —
@@ -442,7 +442,7 @@ class GameLevelBasketball {
             // — Catch —
             if (dist < PR + LR + 2) {
                 caught = gameOver = true;
-                if (elapsed > bestTime) bestTime = elapsed;
+                if (elapsed > bestTime) bestTime = elapsed; // verifies if a New High Score is achieved
             }
         };
 
@@ -453,8 +453,8 @@ class GameLevelBasketball {
             drawObstacles();
 
             // Ball dribbles beside player
-            const ballOffX = player.dir === 'left' ? -22 : 22;
-            drawBall(player.x + ballOffX, player.y - 12);
+            const ballOffX = player.dir === 'left' ? -22 : 22; // -22 when on left and 22 on the right
+            drawBall(player.x + ballOffX, player.y - 12); // sine wave bounces based on player coords
 
             // Player: red #11
             drawPerson(
