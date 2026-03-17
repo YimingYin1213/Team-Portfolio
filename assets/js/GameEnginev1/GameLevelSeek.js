@@ -49,64 +49,64 @@ class GameLevelSeek {
         };
 
         const npcData1 = {
-            id: 'NPC',
-            greeting: 'Oh you found me',
-            src: path + "/images/gamebuilder/sprites/kirby.png",
-            SCALE_FACTOR: 8,
-            ANIMATION_RATE: 50,
-            INIT_POSITION: { x: 599, y: 88 },
-            pixels: { height: 36, width: 569 },
-            orientation: { rows: 1, columns: 13 },
-            // Simplified to row 0 since the sprite only has 1 row
-            down:      { row: 0, start: 0, columns: 3 },
-            right:     { row: 0, start: 0, columns: 3 },
-            left:      { row: 0, start: 0, columns: 3 },
-            up:        { row: 0, start: 0, columns: 3 },
-            upRight:   { row: 0, start: 0, columns: 3 },
-            downRight: { row: 0, start: 0, columns: 3 },
-            upLeft:    { row: 0, start: 0, columns: 3 },
-            downLeft:  { row: 0, start: 0, columns: 3 },
-            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-            dialogues: ['Oh you found me'],
+            id: 'NPC',
+            greeting: 'Oh you found me',
+            src: path + "/images/gamebuilder/sprites/kirby.png",
+            SCALE_FACTOR: 8,
+            ANIMATION_RATE: 50,
+            INIT_POSITION: { x: 599, y: 88 },
+            pixels: { height: 36, width: 569 },
+            orientation: { rows: 1, columns: 13 },
+            // Simplified to row 0 since the sprite only has 1 row
+            down: { row: 0, start: 0, columns: 3 },
+            right: { row: 0, start: 0, columns: 3 },
+            left: { row: 0, start: 0, columns: 3 },
+            up: { row: 0, start: 0, columns: 3 },
+            upRight: { row: 0, start: 0, columns: 3 },
+            downRight: { row: 0, start: 0, columns: 3 },
+            upLeft: { row: 0, start: 0, columns: 3 },
+            downLeft: { row: 0, start: 0, columns: 3 },
+            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+            dialogues: ['Oh you found me'],
 
-            // Kirby chases the player every frame
-            CHASE_SPEED: 1.5,  // increase this number to make Kirby faster
-            update: function() {
-                // Try to call the parent NPC update first (keeps animations running)
-                try { Npc.prototype.update.call(this); } catch(e) {}
+            // Kirby chases the player every frame (safe guards included)
+            CHASE_SPEED: 1.6, // increase to make Kirby faster
+            MIN_DISTANCE: 4,
+            update: function() {
+                // Keep NPC animation/state update if available
+                try { Npc.prototype.update.call(this); } catch (e) {}
 
-                // Find the player among all active game objects
-                const player = this.gameEnv?.gameObjects?.find(
-                    obj => obj?.spriteData?.id === 'playerData'
-                );
+                const objects =
+                    this.gameEnv?.gameObjects ||
+                    this.gameEnv?.gameControl?.currentLevel?.gameObjects ||
+                    [];
 
-                if (player) {
-                    const dx = player.x - this.x;
-                    const dy = player.y - this.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
+                const player = objects.find(obj => obj?.spriteData?.id === 'playerData');
+                if (!player || typeof player.x !== 'number' || typeof player.y !== 'number') return;
 
-                    // Only move if not already on top of the player
-                    if (dist > 4) {
-                        this.x += (dx / dist) * this.CHASE_SPEED;
-                        this.y += (dy / dist) * this.CHASE_SPEED;
-                    }
-                }
-            },
+                const dx = player.x - this.x;
+                const dy = player.y - this.y;
+                const dist = Math.hypot(dx, dy);
+                if (!dist || dist <= this.MIN_DISTANCE) return;
 
-            reaction: function() {
-                if (this.dialogueSystem) { this.showReactionDialogue(); }
-                else { console.log(this.greeting); }
-            },
-            interact: function() {
-                if (this.dialogueSystem) { this.showReactionDialogue(); }
-            },
-            onDialogueClose: function() {
-                const gameControl = this.gameEnv?.gameControl;
-                if (gameControl?.currentLevel) {
-                    gameControl.currentLevel.continue = false;
-                }
-            }
-        };
+                this.x += (dx / dist) * this.CHASE_SPEED;
+                this.y += (dy / dist) * this.CHASE_SPEED;
+            },
+
+            reaction: function() {
+                if (this.dialogueSystem) { this.showReactionDialogue(); }
+                else { console.log(this.greeting); }
+            },
+            interact: function() {
+                if (this.dialogueSystem) { this.showReactionDialogue(); }
+            },
+            onDialogueClose: function() {
+                const gameControl = this.gameEnv?.gameControl;
+                if (gameControl?.currentLevel) {
+                    gameControl.currentLevel.continue = false;
+                }
+            }
+        };
 
         const dbarrier_1 = {
             id: 'dbarrier_1', x: 232, y: 218, width: 83,  height: 78, visible: false,
