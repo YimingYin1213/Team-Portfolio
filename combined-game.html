@@ -47,10 +47,10 @@ permalink: /games/combined
           { default: GameLevelSeek },
           { default: GameLevelBasketball }
         ] = await Promise.all([
-          import(`${baseUrl}/assets/js/GameEnginev1/essentials/Game.js`),
-          import(`${baseUrl}/assets/js/GameLevelAquaticGameLevel.js`),
-          import(`${baseUrl}/assets/js/GameEnginev1/GameLevelSeek.js`),
-          import(`${baseUrl}/assets/js/GameEnginev1/GameLevelBasketball.js`)
+          import(`${baseUrl}/assets/js/GameEnginev1/essentials/Game.js?v={{ site.time | date: '%s' }}`),
+          import(`${baseUrl}/assets/js/GameLevelAquaticGameLevel.js?v={{ site.time | date: '%s' }}`),
+          import(`${baseUrl}/assets/js/GameEnginev1/GameLevelSeek.js?v={{ site.time | date: '%s' }}`),
+          import(`${baseUrl}/assets/js/GameEnginev1/GameLevelBasketball.js?v={{ site.time | date: '%s' }}`)
         ]);
 
         const container = document.getElementById('gameContainer');
