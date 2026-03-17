@@ -831,6 +831,23 @@ layout: null
             color: #64b5f6 !important;
             font-weight: bold !important;
         }
+
+        .code-box {
+            background: rgba(0, 0, 0, 0.65) !important;
+            border: 1px solid rgba(129, 212, 250, 0.35) !important;
+            border-radius: 10px !important;
+            padding: 12px 14px !important;
+            overflow-x: auto !important;
+            color: #e3f2fd !important;
+            box-shadow: 0 0 18px rgba(33, 150, 243, 0.15) !important;
+        }
+
+        .code-box code {
+            color: inherit !important;
+            font-family: "Courier New", monospace !important;
+            font-size: 0.85rem !important;
+            line-height: 1.4 !important;
+        }
     </style>
 </head>
 <body>
@@ -1060,6 +1077,251 @@ layout: null
                             <p><strong>Speed on NPC:</strong> 0 — prevents LeBron from wandering</p>
                             <p><strong>Columns on all NPC directions:</strong> 1 — freezes on single idle frame</p>
                             <p><strong>Hitbox on NPC:</strong> 0.01 — allows player to walk close enough to interact</p>
+                        `
+                    },
+                    {
+                        title: "Lance's Basketball Game V2",
+                        description: 'Dribble evasion game against LeBron',
+                        content: `
+                            <h3>Game Concept</h3>
+                            <p>A basketball "evasion" game where the player must dribble around a basketball court while avoiding being caught by LeBron. The longer a player survives the higher their score.</p>
+
+                            <h3>Configured Game Objects and Roles</h3>
+                            <p><strong>Background:</strong> Custom basketball court canvas due to Game Builder errors. Court markings include the paint and three point arc.</p>
+                            <pre class="code-box"><code>const canvas = document.createElement('canvas');
+canvas.id = 'bball-evasion';
+canvas.width = W;
+canvas.height = H;
+
+document.body.appendChild(canvas);
+
+const ctx = canvas.getContext('2d');
+const drawCourt = () => {
+ctx.fillStyle = '#1a1a2a';
+ctx.fillRect(0, 0, W, H);
+
+const woodGrad = ctx.createLinearGradient(0, 0, W, 0);
+woodGrad.addColorStop(0,   '#b5651d');
+woodGrad.addColorStop(0.5, '#cd853f');
+woodGrad.addColorStop(1,   '#b5651d');
+
+ctx.fillStyle = woodGrad;
+ctx.fillRect(0, 0, W, H);
+};</code></pre>
+
+                            <p><strong>Player:</strong> Basketball Player 11 — user-controlled with WASD or arrow keys.</p>
+                            <pre class="code-box"><code>player = {
+x: W0.08,
+y: H0.50,
+dir:'right',
+frame:0,
+moving:false
+
+Movement
+};
+if (keys['w'] || keys['arrowup']) dy = -3.8;
+if (keys['s'] || keys['arrowdown']) dy = 3.8;
+if (keys['a'] || keys['arrowleft']) dx = -3.8;
+if (keys['d'] || keys['arrowright']) dx = 3.8;</code></pre>
+
+                            <h3>Collision</h3>
+                            <pre class="code-box"><code>if (!blocked(player.x + dx, player.y, PR)) player.x += dx;
+if (!blocked(player.x, player.y + dy, PR)) player.y += dy;</code></pre>
+                            <p><strong>Character Render:</strong></p>
+                            <pre class="code-box"><code>drawPerson(
+player.x, player.y,
+player.dir !== 'left',
+'#e53935', '#1565c0', '#d4845a',
+'11', '#e53935', PR
+);</code></pre>
+
+                            <h3>NPC</h3>
+                            <p><strong>LeBron:</strong> Chases the user constantly.</p>
+                            <pre class="code-box"><code>const spd = Math.min(1.6 + elapsed * 0.04, 4.2);
+
+const ddx = player.x - lebron.x;
+const ddy = player.y - lebron.y;
+
+const dist = Math.sqrt(ddxddx + ddyddy);
+
+const nx = ddx / dist;
+const ny = ddy / dist;
+
+const mx = nx * spd;
+const my = ny * spd;</code></pre>
+
+                            <h3>Barriers</h3>
+                            <p>Objects placed along the court to block movement and make navigation more difficult (walls, bench, gatorade coolers).</p>
+                            <pre class="code-box"><code>const obstacles = [
+
+{ x: W0.28, y: H0.30, w: W0.10, h: H0.06, type:'bench' },
+
+{ x: W0.55, y: H0.58, w: W0.10, h: H0.06, type:'bench' },
+
+{ x: W0.20, y: H0.64, w: W0.07, h: H0.18, type:'gator' },
+
+{ x: W0.46, y: H0.38, w: W0.06, h: H0.14, type:'cone' },
+
+{ x:0, y:0, w:4, h:H, type:'wall' }
+
+];</code></pre>
+
+                            <h3>Rendering</h3>
+                            <pre class="code-box"><code>const drawObstacles = () => {
+obstacles.forEach(o => {
+
+    if (o.type === 'bench') {
+        ctx.fillStyle = '#8d6e4a';
+        ctx.fillRect(o.x, o.y, o.w, o.h*0.38);
+    }
+
+    if (o.type === 'gator') {
+        ctx.fillStyle = '#2e7d32';
+        ctx.beginPath();
+        ctx.roundRect(o.x, o.y, o.w, o.h*0.80, 8);
+        ctx.fill();
+    }
+
+    if (o.type === 'cone') {
+        ctx.fillStyle = '#ff6f00';
+        ctx.fillRect(o.x, o.y + o.h*0.10, o.w, o.h*0.12);
+    }
+
+});
+};</code></pre>
+
+                            <h3>Collision Helper</h3>
+                            <pre class="code-box"><code>const circVsRect = (cx, cy, r, rx, ry, rw, rh) => {
+
+const nearX = Math.max(rx, Math.min(cx, rx+rw));
+const nearY = Math.max(ry, Math.min(cy, ry+rh));
+
+const dx = cx - nearX;
+const dy = cy - nearY;
+
+return dx*dx + dy*dy < r*r;
+};</code></pre>
+
+                            <h3>JavaScript Configuration File</h3>
+                            <p><code>assets/js/GameEnginev1/GameLevelBasketball.js</code></p>
+                        `
+                    },
+                    {
+                        title: "Yiming's Aquatic Game",
+                        description: 'Scuba diver seeks the floating slime',
+                        content: `
+                            <h3>Game Concept</h3>
+                            <p>The player will play as a scuba diver and seek for the floating slime under the sea.</p>
+
+                            <h3>How It Works</h3>
+                            <p>You need a Game Builder on your website to load custom assets. You also need to put the correct asset path so the background and sprites load properly.</p>
+
+                            <h3>Unique Assets</h3>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>Added scuba diver spritesheet</li>
+                                <li>Added under sea background</li>
+                                <li>Collision walls to challenge the player</li>
+                            </ul>
+
+                            <h3>Game Level Configuration</h3>
+                            <pre class="code-box"><code>class GameLevelAquaticGameLevel {
+    constructor(gameEnv) {
+        const path = gameEnv.path;
+        const width = gameEnv.innerWidth;
+        const height = gameEnv.innerHeight;
+
+        const bgData = {
+            name: "custom_bg",
+            src: path + "/images/gamebuilder/bg/Aquatic.png",
+            pixels: { height: 1960, width: 2940 }
+        };
+
+        const playerData = {
+            id: 'playerData',
+            src: path + "/images/gamebuilder/sprites/scubadiver.png",
+            SCALE_FACTOR: 5,
+            STEP_FACTOR: 1000,
+            ANIMATION_RATE: 50,
+            INIT_POSITION: { x: 100, y: 300 },
+            pixels: { height: 948, width: 632 },
+            orientation: { rows: 4, columns: 3 },
+            down: { row: 0, start: 0, columns: 3 },
+            downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI/16 },
+            downLeft: { row: 0, start: 0, columns: 3, rotate: -Math.PI/16 },
+            left: { row: 2, start: 0, columns: 3 },
+            right: { row: 1, start: 0, columns: 3 },
+            up: { row: 3, start: 0, columns: 3 },
+            upLeft: { row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
+            upRight: { row: 3, start: 0, columns: 3, rotate: -Math.PI/16 },
+            hitbox: { widthPercentage: 0, heightPercentage: 0 },
+            keypress: { up: 87, left: 65, down: 83, right: 68 }
+            };
+
+        const npcData1 = {
+            id: 'Random Slime',
+            greeting: '^$%#^@&!^# (Slime Language) Did I see a human?',
+            src: path + "/images/gamebuilder/sprites/slime.png",
+            SCALE_FACTOR: 8,
+            ANIMATION_RATE: 50,
+            INIT_POSITION: { x: 800, y: 128 },
+            pixels: { height: 225, width: 225 },
+            orientation: { rows: 4, columns: 4 },
+            down: { row: 0, start: 0, columns: 3 },
+            right: { row: Math.min(1, 4 - 1), start: 0, columns: 3 },
+            left: { row: Math.min(2, 4 - 1), start: 0, columns: 3 },
+            up: { row: Math.min(3, 4 - 1), start: 0, columns: 3 },
+            upRight: { row: Math.min(3, 4 - 1), start: 0, columns: 3 },
+            downRight: { row: Math.min(1, 4 - 1), start: 0, columns: 3 },
+            upLeft: { row: Math.min(2, 4 - 1), start: 0, columns: 3 },
+            downLeft: { row: 0, start: 0, columns: 3 },
+            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
+            dialogues: ['^$%#^@&!^# (Slime Language) Did I see a human?'],
+            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
+            interact: function() {
+                if (this.dialogueSystem) {
+                    this.showReactionDialogue();
+                }
+            },
+            onDialogueClose: function() {
+                const gameControl = this.gameEnv?.gameControl;
+                if (gameControl?.currentLevel) {
+                    gameControl.currentLevel.continue = false;
+                }
+            }
+        };
+        const dbarrier_1 = {
+            id: 'dbarrier_1', x: 67, y: 86, width: 380, height: 40, visible: false,
+            hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
+            fromOverlay: true
+        };
+
+        const dbarrier_2 = {
+            id: 'dbarrier_2', x: 457, y: 356, width: 40, height: 187, visible: false,
+            hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
+            fromOverlay: true
+        };
+
+        const dbarrier_3 = {
+            id: 'dbarrier_3', x: 754, y: 340, width: 325, height: 40, visible: false,
+            hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
+            fromOverlay: true
+        };
+this.classes = [      { class: GameEnvBackground, data: bgData },
+      { class: Player, data: playerData },
+      { class: Npc, data: npcData1 },
+      { class: Barrier, data: dbarrier_1 },
+      { class: Barrier, data: dbarrier_2 },
+      { class: Barrier, data: dbarrier_3 }
+];
+
+        
+    }
+}
+
+export default GameLevelAquaticGameLevel;</code></pre>
+
+                            <h3>Hardships</h3>
+                            <p>While creating the game level, I priorly focused on manipulating the collision walls. They had quite big hitbox, sometimes when the player is unable to enter the crack of between the walls.</p>
                         `
                     }
                 ]

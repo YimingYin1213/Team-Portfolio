@@ -11,16 +11,19 @@ permalink: /gamify/seek
 
 <script type="module">
     // Adnventure Game assets locations
-    import Core from "{{site.baseurl}}/assets/js/GameEnginev1/essentials/Game.js";
-    import GameControl from "{{site.baseurl}}/assets/js/GameEnginev1/essentials/GameControl.js";
-    import GameLevelSeek from "{{site.baseurl}}/assets/js/GameEnginev1/GameLevelSeek.js";
-    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js';
+    import Core from "{{site.baseurl}}/assets/js/GameEnginev1/essentials/Game.js?v={{ site.time | date: '%s' }}";
+    import GameControl from "{{site.baseurl}}/assets/js/GameEnginev1/essentials/GameControl.js?v={{ site.time | date: '%s' }}";
+    import GameLevelSeek from "{{site.baseurl}}/assets/js/GameEnginev1/GameLevelSeek.js?v={{ site.time | date: '%s' }}";
+    import { pythonURI, javaURI, fetchOptions } from '{{site.baseurl}}/assets/js/api/config.js?v={{ site.time | date: '%s' }}';
 
     const gameLevelClasses = [GameLevelSeek];
 
     // Web Server Environment data
+    const inferredBase = window.location.pathname.startsWith('/Team-Portfolio/') ? '/Team-Portfolio' : '';
+    const path = "{{site.baseurl}}" || inferredBase;
+
     const environment = {
-        path:"{{site.baseurl}}",
+        path: path,
         pythonURI: pythonURI,
         javaURI: javaURI,
         fetchOptions: fetchOptions,
