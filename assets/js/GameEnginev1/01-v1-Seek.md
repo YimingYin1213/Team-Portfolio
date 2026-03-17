@@ -19,8 +19,11 @@ permalink: /gamify/seek
     const gameLevelClasses = [GameLevelSeek];
 
     // Web Server Environment data
+    const inferredBase = window.location.pathname.startsWith('/Team-Portfolio/') ? '/Team-Portfolio' : '';
+    const path = "{{site.baseurl}}" || inferredBase;
+
     const environment = {
-        path:"{{site.baseurl}}",
+        path: path,
         pythonURI: pythonURI,
         javaURI: javaURI,
         fetchOptions: fetchOptions,
