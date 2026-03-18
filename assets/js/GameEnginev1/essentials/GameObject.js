@@ -181,9 +181,9 @@ class GameObject {
                 obj.spriteData && obj.spriteData.id === other.id
             );
             
-            if (targetObject && targetObject.dialogueSystem) {
+            if (targetObject && typeof targetObject.showReactionDialogue === "function") {
                 targetObject.showReactionDialogue();
-            } else if (targetObject && targetObject.showItemMessage) {
+            } else if (targetObject && typeof targetObject.showItemMessage === "function") {
                 targetObject.showItemMessage();
             } else if (other.greeting) {
                 // Fallback to greeting if available
