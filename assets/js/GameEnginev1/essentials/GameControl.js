@@ -18,6 +18,7 @@ class GameControl {
         this.currentLevelIndex = 0;
         this.gameLoopCounter = 0;
         this.isPaused = false;
+        this.loopToken = 0;
         this.exitKeyListener = this.handleExitKey.bind(this);
         this.gameOver = null; // Callback for when the game is over 
         this.savedCanvasState = []; // Save the current levels game elements 
@@ -125,13 +126,23 @@ class GameControl {
         const GameLevelClass = this.levelClasses[this.currentLevelIndex];
         this.currentLevel = new GameLevel(this);
         this.currentLevel.create(GameLevelClass);
-        this.gameLoop();
+        this.loopToken += 1;
+        this.gameLoop(this.loopToken);
+        document.dispatchEvent(new CustomEvent('game:levelchange', {
+            detail: {
+                index: this.currentLevelIndex,
+                levelClass: GameLevelClass
+            }
+        }));
     }
 
     /**
      * The main game loop 
      */
-    gameLoop() {
+    gameLoop(loopToken) {
+        if (loopToken !== this.loopToken) {
+            return;
+        }
         // If the level is not set to continue, handle the level end condition 
         if (!this.currentLevel.continue) {
             this.handleLevelEnd();
@@ -145,7 +156,7 @@ class GameControl {
         this.currentLevel.update();
         this.handleInLevelLogic();
         // Recurse at frame rate speed
-        requestAnimationFrame(this.gameLoop.bind(this));
+        requestAnimationFrame(() => this.gameLoop(loopToken));
     }
 
     /**
@@ -278,10 +289,24 @@ class GameControl {
         this.isPaused = false;
         this.addExitKeyListener();
         this.showCanvasState();
-        this.gameLoop();
+        this.loopToken += 1;
+        this.gameLoop(this.loopToken);
 
         // Restore interaction handlers for outer game
         this.restoreInteractionHandlers();
+    }
+
+    /**
+     * Switch to a specific level by index.
+     * @param {number} index - Level index to switch to.
+     */
+    switchToLevel(index) {
+        const parsed = Number(index);
+        if (!Number.isInteger(parsed)) return;
+        if (parsed < 0 || parsed >= this.levelClasses.length) return;
+        if (parsed === this.currentLevelIndex) return;
+        this.currentLevelIndex = parsed;
+        this.transitionToLevel();
     }
 }
 
