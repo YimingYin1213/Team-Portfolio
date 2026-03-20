@@ -2,64 +2,106 @@
 // Save as assets/js/GameEnginev1/GameLevelBasketball.js
 //
 // Usage:
-//   import GameLevelBasketball from './GameLevelBasketball.js';
+//   import GameLevelBasketball from '/assets/js/GameEnginev1/GameLevelBasketball.js';
 //   export const gameLevelClasses = [GameLevelBasketball];
+
+import GameEnvBackground from './essentials/GameEnvBackground.js';
+import Player from './essentials/Player.js';
 
 class GameLevelBasketball {
     constructor(gameEnv) {
-        this.classes = [];
-        const W = gameEnv.innerWidth  || window.innerWidth;
-        const H = gameEnv.innerHeight || window.innerHeight;
-        setTimeout(() => this._boot(W, H), 200);
+        const path   = gameEnv.path;
+        const width  = gameEnv.innerWidth;
+        const height = gameEnv.innerHeight;
+
+        // ── Background — same format as Kirby ──────────────────────────
+        const bgData = {
+            name: 'basketball_court',
+            src: path + '/images/gamebuilder/bg/basketballcourt.jpg',
+            pixels: { height: 580, width: 1060 }
+        };
+
+        // ── Player — same format as Kirby ──────────────────────────────
+        // BasketballPlayer.png: 1080x1350px, 4 rows x 3 columns
+        const playerData = {
+            id: 'basketballPlayer',
+            src: path + '/images/gamebuilder/sprites/BasketballPlayer.png',
+            SCALE_FACTOR: 5,
+            STEP_FACTOR: 1000,
+            ANIMATION_RATE: 50,
+            INIT_POSITION: { x: 50, y: height * 0.5 },
+            pixels: { height: 1350, width: 1080 },
+            orientation: { rows: 4, columns: 3 },
+            down:      { row: 0, start: 0, columns: 3 },
+            downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI/16 },
+            downLeft:  { row: 0, start: 0, columns: 3, rotate: -Math.PI/16 },
+            left:      { row: 2, start: 0, columns: 3 },
+            right:     { row: 1, start: 0, columns: 3 },
+            up:        { row: 3, start: 0, columns: 3 },
+            upLeft:    { row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
+            upRight:   { row: 3, start: 0, columns: 3, rotate: -Math.PI/16 },
+            hitbox: { widthPercentage: 0.3, heightPercentage: 0.2 },
+            keypress: { up: 87, left: 65, down: 83, right: 68 }
+        };
+
+        // GameEngine handles background + player exactly like Kirby
+        this.classes = [
+            { class: GameEnvBackground, data: bgData     },
+            { class: Player,            data: playerData },
+        ];
+
+        // Boot the custom overlay after GameEngine sets up
+        // Overlay handles: benches, LeBron AI, dribbling ball, HUD
+        setTimeout(() => this._bootOverlay(width, height, path, gameEnv), 500);
     }
 
-    _boot(W, H) {
-        const old = document.getElementById('bball-game');
+    _bootOverlay(W, H, path, gameEnv) {
+        const old = document.getElementById('bball-overlay');
         if (old) old.remove();
 
+        // Transparent overlay canvas on top of everything
         const canvas = document.createElement('canvas');
-        canvas.id = 'bball-game';
+        canvas.id = 'bball-overlay';
         canvas.width = W; canvas.height = H;
-        canvas.setAttribute('tabindex', '0');
-        canvas.style.cssText = 'display:block;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;outline:none;';
+        canvas.style.cssText = `
+            display:block; position:fixed; top:0; left:0;
+            width:100vw; height:100vh;
+            z-index:100; outline:none; pointer-events:none;
+        `;
         document.body.appendChild(canvas);
-        canvas.focus();
         const ctx = canvas.getContext('2d');
 
-        // Obstacles + boundary walls
+        // LeBron sprite — bron.png: 1080x1350px, 4 rows x 1 column
+        const bronImg = new Image();
+        bronImg.src = path + '/images/gamebuilder/sprites/bron.png';
+        const L_FW = 1080;
+        const L_FH = Math.round(1350 / 4);
+        const SS   = Math.round(H * 0.13);
+
+        // Obstacles + boundary walls (benches)
         const OBS = [
             { x: W*.25, y: H*.25, w: W*.12, h: H*.08 },
             { x: W*.55, y: H*.55, w: W*.12, h: H*.08 },
             { x: W*.35, y: H*.60, w: W*.10, h: H*.08 },
             { x: W*.60, y: H*.20, w: W*.10, h: H*.08 },
-            { x: 0,   y: 0,   w: 4, h: H },
-            { x: W-4, y: 0,   w: 4, h: H },
-            { x: 0,   y: 0,   w: W, h: 4 },
-            { x: 0,   y: H-4, w: W, h: 4 },
+            { x: 0,   y: 0,   w: 4,  h: H },
+            { x: W-4, y: 0,   w: 4,  h: H },
+            { x: 0,   y: 0,   w: W,  h: 4 },
+            { x: 0,   y: H-4, w: W,  h: 4 },
         ];
 
-        const PR = 12, LR = 15;
-        let p, l, keys, over, t0, elapsed, best, tick;
+        const LR = SS * 0.30;
+        const lAnim = { col: 0, timer: 0, rate: 8 };
+        let l, over, t0, elapsed, best, tick;
         best = 0;
 
         const reset = () => {
-            p       = { x: W*.08, y: H*.5, dir: 1 };
-            l       = { x: W*.90, y: H*.5, dir: -1 };
-            keys    = {};
-            over    = false;
-            t0      = Date.now();
-            elapsed = 0;
-            tick    = 0;
+            l = { x: W*.90, y: H*.5, dir: 'left' };
+            over = false; t0 = Date.now(); elapsed = 0; tick = 0;
         };
         reset();
 
-        // Input
-        window.addEventListener('keydown', e => {
-            keys[e.key.toLowerCase()] = true;
-            if (['arrowup','arrowdown','arrowleft','arrowright'].includes(e.key.toLowerCase())) e.preventDefault();
-        });
         window.addEventListener('keyup', e => {
-            keys[e.key.toLowerCase()] = false;
             if (e.key.toLowerCase() === 'r' && over) reset();
         });
 
@@ -70,91 +112,95 @@ class GameLevelBasketball {
             return (cx-nx)**2 + (cy-ny)**2 < r*r;
         });
 
-        // Draw court
-        const drawCourt = () => {
-            const g = ctx.createLinearGradient(0,0,W,0);
-            g.addColorStop(0, '#b5651d'); g.addColorStop(.5, '#cd853f'); g.addColorStop(1, '#b5651d');
-            ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
-            ctx.strokeStyle = 'rgba(90,40,0,.2)'; ctx.lineWidth = 1;
-            for (let x = 0; x < W; x += W/28) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-            ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 2;
-            const pad = 20;
-            ctx.strokeRect(pad, pad, W-pad*2, H-pad*2);
-            ctx.beginPath(); ctx.moveTo(W/2,pad); ctx.lineTo(W/2,H-pad); ctx.stroke();
-            ctx.beginPath(); ctx.arc(W/2, H/2, H*.13, 0, Math.PI*2); ctx.stroke();
-        };
-
         // Draw bench obstacles
         const drawObs = () => OBS.slice(0,4).forEach(o => {
             ctx.fillStyle = '#7a5230'; ctx.fillRect(o.x, o.y, o.w, o.h*.4);
             ctx.fillStyle = '#4a2f10';
-            [.1,.5,.82].forEach(fx => ctx.fillRect(o.x+o.w*fx, o.y+o.h*.4, o.w*.1, o.h*.55));
+            [.1,.5,.82].forEach(fx =>
+                ctx.fillRect(o.x+o.w*fx, o.y+o.h*.4, o.w*.1, o.h*.55)
+            );
         });
 
-        // Draw stick-figure player
-        const drawPlayer = (x, y, jersey, num, dir) => {
-            ctx.save(); ctx.translate(Math.round(x), Math.round(y));
-            ctx.fillStyle = 'rgba(0,0,0,.25)';
-            ctx.beginPath(); ctx.ellipse(0,4,10,3,0,0,Math.PI*2); ctx.fill();
-            ctx.fillStyle = '#111'; ctx.fillRect(-9,-5,8,5); ctx.fillRect(1,-5,8,5);
-            ctx.fillStyle = jersey; ctx.fillRect(-9,-20,18,15); ctx.fillRect(-10,-38,20,18);
-            ctx.fillStyle = '#c8784a'; ctx.fillRect(-15,-37,5,13); ctx.fillRect(10,-37,5,13);
-            ctx.fillStyle = '#fff'; ctx.font = 'bold 9px monospace';
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(num, 0, -28);
-            ctx.fillStyle = '#c8784a'; ctx.fillRect(-3,-41,6,4);
-            ctx.beginPath(); ctx.arc(0,-50,9,0,Math.PI*2); ctx.fill();
-            ctx.fillStyle = '#111'; ctx.fillRect(dir*2,-52,3,3);
+        // Draw LeBron sprite
+        const drawLebron = () => {
+            if (!bronImg.complete || bronImg.naturalWidth === 0) return;
+            ctx.save();
+            ctx.translate(Math.round(l.x), Math.round(l.y - SS * 0.3));
+            if (l.dir === 'left') ctx.scale(-1, 1);
+            ctx.drawImage(bronImg, 0, 0, L_FW, L_FH, -SS/2, -SS/2, SS, SS);
             ctx.restore();
         };
 
-        // Draw bouncing basketball
-        const drawBall = (x, y) => {
-            const b = Math.sin(tick*.22)*5;
-            ctx.save(); ctx.translate(Math.round(x), Math.round(y+b));
+        // Draw bouncing basketball beside player
+        const drawBall = (px, py, pdir) => {
+            const b = Math.sin(tick * .22) * 5;
+            const offX = pdir === 'left' ? -SS*.45 : SS*.45;
+            ctx.save(); ctx.translate(Math.round(px + offX), Math.round(py + b));
             ctx.fillStyle = 'rgba(0,0,0,.2)';
-            ctx.beginPath(); ctx.ellipse(0,14-b*.4,8,2.5,0,0,Math.PI*2); ctx.fill();
-            ctx.fillStyle = '#e65100'; ctx.beginPath(); ctx.arc(0,0,9,0,Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(0, 14-b*.4, 8, 2.5, 0, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#e65100';
+            ctx.beginPath(); ctx.arc(0, 0, 9, 0, Math.PI*2); ctx.fill();
             ctx.strokeStyle = '#111'; ctx.lineWidth = 1;
             ctx.beginPath(); ctx.moveTo(-9,0); ctx.lineTo(9,0); ctx.stroke();
-            ctx.beginPath(); ctx.arc(0,0,9,0,Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.arc(0, 0, 9, 0, Math.PI); ctx.stroke();
             ctx.restore();
         };
 
-        // Update game state
+        // Get player position from GameEngine's player object
+        const getPlayer = () => {
+            // GameEngine stores game objects on gameEnv
+            try {
+                const objs = gameEnv?.gameObjects || [];
+                for (const obj of objs) {
+                    if (obj?.spriteData?.id === 'basketballPlayer' || obj?.id === 'basketballPlayer') {
+                        return {
+                            x: obj.x + (obj.width  || SS) / 2,
+                            y: obj.y + (obj.height || SS) / 2,
+                            dir: obj.direction || 'right'
+                        };
+                    }
+                }
+            } catch(e) {}
+            return { x: W * 0.08, y: H * 0.5, dir: 'right' };
+        };
+
         const update = () => {
             if (over) return;
             elapsed = (Date.now() - t0) / 1000;
             tick++;
 
-            let dx = 0, dy = 0;
-            if (keys['w'] || keys['arrowup'])    dy = -3.5;
-            if (keys['s'] || keys['arrowdown'])  dy =  3.5;
-            if (keys['a'] || keys['arrowleft'])  dx = -3.5;
-            if (keys['d'] || keys['arrowright']) dx =  3.5;
-            if (dx && dy) { dx *= .707; dy *= .707; }
-            if (dx) p.dir = dx > 0 ? 1 : -1;
-            if (!blocked(p.x+dx, p.y,    PR)) p.x += dx;
-            if (!blocked(p.x,    p.y+dy, PR)) p.y += dy;
+            const pPos = getPlayer();
+            const PR   = SS * 0.28;
 
-            const spd = Math.min(1.5 + elapsed*.04, 4);
-            const ddx = p.x - l.x, ddy = p.y - l.y;
+            // LeBron chase AI — vector normalization
+            const spd = Math.min(1.5 + elapsed * .04, 4);
+            const ddx = pPos.x - l.x, ddy = pPos.y - l.y;
             const dist = Math.sqrt(ddx*ddx + ddy*ddy);
+
             if (dist > 1) {
                 const mx = (ddx/dist)*spd, my = (ddy/dist)*spd;
                 if (!blocked(l.x+mx, l.y+my, LR)) { l.x += mx; l.y += my; }
-                else { if (!blocked(l.x+mx, l.y, LR)) l.x += mx; if (!blocked(l.x, l.y+my, LR)) l.y += my; }
-                l.dir = ddx >= 0 ? 1 : -1;
+                else {
+                    if (!blocked(l.x+mx, l.y, LR)) l.x += mx;
+                    if (!blocked(l.x, l.y+my, LR)) l.y += my;
+                }
+                l.dir = ddx >= 0 ? 'right' : 'left';
+                if (++lAnim.timer >= lAnim.rate) { lAnim.timer = 0; }
             }
-            if (dist < PR+LR+2) { over = true; if (elapsed > best) best = elapsed; }
+
+            if (dist < PR + LR + 2) {
+                over = true;
+                if (elapsed > best) best = elapsed;
+            }
         };
 
-        // Render frame
         const render = () => {
-            ctx.clearRect(0,0,W,H);
-            drawCourt(); drawObs();
-            drawBall(p.x + p.dir*20, p.y - 10);
-            drawPlayer(p.x, p.y, '#e53935', '11', p.dir);
-            drawPlayer(l.x, l.y, '#552583', '23', l.dir);
+            ctx.clearRect(0, 0, W, H);
+            drawObs();
+
+            const pPos = getPlayer();
+            drawBall(pPos.x, pPos.y, pPos.dir);
+            drawLebron();
 
             // HUD
             ctx.fillStyle = 'rgba(0,0,0,.75)';
@@ -163,22 +209,32 @@ class GameLevelBasketball {
             ctx.fillStyle = '#fff'; ctx.font = `bold ${Math.round(W*.018)}px monospace`;
             ctx.fillText(`⏱ ${elapsed.toFixed(1)}s`, W/2, 24);
             ctx.fillStyle = '#fdb927'; ctx.font = 'bold 12px monospace';
-            ctx.textAlign = 'right'; ctx.fillText(`Best: ${best.toFixed(1)}s`, W/2+145, 24);
+            ctx.textAlign = 'right';
+            ctx.fillText(`Best: ${best.toFixed(1)}s`, W/2+145, 24);
 
             const spd = Math.min(1.5 + elapsed*.04, 4);
             if (spd > 2.8) {
                 ctx.fillStyle = `rgba(230,50,50,${Math.min((spd-2.8)*.5,.9)})`;
                 ctx.font = 'bold 13px monospace'; ctx.textAlign = 'center';
-                ctx.fillText('⚡ LeBron is heating up!', W/2, 54);
+                ctx.fillText('⚡ LeBron is heating up!', W/2, 60);
             }
+
+            ctx.save();
+            ctx.fillStyle = 'rgba(0,0,0,.50)';
+            ctx.beginPath(); ctx.roundRect(8, H-26, 290, 18, 4); ctx.fill();
+            ctx.fillStyle = '#bbb'; ctx.font = '11px monospace';
+            ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+            ctx.fillText('Move: WASD / Arrow Keys   |   R = restart', 14, H-17);
+            ctx.restore();
 
             // Game over card
             if (over) {
-                ctx.fillStyle = 'rgba(0,0,0,.75)'; ctx.fillRect(0,0,W,H);
-                const bw = Math.min(420, W*.7), bh = 200, bx = (W-bw)/2, by = (H-bh)/2;
+                ctx.fillStyle = 'rgba(0,0,0,.78)'; ctx.fillRect(0,0,W,H);
+                const bw = Math.min(420,W*.7), bh = 200, bx = (W-bw)/2, by = (H-bh)/2;
                 ctx.fillStyle = '#0d0d1a'; ctx.strokeStyle = '#fdb927'; ctx.lineWidth = 3;
                 ctx.beginPath(); ctx.roundRect(bx,by,bw,bh,16); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#fdb927'; ctx.beginPath(); ctx.roundRect(bx,by,bw,7,[16,16,0,0]); ctx.fill();
+                ctx.fillStyle = '#fdb927';
+                ctx.beginPath(); ctx.roundRect(bx,by,bw,8,[16,16,0,0]); ctx.fill();
                 ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#fdb927'; ctx.font = `bold ${Math.round(bw*.065)}px monospace`;
                 ctx.fillText('🏀 LeBron stole the ball!', W/2, by+55);
@@ -186,7 +242,8 @@ class GameLevelBasketball {
                 ctx.fillText(`Survived  ${elapsed.toFixed(1)}s`, W/2, by+105);
                 ctx.fillStyle = '#888'; ctx.font = `${Math.round(bw*.035)}px monospace`;
                 ctx.fillText(`Best: ${best.toFixed(1)}s`, W/2, by+145);
-                ctx.fillStyle = '#ccc'; ctx.fillText('Press R to play again', W/2, by+178);
+                ctx.fillStyle = '#ddd';
+                ctx.fillText('Press R to play again', W/2, by+178);
             }
         };
 
