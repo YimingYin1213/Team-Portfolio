@@ -4,6 +4,41 @@ title: Hide and Seek
 permalink: /gamify/seek
 ---
 
+<style>
+  #gameContainer {
+    width: 100%;
+    min-height: 600px;
+  }
+  .embed-mode header,
+  .embed-mode footer,
+  .embed-mode nav,
+  .embed-mode .site-header,
+  .embed-mode .site-footer {
+    display: none !important;
+  }
+  .embed-mode .page-content,
+  .embed-mode .wrapper {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .embed-mode #gameContainer {
+    height: 100vh;
+    min-height: 100vh;
+  }
+</style>
+
+<script>
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    const isEmbed = params.get('embed') === '1' || window.self !== window.top;
+    if (isEmbed) {
+      document.documentElement.classList.add('embed-mode');
+      document.body.classList.add('embed-mode');
+    }
+  })();
+</script>
+
 <div id="gameContainer">
     <div id="promptDropDown" class="promptDropDown" style="z-index: 9999"></div>
     <!-- GameEnv will create canvas dynamically -->

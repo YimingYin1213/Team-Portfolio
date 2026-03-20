@@ -37,13 +37,18 @@ permalink: /games/basketball
     </div>
 
     <script type="module">
-      const path = '{{ site.baseurl }}';
+      const configuredBase = '{{ site.baseurl }}';
+      const firstSegment = window.location.pathname.split('/')[1];
+      const inferredBase = firstSegment ? `/${firstSegment}` : '';
+      const path = (configuredBase && window.location.pathname.startsWith(configuredBase + '/'))
+        ? configuredBase
+        : inferredBase;
       const baseUrl = window.location.origin + path;
 
       async function boot() {
         const [{ default: Game }, { default: GameLevelBasketball }] = await Promise.all([
-          import(`${baseUrl}/assets/js/GameEnginev1/essentials/Game.js`),
-          import(`${baseUrl}/assets/js/GameEnginev1/GameLevelBasketball.js`)
+          import(`${baseUrl}/assets/js/GameEnginev1/essentials/Game.js?v={{ site.time | date: '%s' }}`),
+          import(`${baseUrl}/assets/js/GameEnginev1/GameLevelBasketball.js?v={{ site.time | date: '%s' }}`)
         ]);
 
         const container = document.getElementById('gameContainer');
