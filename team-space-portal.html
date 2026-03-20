@@ -711,18 +711,19 @@ layout: null
 
         .game-embed {
             width: 100% !important;
-            height: 420px !important;
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+        }
+
+        .game-embed iframe {
+            width: 100% !important;
+            height: 320px !important;
             border-radius: 16px !important;
             overflow: hidden !important;
             border: 1px solid rgba(129, 212, 250, 0.4) !important;
             box-shadow: inset 0 0 18px rgba(129, 212, 250, 0.1) !important;
             background: #050814 !important;
-        }
-
-        .game-embed iframe {
-            width: 100% !important;
-            height: 100% !important;
-            border: 0 !important;
         }
 
         /* Responsive design */
