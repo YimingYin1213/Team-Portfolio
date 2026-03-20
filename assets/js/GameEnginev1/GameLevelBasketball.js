@@ -50,25 +50,33 @@ class GameLevelBasketball {
             { class: Player,            data: playerData },
         ];
 
+        this._overlayKeyHandler = null;
+        this._overlayCanvasId = 'bball-overlay';
+
         // Boot the custom overlay after GameEngine sets up
         // Overlay handles: benches, LeBron AI, dribbling ball, HUD
         setTimeout(() => this._bootOverlay(width, height, path, gameEnv), 500);
     }
 
     _bootOverlay(W, H, path, gameEnv) {
-        const old = document.getElementById('bball-overlay');
+        const old = document.getElementById(this._overlayCanvasId);
         if (old) old.remove();
+
+        const container = gameEnv?.gameContainer || document.getElementById('gameContainer') || document.body;
 
         // Transparent overlay canvas on top of everything
         const canvas = document.createElement('canvas');
-        canvas.id = 'bball-overlay';
+        canvas.id = this._overlayCanvasId;
         canvas.width = W; canvas.height = H;
         canvas.style.cssText = `
-            display:block; position:fixed; top:0; left:0;
-            width:100vw; height:100vh;
-            z-index:100; outline:none; pointer-events:none;
+            display:block; position:absolute; top:0; left:0;
+            width:100%; height:100%;
+            z-index:5; outline:none; pointer-events:none;
         `;
-        document.body.appendChild(canvas);
+        if (container && getComputedStyle(container).position === 'static') {
+            container.style.position = 'relative';
+        }
+        container.appendChild(canvas);
         const ctx = canvas.getContext('2d');
 
         // LeBron sprite — bron.png: 1080x1350px, 4 rows x 1 column
@@ -101,9 +109,10 @@ class GameLevelBasketball {
         };
         reset();
 
-        window.addEventListener('keyup', e => {
+        this._overlayKeyHandler = (e) => {
             if (e.key.toLowerCase() === 'r' && over) reset();
-        });
+        };
+        window.addEventListener('keyup', this._overlayKeyHandler);
 
         // Circle vs rect collision
         const blocked = (cx, cy, r) => OBS.some(o => {
@@ -248,6 +257,15 @@ class GameLevelBasketball {
         };
 
         (function loop() { update(); render(); requestAnimationFrame(loop); })();
+    }
+
+    destroy() {
+        const overlay = document.getElementById(this._overlayCanvasId);
+        if (overlay) overlay.remove();
+        if (this._overlayKeyHandler) {
+            window.removeEventListener('keyup', this._overlayKeyHandler);
+            this._overlayKeyHandler = null;
+        }
     }
 }
 
