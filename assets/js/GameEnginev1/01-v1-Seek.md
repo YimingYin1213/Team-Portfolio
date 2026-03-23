@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: Hide and Seek
-permalink: /gamify/seek
+permalink: /gamify/seek.html
 ---
 
 <style>

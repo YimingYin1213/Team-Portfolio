@@ -1,7 +1,7 @@
 ---
 layout: opencs
 title: Basketball Game
-permalink: /gamify/basketball
+permalink: /gamify/basketball.html
 ---
 
 <div id="gameContainer">
