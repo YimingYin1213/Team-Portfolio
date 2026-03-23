@@ -498,14 +498,24 @@ layout: null
             top: calc(100% - 150px) !important;
             z-index: 999 !important;
             user-select: none !important;
-            width: 60px !important;
-            height: 80px !important;
+            width: 84px !important;
+            height: 112px !important;
+            transition: transform 0.18s ease, filter 0.18s ease !important;
+        }
+
+        .rocket-container.traveler-active {
+            filter: drop-shadow(0 0 18px rgba(129, 212, 250, 0.9)) !important;
+        }
+
+        .rocket-container.docked {
+            transform: scale(1.06) !important;
+            filter: drop-shadow(0 0 28px rgba(255, 235, 59, 0.9)) !important;
         }
 
         .rocket {
             position: relative !important;
-            width: 60px !important;
-            height: 80px !important;
+            width: 84px !important;
+            height: 112px !important;
             cursor: grab !important;
             animation: rocketFloat 3s ease-in-out infinite !important;
         }
@@ -516,61 +526,108 @@ layout: null
 
         .rocket-body {
             position: absolute !important;
-            width: 40px !important;
-            height: 50px !important;
-            background: linear-gradient(90deg, #ff6b9d 0%, #ff8a80 50%, #ff6b9d 100%) !important;
-            border-radius: 10px 10px 20px 20px !important;
-            left: 10px !important;
+            width: 52px !important;
+            height: 72px !important;
+            background: linear-gradient(180deg, #ffe0f0 0%, #ff8a80 35%, #ff6b9d 70%, #d94b80 100%) !important;
+            border-radius: 26px 26px 18px 18px !important;
+            left: 16px !important;
             top: 10px !important;
-            box-shadow: 0 0 20px rgba(255, 107, 157, 0.6) !important;
+            border: 2px solid rgba(255, 255, 255, 0.45) !important;
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.6), inset 0 0 18px rgba(255, 255, 255, 0.25) !important;
+        }
+
+        .rocket-nose {
+            position: absolute !important;
+            top: -16px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 0 !important;
+            height: 0 !important;
+            border-left: 18px solid transparent !important;
+            border-right: 18px solid transparent !important;
+            border-bottom: 26px solid #ffd1e6 !important;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.35)) !important;
         }
 
         .rocket-window {
             position: absolute !important;
-            width: 20px !important;
-            height: 20px !important;
+            width: 22px !important;
+            height: 22px !important;
             background: radial-gradient(circle at 35% 35%, #ffffff, #64b5f6) !important;
             border-radius: 50% !important;
-            left: 20px !important;
-            top: 15px !important;
-            box-shadow: inset 0 0 10px rgba(100, 181, 246, 0.5) !important;
+            left: 30px !important;
+            top: 20px !important;
+            border: 2px solid rgba(255, 255, 255, 0.6) !important;
+            box-shadow: inset 0 0 10px rgba(100, 181, 246, 0.5), 0 0 10px rgba(100, 181, 246, 0.5) !important;
+        }
+
+        .rocket-stripe {
+            position: absolute !important;
+            left: 7px !important;
+            right: 7px !important;
+            height: 6px !important;
+            background: rgba(255, 255, 255, 0.55) !important;
+            border-radius: 999px !important;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3) !important;
+        }
+
+        .rocket-stripe-top {
+            top: 48px !important;
+        }
+
+        .rocket-stripe-bottom {
+            top: 58px !important;
+            opacity: 0.75 !important;
         }
 
         .rocket-fins {
             position: absolute !important;
-            bottom: 0px !important;
-            left: 10px !important;
+            bottom: 8px !important;
+            left: 16px !important;
         }
 
         .rocket-fin {
             position: absolute !important;
             width: 0 !important;
             height: 0 !important;
-            border-left: 8px solid transparent !important;
-            border-right: 8px solid transparent !important;
-            border-bottom: 15px solid #ff6b9d !important;
+            border-left: 12px solid transparent !important;
+            border-right: 12px solid transparent !important;
+            border-bottom: 22px solid #ff6b9d !important;
+            filter: drop-shadow(0 0 8px rgba(255, 107, 157, 0.4)) !important;
         }
 
         .rocket-fin-left {
-            left: -5px !important;
+            left: -10px !important;
             transform: skewX(-10deg) !important;
         }
 
         .rocket-fin-right {
-            right: -5px !important;
+            right: -10px !important;
             transform: skewX(10deg) !important;
+        }
+
+        .rocket-engine {
+            position: absolute !important;
+            bottom: 4px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 22px !important;
+            height: 14px !important;
+            background: linear-gradient(180deg, #b0bec5, #546e7a) !important;
+            border-radius: 0 0 10px 10px !important;
+            border: 1px solid rgba(255, 255, 255, 0.35) !important;
         }
 
         .rocket-flame {
             position: absolute !important;
-            bottom: -20px !important;
+            bottom: -28px !important;
             left: 50% !important;
             transform: translateX(-50%) !important;
-            width: 20px !important;
-            height: 25px !important;
-            background: linear-gradient(180deg, #ffeb3b 0%, #ff9800 50%, transparent 100%) !important;
+            width: 26px !important;
+            height: 34px !important;
+            background: linear-gradient(180deg, #fff176 0%, #ff9800 45%, #ff5722 75%, transparent 100%) !important;
             border-radius: 50% 50% 0 0 !important;
-            filter: blur(2px) !important;
+            filter: blur(2px) drop-shadow(0 0 8px rgba(255, 152, 0, 0.6)) !important;
             animation: flame 0.3s ease-in-out infinite !important;
         }
 
@@ -592,7 +649,7 @@ layout: null
 
         .rocket-tooltip {
             position: absolute !important;
-            bottom: 100px !important;
+            bottom: 128px !important;
             right: 0 !important;
             background: rgba(0, 0, 0, 0.8) !important;
             color: #81d4fa !important;
@@ -851,6 +908,51 @@ layout: null
             cursor: pointer !important;
         }
 
+        .traveler-docked {
+            filter: drop-shadow(0 0 24px rgba(255, 235, 59, 0.95)) !important;
+            transform: scale(1.06) !important;
+        }
+
+        .traveler-back-btn {
+            position: fixed !important;
+            top: 22px !important;
+            right: 22px !important;
+            z-index: 120 !important;
+            display: none !important;
+            background: rgba(0, 0, 0, 0.75) !important;
+            border: 2px solid rgba(129, 212, 250, 0.55) !important;
+            color: #81d4fa !important;
+            padding: 10px 18px !important;
+            border-radius: 999px !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            box-shadow: 0 0 18px rgba(33, 150, 243, 0.2) !important;
+        }
+
+        .traveler-back-btn.active {
+            display: inline-flex !important;
+        }
+
+        .traveler-instruction {
+            position: fixed !important;
+            bottom: 95px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            z-index: 120 !important;
+            padding: 10px 18px !important;
+            border-radius: 999px !important;
+            background: rgba(0, 0, 0, 0.74) !important;
+            border: 1px solid rgba(129, 212, 250, 0.45) !important;
+            color: #cfefff !important;
+            font-size: 0.9rem !important;
+            display: none !important;
+            white-space: nowrap !important;
+        }
+
+        .traveler-instruction.active {
+            display: block !important;
+        }
+
         .hud-display {
             position: fixed !important;
             top: 20px !important;
@@ -936,6 +1038,8 @@ layout: null
             <p><span class="label">SECTOR SCAN:</span> <span id="hudCoords">0.0, 0.0</span></p>
             <p><span class="label">DISTANCE:</span> <span id="hudDistance">N/A</span></p>
         </div>
+        <button class="traveler-back-btn" id="travelerBackBtn" onclick="backToTravelerGalaxies()">← Back to Galaxies</button>
+        <div class="traveler-instruction" id="travelerInstruction">Use WASD to fly. Dock with a glowing object and press Enter.</div>
     </div>
 
     <!-- Controllable Rocket -->
@@ -943,12 +1047,16 @@ layout: null
         <div class="rocket-tooltip">Use arrow keys or WASD to move the rocket!</div>
         <div class="rocket" id="rocket">
             <div class="rocket-body">
+                <div class="rocket-nose"></div>
                 <div class="rocket-window"></div>
+                <div class="rocket-stripe rocket-stripe-top"></div>
+                <div class="rocket-stripe rocket-stripe-bottom"></div>
             </div>
             <div class="rocket-fins">
                 <div class="rocket-fin rocket-fin-left"></div>
                 <div class="rocket-fin rocket-fin-right"></div>
             </div>
+            <div class="rocket-engine"></div>
             <div class="rocket-flame"></div>
         </div>
     </div>
@@ -1773,6 +1881,104 @@ export default GameLevelAquaticGameLevel;</code></pre>
         };
 
         const keys = {};
+        let travelerModeState = {
+            level: 'galaxies',
+            activeGalaxyIndex: null,
+            interactableTargets: [],
+            activeDockTarget: null
+        };
+
+        function setTravelerInstruction(message) {
+            const el = document.getElementById('travelerInstruction');
+            if (el) {
+                el.textContent = message;
+            }
+        }
+
+        function setTravelerTargets(targets = []) {
+            travelerModeState.interactableTargets = targets;
+            travelerModeState.activeDockTarget = null;
+            updateDockingState();
+        }
+
+        function updateDockingState() {
+            const rocketContainer = document.getElementById('rocketContainer');
+            if (!rocketContainer) return;
+            const hudDistance = document.getElementById('hudDistance');
+
+            travelerModeState.interactableTargets.forEach(target => {
+                if (target.element) target.element.classList.remove('traveler-docked');
+            });
+
+            if (currentView !== 'traveler') {
+                rocketContainer.classList.remove('traveler-active', 'docked');
+                travelerModeState.activeDockTarget = null;
+                if (hudDistance) hudDistance.textContent = 'N/A';
+                return;
+            }
+
+            rocketContainer.classList.add('traveler-active');
+
+            const rocketCenterX = rocketState.x + 42;
+            const rocketCenterY = rocketState.y + 56;
+            let nearest = null;
+
+            travelerModeState.interactableTargets.forEach(target => {
+                if (!target.element) return;
+                const bounds = target.element.getBoundingClientRect();
+                const centerX = bounds.left + bounds.width / 2;
+                const centerY = bounds.top + bounds.height / 2;
+                const dx = centerX - rocketCenterX;
+                const dy = centerY - rocketCenterY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (!nearest || distance < nearest.distance) {
+                    nearest = { ...target, distance };
+                }
+            });
+
+            if (nearest) {
+                if (hudDistance) hudDistance.textContent = `${nearest.distance.toFixed(0)} px`;
+            } else {
+                if (hudDistance) hudDistance.textContent = 'N/A';
+            }
+
+            if (nearest && nearest.distance < 120) {
+                travelerModeState.activeDockTarget = nearest;
+                rocketContainer.classList.add('docked');
+                if (nearest.element) nearest.element.classList.add('traveler-docked');
+                setTravelerInstruction(`Docked with ${nearest.title}. Press Enter to explore.`);
+            } else {
+                travelerModeState.activeDockTarget = null;
+                rocketContainer.classList.remove('docked');
+                setTravelerInstruction(
+                    travelerModeState.level === 'galaxies'
+                        ? 'Use WASD to fly. Dock with a galaxy cloud and press Enter.'
+                        : 'Use WASD to fly. Dock with a planet and press Enter, or go back.'
+                );
+            }
+        }
+
+        function activateDockedTarget() {
+            if (currentView !== 'traveler' || !travelerModeState.activeDockTarget) return;
+            const target = travelerModeState.activeDockTarget;
+
+            if (target.type === 'galaxy') {
+                showTravelerPlanets(target.index);
+            } else if (target.type === 'planet') {
+                if (target.planet.link) {
+                    window.location.href = target.planet.link;
+                } else {
+                    openPlanetModal(target.planet);
+                }
+            }
+        }
+
+        function updateTravelerHud() {
+            const hudCoords = document.getElementById('hudCoords');
+            if (hudCoords) {
+                hudCoords.textContent = `${rocketState.x.toFixed(0)}, ${rocketState.y.toFixed(0)}`;
+            }
+        }
 
         // Handle rocket movement
         function updateRocketPosition() {
@@ -1794,8 +2000,8 @@ export default GameLevelAquaticGameLevel;</code></pre>
             rocketState.y += rocketState.vy;
 
             // Boundary constraints
-            rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 70));
-            rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 110));
+            rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 94));
+            rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 132));
 
             // Update rocket container position
             const rocketContainer = document.getElementById('rocketContainer');
@@ -1803,6 +2009,9 @@ export default GameLevelAquaticGameLevel;</code></pre>
                 rocketContainer.style.left = rocketState.x + 'px';
                 rocketContainer.style.top = rocketState.y + 'px';
             }
+
+            updateTravelerHud();
+            updateDockingState();
 
             requestAnimationFrame(updateRocketPosition);
         }
@@ -1814,6 +2023,10 @@ export default GameLevelAquaticGameLevel;</code></pre>
 
         document.addEventListener('keydown', (e) => {
             keys[e.key.toLowerCase()] = true;
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                activateDockedTarget();
+            }
         });
 
         document.addEventListener('keyup', (e) => {
@@ -1836,8 +2049,8 @@ export default GameLevelAquaticGameLevel;</code></pre>
                 rocketState.y = e.clientY - dragOffsetY;
 
                 // Boundary constraints
-                rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 70));
-                rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 110));
+                rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 94));
+                rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 132));
 
                 const rocketContainer = document.getElementById('rocketContainer');
                 if (rocketContainer) {
@@ -1859,9 +2072,19 @@ export default GameLevelAquaticGameLevel;</code></pre>
             currentView = 'list';
             document.getElementById('container').style.display = 'flex';
             document.getElementById('travelerView').style.display = 'none';
+            document.getElementById('travelerSpace').innerHTML = '';
             document.getElementById('listViewBtn').classList.add('active');
             document.getElementById('travelerViewBtn').classList.remove('active');
             document.getElementById('hudDisplay').classList.remove('active');
+            document.getElementById('travelerBackBtn').classList.remove('active');
+            document.getElementById('travelerInstruction').classList.remove('active');
+            travelerModeState = {
+                level: 'galaxies',
+                activeGalaxyIndex: null,
+                interactableTargets: [],
+                activeDockTarget: null
+            };
+            setTravelerTargets([]);
         }
 
         function switchToTravelerView() {
@@ -1871,19 +2094,28 @@ export default GameLevelAquaticGameLevel;</code></pre>
             document.getElementById('listViewBtn').classList.remove('active');
             document.getElementById('travelerViewBtn').classList.add('active');
             document.getElementById('hudDisplay').classList.add('active');
+            document.getElementById('travelerInstruction').classList.add('active');
+
+            travelerModeState.level = 'galaxies';
+            travelerModeState.activeGalaxyIndex = null;
+            rocketState.x = window.innerWidth - 120;
+            rocketState.y = window.innerHeight - 180;
             
-            if (travelerGalaxies.length === 0) {
-                initializeTravelerView();
-            }
+            initializeTravelerView();
         }
 
         function initializeTravelerView() {
             const travelerSpace = document.getElementById('travelerSpace');
             travelerSpace.innerHTML = '';
             travelerGalaxies = [];
+            travelerModeState.level = 'galaxies';
+            travelerModeState.activeGalaxyIndex = null;
+            document.getElementById('travelerBackBtn').classList.remove('active');
+            setTravelerInstruction('Use WASD to fly. Dock with a galaxy cloud and press Enter.');
 
             // Generate random non-overlapping positions for galaxies
-            const positions = generateNonOverlappingPositions(galaxies.length, 250, 200, 1900, 1900);
+            const positions = generateNonOverlappingPositions(galaxies.length, 260, 210, 1700, 1100, 80, 80);
+            const targets = [];
 
             galaxies.forEach((galaxy, index) => {
                 const pos = positions[index];
@@ -1924,55 +2156,110 @@ export default GameLevelAquaticGameLevel;</code></pre>
                 }
 
                 galaxyDiv.addEventListener('click', () => {
-                    handleGalaxyClick(galaxy.title, index);
+                    showTravelerPlanets(index);
                 });
 
                 travelerSpace.appendChild(galaxyDiv);
-                
-                // Add planets if they exist
-                if (galaxy.planets && galaxy.planets.length > 0) {
-                    const planetPositions = generateNonOverlappingPositions(galaxy.planets.length, 120, 100, pos.x + 300, pos.y + 300);
-                    const planetTypes = ['ice', 'lava', 'gas', 'ocean', 'jungle'];
-                    
-                    galaxy.planets.forEach((planet, pIndex) => {
-                        const pPos = planetPositions[pIndex];
-                        const planetDiv = document.createElement('div');
-                        planetDiv.className = 'planet-traveler';
-                        planetDiv.style.left = pPos.x + 'px';
-                        planetDiv.style.top = pPos.y + 'px';
-                        planetDiv.style.width = '100px';
-                        planetDiv.style.height = '100px';
-                        
-                        const planetType = planetTypes[pIndex % planetTypes.length];
-                        
-                        planetDiv.innerHTML = `
-                            <div class="planet-inner" style="width: 100%; height: 100%; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                <div class="planet-surface planet-${planetType}" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 1;"></div>
-                                <div class="planet-atmosphere" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 2;"></div>
-                                <div class="planet-content" style="position: relative; z-index: 3; text-align: center;">
-                                    <div class="planet-title" style="font-size: 0.9rem; font-weight: 700; color: #ffffff; text-shadow: 0 0 10px rgba(100, 181, 246, 0.8);">${planet.title}</div>
-                                </div>
-                            </div>
-                        `;
-                        
-                        planetDiv.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            openPlanetModal(planet);
-                        });
-                        
-                        travelerSpace.appendChild(planetDiv);
-                    });
-                }
 
                 travelerGalaxies.push({
                     element: galaxyDiv,
                     ...galaxy,
                     position: pos
                 });
+
+                targets.push({
+                    type: 'galaxy',
+                    index,
+                    title: galaxy.title,
+                    galaxy,
+                    element: galaxyDiv
+                });
             });
+
+            setTravelerTargets(targets);
         }
 
-        function generateNonOverlappingPositions(count, minSpacing, objectSize, maxWidth, maxHeight) {
+        function showTravelerPlanets(galaxyIndex) {
+            const travelerSpace = document.getElementById('travelerSpace');
+            const galaxy = galaxies[galaxyIndex];
+            travelerSpace.innerHTML = '';
+            travelerModeState.level = 'planets';
+            travelerModeState.activeGalaxyIndex = galaxyIndex;
+            document.getElementById('travelerBackBtn').classList.add('active');
+            setTravelerInstruction(`Exploring ${galaxy.title}. Dock with a planet and press Enter.`);
+
+            const titleBanner = document.createElement('div');
+            titleBanner.style.position = 'absolute';
+            titleBanner.style.left = '50%';
+            titleBanner.style.top = '90px';
+            titleBanner.style.transform = 'translateX(-50%)';
+            titleBanner.style.color = '#ffffff';
+            titleBanner.style.fontSize = '2rem';
+            titleBanner.style.fontWeight = '700';
+            titleBanner.style.textShadow = '0 0 20px rgba(129, 212, 250, 0.7)';
+            titleBanner.textContent = galaxy.title;
+            travelerSpace.appendChild(titleBanner);
+
+            const positions = generateNonOverlappingPositions(
+                galaxy.planets.length,
+                170,
+                120,
+                1600,
+                900,
+                110,
+                180
+            );
+
+            const planetTypes = ['ice', 'lava', 'gas', 'ocean', 'jungle'];
+            const targets = [];
+
+            galaxy.planets.forEach((planet, pIndex) => {
+                const pPos = positions[pIndex];
+                const planetDiv = document.createElement('div');
+                planetDiv.className = 'planet-traveler';
+                planetDiv.style.left = pPos.x + 'px';
+                planetDiv.style.top = pPos.y + 'px';
+                planetDiv.style.width = '120px';
+                planetDiv.style.height = '120px';
+
+                const planetType = planetTypes[pIndex % planetTypes.length];
+
+                planetDiv.innerHTML = `
+                    <div class="planet-inner" style="width: 100%; height: 100%; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <div class="planet-surface planet-${planetType}" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 1;"></div>
+                        <div class="planet-atmosphere" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 2;"></div>
+                        <div class="planet-ring" style="width: 140px; height: 34px; border-width: 2px;"></div>
+                        <div class="planet-content" style="position: relative; z-index: 3; text-align: center; padding: 12px;">
+                            <div class="planet-title" style="font-size: 0.88rem; font-weight: 700; color: #ffffff; text-shadow: 0 0 10px rgba(100, 181, 246, 0.8);">${planet.title}</div>
+                        </div>
+                    </div>
+                `;
+
+                planetDiv.addEventListener('click', () => {
+                    if (planet.link) {
+                        window.location.href = planet.link;
+                    } else {
+                        openPlanetModal(planet);
+                    }
+                });
+
+                travelerSpace.appendChild(planetDiv);
+                targets.push({
+                    type: 'planet',
+                    title: planet.title,
+                    planet,
+                    element: planetDiv
+                });
+            });
+
+            setTravelerTargets(targets);
+        }
+
+        function backToTravelerGalaxies() {
+            initializeTravelerView();
+        }
+
+        function generateNonOverlappingPositions(count, minSpacing, objectSize, maxWidth, maxHeight, minX = 0, minY = 0) {
             const positions = [];
             const maxAttempts = 100;
             
@@ -1981,8 +2268,8 @@ export default GameLevelAquaticGameLevel;</code></pre>
                 let attempts = 0;
                 
                 while (!position && attempts < maxAttempts) {
-                    const x = Math.random() * (maxWidth - objectSize);
-                    const y = Math.random() * (maxHeight - objectSize);
+                    const x = minX + Math.random() * Math.max(1, (maxWidth - minX - objectSize));
+                    const y = minY + Math.random() * Math.max(1, (maxHeight - minY - objectSize));
                     
                     // Check if this position overlaps with existing positions
                     const overlaps = positions.some(pos => {
@@ -2003,8 +2290,8 @@ export default GameLevelAquaticGameLevel;</code></pre>
                 } else {
                     // Fallback if we can't find a non-overlapping position
                     positions.push({
-                        x: (i % 4) * (maxWidth / 4),
-                        y: Math.floor(i / 4) * (maxHeight / 4)
+                        x: minX + (i % 4) * Math.max(150, ((maxWidth - minX) / 4)),
+                        y: minY + Math.floor(i / 4) * Math.max(150, ((maxHeight - minY) / 4))
                     });
                 }
             }
