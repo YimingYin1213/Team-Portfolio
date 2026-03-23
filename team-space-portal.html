@@ -1609,6 +1609,100 @@ export default GameLevelAquaticGameLevel;</code></pre>
                             <p>This content comes from the Aquatic arrays and booleans lesson notebook and is published as a blog post in the portfolio.</p>
                             <p><a class="portal-button" href="{{ site.baseurl }}/blog/aquatic-arrays-booleans"><span class="spark"></span>Open Yiming's CSS1</a></p>
                         `
+                    },
+                    {
+                        title: "Lance's CSS1",
+                        description: 'CSSE-2 reflection and code review from Lance\'s notebook',
+                        link: '{{ site.baseurl }}/csse2/blogtest',
+                        content: `
+                            <h3>Lance's CSS1</h3>
+                            <p>This blog post is based on Lance's notebook entry and focuses on a basketball evasion project through a CSSE lesson-style reflection.</p>
+
+                            <h3>What It Covers</h3>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>Control structures like loops, conditionals, and nested conditions</li>
+                                <li>Data types including numbers, strings, booleans, arrays, and objects</li>
+                                <li>Operators used in movement, collision, timing, and gameplay logic</li>
+                                <li>An embedded basketball evasion game and final reflection</li>
+                            </ul>
+
+                            <h3>Notebook Post</h3>
+                            <p>This content comes from the CSSE-2 notebook post titled <strong>CSSE-2 Personal Blog</strong> and is published through the site as a blog page.</p>
+                            <p><a class="portal-button" href="{{ site.baseurl }}/csse2/blogtest"><span class="spark"></span>Open Lance's CSS1</a></p>
+                        `
+                    },
+                    {
+                        title: "Arjun's Game Blog V2",
+                        description: 'Game development progress blog for a custom seek level',
+                        content: `
+                            <h3>Game Development Progress Blog – Custom Seek Level</h3>
+                            <p>In this update, Arjun created a custom level called <strong>GameLevelSeek</strong> using the GameBuilder engine. The goal of the level is simple: the player must navigate the map and find the hidden NPC.</p>
+
+                            <h3>What I Built</h3>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>A background environment</li>
+                                <li>A controllable player</li>
+                                <li>An NPC (Kirby) to find</li>
+                                <li>Multiple invisible barriers to shape the map</li>
+                            </ul>
+
+                            <h3>Background Setup</h3>
+                            <p>A custom background image, <strong>tagplayground.png</strong>, was added as the main map where the player moves around.</p>
+
+                            <h3>Player Mechanics</h3>
+                            <p>The player uses <strong>WASD</strong> controls for movement and includes animations for up, down, left, right, and diagonal directions.</p>
+                            <p>The player starts at position <strong>(32, 300)</strong>, with custom animation speed, sprite scaling, and movement speed settings.</p>
+
+                            <h3>NPC Interaction</h3>
+                            <p>An NPC, <strong>Kirby</strong>, is placed far from the start to encourage exploration.</p>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>Displays the message: <strong>"Oh you found me"</strong></li>
+                                <li>Ends the level after interaction</li>
+                                <li>Creates a simple seek-and-find objective</li>
+                            </ul>
+
+                            <h3>Barriers & Map Design</h3>
+                            <p>Multiple invisible barriers were added to shape the level and guide the player:</p>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>Prevent the player from walking through certain spaces</li>
+                                <li>Create a maze-like layout</li>
+                                <li>Remain hidden with <code>visible: false</code> for a cleaner look</li>
+                            </ul>
+
+                            <h3>Game Structure</h3>
+                            <p>All game elements are registered through the class array:</p>
+                            <pre class="code-box"><code>this.classes = [
+GameEnvBackground,
+Player,
+Npc,
+Barrier
+];</code></pre>
+                            <p>Each object is passed custom data to control placement and behavior.</p>
+
+                            <h3>Goal of the Level</h3>
+                            <p>The objective is to:</p>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>Move around the map</li>
+                                <li>Avoid obstacles</li>
+                                <li>Find the NPC</li>
+                                <li>Interact to win</li>
+                            </ul>
+
+                            <h3>Challenges Faced</h3>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>Positioning barriers correctly without blocking the player completely</li>
+                                <li>Getting NPC interaction to properly end the level</li>
+                                <li>Adjusting player movement and animation to feel smooth</li>
+                            </ul>
+
+                            <h3>Next Steps</h3>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>Make Kirby invisible and make it jump out</li>
+                                <li>Introduce a timer or scoring system</li>
+                                <li>Improve map complexity</li>
+                                <li>Add sound effects or background music</li>
+                            </ul>
+                        `
                     }
                 ]
             },
