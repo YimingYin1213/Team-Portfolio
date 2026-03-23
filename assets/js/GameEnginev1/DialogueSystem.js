@@ -18,7 +18,6 @@ class DialogueSystem {
     this.dialogueBox = null;
     this.dialogueText = null;
     this.closeBtn = null;
-    this.onClose = options.onClose || null;
     
     // Sound effect option
     this.enableSound = options.enableSound !== undefined ? options.enableSound : false;
@@ -214,10 +213,6 @@ class DialogueSystem {
       }
       container.remove();
     });
-
-    if (typeof this.onClose === "function") {
-      this.onClose();
-    }
   }
 
   // Check if dialogue is currently open

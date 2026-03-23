@@ -18,7 +18,6 @@ class GameControl {
         this.currentLevelIndex = 0;
         this.gameLoopCounter = 0;
         this.isPaused = false;
-        this.loopToken = 0;
         this.exitKeyListener = this.handleExitKey.bind(this);
         this.gameOver = null; // Callback for when the game is over 
         this.savedCanvasState = []; // Save the current levels game elements 
@@ -126,23 +125,13 @@ class GameControl {
         const GameLevelClass = this.levelClasses[this.currentLevelIndex];
         this.currentLevel = new GameLevel(this);
         this.currentLevel.create(GameLevelClass);
-        this.loopToken += 1;
-        this.gameLoop(this.loopToken);
-        document.dispatchEvent(new CustomEvent('game:levelchange', {
-            detail: {
-                index: this.currentLevelIndex,
-                levelClass: GameLevelClass
-            }
-        }));
+        this.gameLoop();
     }
 
     /**
      * The main game loop 
      */
-    gameLoop(loopToken) {
-        if (loopToken !== this.loopToken) {
-            return;
-        }
+    gameLoop() {
         // If the level is not set to continue, handle the level end condition 
         if (!this.currentLevel.continue) {
             this.handleLevelEnd();
@@ -156,7 +145,7 @@ class GameControl {
         this.currentLevel.update();
         this.handleInLevelLogic();
         // Recurse at frame rate speed
-        requestAnimationFrame(() => this.gameLoop(loopToken));
+        requestAnimationFrame(this.gameLoop.bind(this));
     }
 
     /**
@@ -194,15 +183,9 @@ class GameControl {
         // Call the gameOver callback if it exists
         if (this.gameOver) {
             this.gameOver();
-            return;
-        }
-
-        // Only advance if there is another level available
-        if (this.currentLevelIndex < this.levelClasses.length - 1) {
+        } else {
             this.currentLevelIndex++;
             this.transitionToLevel();
-        } else {
-            this.isPaused = true;
         }
     }
 
@@ -289,24 +272,10 @@ class GameControl {
         this.isPaused = false;
         this.addExitKeyListener();
         this.showCanvasState();
-        this.loopToken += 1;
-        this.gameLoop(this.loopToken);
+        this.gameLoop();
 
         // Restore interaction handlers for outer game
         this.restoreInteractionHandlers();
-    }
-
-    /**
-     * Switch to a specific level by index.
-     * @param {number} index - Level index to switch to.
-     */
-    switchToLevel(index) {
-        const parsed = Number(index);
-        if (!Number.isInteger(parsed)) return;
-        if (parsed < 0 || parsed >= this.levelClasses.length) return;
-        if (parsed === this.currentLevelIndex) return;
-        this.currentLevelIndex = parsed;
-        this.transitionToLevel();
     }
 }
 
