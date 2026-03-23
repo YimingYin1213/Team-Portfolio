@@ -889,10 +889,10 @@ layout: null
 
         .traveler-space {
             position: absolute !important;
-            width: 200% !important;
-            height: 200% !important;
-            top: -50% !important;
-            left: -50% !important;
+            width: 100% !important;
+            height: 100% !important;
+            top: 0 !important;
+            left: 0 !important;
         }
 
         .galaxy-cloud-traveler {
@@ -2116,15 +2116,27 @@ Barrier
         let dragOffsetY = 0;
 
         document.addEventListener('keydown', (e) => {
+            if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'enter'].includes(e.key.toLowerCase())) {
+                e.preventDefault();
+            }
             keys[e.key.toLowerCase()] = true;
             if (e.key === 'Enter') {
-                e.preventDefault();
                 activateDockedTarget();
             }
         });
 
         document.addEventListener('keyup', (e) => {
             keys[e.key.toLowerCase()] = false;
+        });
+
+        window.addEventListener('blur', () => {
+            Object.keys(keys).forEach(key => keys[key] = false);
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                Object.keys(keys).forEach(key => keys[key] = false);
+            }
         });
 
         // Rocket dragging
@@ -2192,6 +2204,8 @@ Barrier
 
             travelerModeState.level = 'galaxies';
             travelerModeState.activeGalaxyIndex = null;
+            Object.keys(keys).forEach(key => keys[key] = false);
+            window.focus();
             rocketState.x = window.innerWidth - 120;
             rocketState.y = window.innerHeight - 180;
             
@@ -2207,8 +2221,11 @@ Barrier
             document.getElementById('travelerBackBtn').classList.remove('active');
             setTravelerInstruction('Use WASD to fly. Dock with a galaxy cloud and press Enter.');
 
+            const availableWidth = Math.max(window.innerWidth - 220, 600);
+            const availableHeight = Math.max(window.innerHeight - 220, 420);
+
             // Generate random non-overlapping positions for galaxies
-            const positions = generateNonOverlappingPositions(galaxies.length, 260, 210, 1700, 1100, 80, 80);
+            const positions = generateNonOverlappingPositions(galaxies.length, 220, 210, availableWidth, availableHeight, 60, 80);
             const targets = [];
 
             galaxies.forEach((galaxy, index) => {
@@ -2282,6 +2299,9 @@ Barrier
             document.getElementById('travelerBackBtn').classList.add('active');
             setTravelerInstruction(`Exploring ${galaxy.title}. Dock with a planet and press Enter.`);
 
+            const availableWidth = Math.max(window.innerWidth - 220, 600);
+            const availableHeight = Math.max(window.innerHeight - 260, 420);
+
             const titleBanner = document.createElement('div');
             titleBanner.style.position = 'absolute';
             titleBanner.style.left = '50%';
@@ -2296,12 +2316,12 @@ Barrier
 
             const positions = generateNonOverlappingPositions(
                 galaxy.planets.length,
-                170,
+                150,
                 120,
-                1600,
-                900,
-                110,
-                180
+                availableWidth,
+                availableHeight,
+                70,
+                150
             );
 
             const planetTypes = ['ice', 'lava', 'gas', 'ocean', 'jungle'];
