@@ -1,197 +1,502 @@
 // Basketball Evasion Game Level
-// Save as assets/js/GameEnginev1/GameLevelBasketball.js
-//
-// Usage:
-//   import GameLevelBasketball from './GameLevelBasketball.js';
-//   export const gameLevelClasses = [GameLevelBasketball];
+// How to use this file:
+// 1) Save as assets/js/GameEnginev1/levels/GameLevelBasketball.js in your repo.
+// 2) Reference it in your runner. Example:
+//    import GameLevelBasketball from '/assets/js/GameEnginev1/levels/GameLevelBasketball.js';
+//    export const gameLevelClasses = [GameLevelBasketball];
+// 3) Ensure images exist and paths resolve via 'path' provided by the engine.
+
+import GameEnvBackground from '../essentials/GameEnvBackground.js';
+import Player from '../essentials/Player.js';
+import Npc from '../essentials/Npc.js';
+import Barrier from '../essentials/Barrier.js';
 
 class GameLevelBasketball {
-    constructor(gameEnv) {
-        this.classes = [];
-        const W = gameEnv.innerWidth  || window.innerWidth;
-        const H = gameEnv.innerHeight || window.innerHeight;
-        setTimeout(() => this._boot(W, H), 200);
+  constructor(gameEnv) {
+    this.gameEnv = gameEnv;
+    this.classes = [];
+
+    this._started = false;
+    this._raf = null;
+    this._lastTime = 0;
+    this._startTime = 0;
+    this._bestTime = 0;
+    this._gameOver = false;
+    this._hudCanvas = null;
+    this._hudCtx = null;
+    this._cleanupFns = [];
+
+    const path = gameEnv.path;
+    const width = gameEnv.innerWidth || 800;
+    const height = gameEnv.innerHeight || 580;
+
+    const bgData = {
+      name: 'basketball_court',
+      src: path + '/images/gamify/BballCourt.png',
+      pixels: { height: 580, width: 900 }
+    };
+
+    const playerData = {
+      id: 'BasketballPlayer',
+      src: path + '/images/gamify/BasketballPlayer.png',
+      SCALE_FACTOR: 4,
+      STEP_FACTOR: 1100,
+      ANIMATION_RATE: 120,
+      INIT_POSITION: { x: Math.round(width * 0.08), y: Math.round(height * 0.5) },
+      pixels: { height: 512, width: 384 },
+      orientation: { rows: 4, columns: 3 },
+
+      down: { row: 0, start: 0, columns: 3 },
+      left: { row: 1, start: 0, columns: 3 },
+      right: { row: 2, start: 0, columns: 3 },
+      up: { row: 3, start: 0, columns: 3 },
+
+      downRight: { row: 2, start: 0, columns: 3 },
+      downLeft: { row: 1, start: 0, columns: 3 },
+      upRight: { row: 2, start: 0, columns: 3 },
+      upLeft: { row: 1, start: 0, columns: 3 },
+
+      hitbox: { widthPercentage: 0.45, heightPercentage: 0.60 },
+      keypress: { up: 87, left: 65, down: 83, right: 68 }
+    };
+
+    const bronData = {
+      id: 'LeBron',
+      greeting: 'LeBron stole the ball!',
+      src: path + '/images/gamify/bron.png',
+      SCALE_FACTOR: 3.5,
+      ANIMATION_RATE: 200,
+      INIT_POSITION: { x: Math.round(width * 0.90), y: Math.round(height * 0.5) },
+      pixels: { height: 1, width: 1 },
+      orientation: { rows: 1, columns: 1 },
+
+      down: { row: 0, start: 0, columns: 1 },
+      right: { row: 0, start: 0, columns: 1 },
+      left: { row: 0, start: 0, columns: 1 },
+      up: { row: 0, start: 0, columns: 1 },
+      upRight: { row: 0, start: 0, columns: 1 },
+      downRight: { row: 0, start: 0, columns: 1 },
+      upLeft: { row: 0, start: 0, columns: 1 },
+      downLeft: { row: 0, start: 0, columns: 1 },
+
+      hitbox: { widthPercentage: 0.65, heightPercentage: 0.75 },
+
+      dialogues: ['LeBron stole the ball! Press Reset to try again.'],
+      reaction: function () {
+        if (this.dialogueSystem) {
+          this.showReactionDialogue();
+        } else {
+          console.log(this.greeting);
+        }
+      },
+      interact: function () {
+        if (this.dialogueSystem) {
+          this.showReactionDialogue();
+        }
+      }
+    };
+
+    const barrier_1 = {
+      id: 'barrier_1',
+      x: Math.round(width * 0.25),
+      y: Math.round(height * 0.25),
+      width: Math.round(width * 0.12),
+      height: Math.round(height * 0.08),
+      visible: false,
+      hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
+      fromOverlay: false
+    };
+
+    const barrier_2 = {
+      id: 'barrier_2',
+      x: Math.round(width * 0.55),
+      y: Math.round(height * 0.55),
+      width: Math.round(width * 0.12),
+      height: Math.round(height * 0.08),
+      visible: false,
+      hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
+      fromOverlay: false
+    };
+
+    const barrier_3 = {
+      id: 'barrier_3',
+      x: Math.round(width * 0.35),
+      y: Math.round(height * 0.60),
+      width: Math.round(width * 0.10),
+      height: Math.round(height * 0.08),
+      visible: false,
+      hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
+      fromOverlay: false
+    };
+
+    const barrier_4 = {
+      id: 'barrier_4',
+      x: Math.round(width * 0.60),
+      y: Math.round(height * 0.20),
+      width: Math.round(width * 0.10),
+      height: Math.round(height * 0.08),
+      visible: false,
+      hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
+      fromOverlay: false
+    };
+
+    const wall_top = {
+      id: 'wall_top',
+      x: 0,
+      y: 0,
+      width: width,
+      height: 8,
+      visible: false,
+      hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
+      fromOverlay: false
+    };
+
+    const wall_bottom = {
+      id: 'wall_bottom',
+      x: 0,
+      y: height - 8,
+      width: width,
+      height: 8,
+      visible: false,
+      hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
+      fromOverlay: false
+    };
+
+    const wall_left = {
+      id: 'wall_left',
+      x: 0,
+      y: 0,
+      width: 8,
+      height: height,
+      visible: false,
+      hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
+      fromOverlay: false
+    };
+
+    const wall_right = {
+      id: 'wall_right',
+      x: width - 8,
+      y: 0,
+      width: 8,
+      height: height,
+      visible: false,
+      hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
+      fromOverlay: false
+    };
+
+    this.classes = [
+      { class: GameEnvBackground, data: bgData },
+      { class: Player, data: playerData },
+      { class: Npc, data: bronData },
+      { class: Barrier, data: barrier_1 },
+      { class: Barrier, data: barrier_2 },
+      { class: Barrier, data: barrier_3 },
+      { class: Barrier, data: barrier_4 },
+      { class: Barrier, data: wall_top },
+      { class: Barrier, data: wall_bottom },
+      { class: Barrier, data: wall_left },
+      { class: Barrier, data: wall_right }
+    ];
+
+    setTimeout(() => this._startCustomLogic(), 250);
+  }
+
+  _startCustomLogic() {
+    if (this._started) return;
+    this._started = true;
+
+    const env = this.gameEnv;
+    const container = env?.gameContainer;
+    if (!container) return;
+
+    this._createHudCanvas(container);
+
+    this._startTime = performance.now();
+    this._lastTime = performance.now();
+
+    const loop = (now) => {
+      this._raf = requestAnimationFrame(loop);
+
+      const dt = Math.min((now - this._lastTime) / 1000, 0.05);
+      this._lastTime = now;
+
+      const player = this._findObjectById('BasketballPlayer');
+      const bron = this._findObjectById('LeBron');
+
+      if (!player || !bron) {
+        this._drawHud(0, this._bestTime, false, false);
+        return;
+      }
+
+      const elapsed = this._gameOver ? (this._freezeElapsed || 0) : (now - this._startTime) / 1000;
+
+      if (!this._gameOver) {
+        this._updateBronChase(bron, player, dt);
+
+        if (this._isTouching(bron, player)) {
+          this._gameOver = true;
+          this._freezeElapsed = elapsed;
+          this._bestTime = Math.max(this._bestTime, elapsed);
+
+          if (typeof bron.showReactionDialogue === 'function') {
+            bron.showReactionDialogue();
+          } else if (typeof bron.interact === 'function') {
+            bron.interact();
+          }
+        }
+      }
+
+      const speed = Math.min(140 + elapsed * 18, 320);
+      this._drawHud(elapsed, this._bestTime, speed > 230, this._gameOver);
+    };
+
+    this._raf = requestAnimationFrame(loop);
+    this._attachResetKey();
+  }
+
+  _findObjectById(id) {
+    const candidates = [];
+
+    if (Array.isArray(this.gameEnv?.gameObjects)) candidates.push(...this.gameEnv.gameObjects);
+    if (Array.isArray(this.gameEnv?.objects)) candidates.push(...this.gameEnv.objects);
+    if (Array.isArray(this.gameEnv?.gameObjectList)) candidates.push(...this.gameEnv.gameObjectList);
+    if (Array.isArray(this.gameEnv?.currentObjects)) candidates.push(...this.gameEnv.currentObjects);
+    if (Array.isArray(this.gameEnv?.sprites)) candidates.push(...this.gameEnv.sprites);
+
+    for (const obj of candidates) {
+      if (!obj) continue;
+      if (obj.id === id) return obj;
+      if (obj?.data?.id === id) return obj;
     }
 
-    _boot(W, H) {
-        const old = document.getElementById('bball-game');
-        if (old) old.remove();
+    return null;
+  }
 
-        const canvas = document.createElement('canvas');
-        canvas.id = 'bball-game';
-        canvas.width = W; canvas.height = H;
-        canvas.setAttribute('tabindex', '0');
-        canvas.style.cssText = 'display:block;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;outline:none;';
-        document.body.appendChild(canvas);
-        canvas.focus();
-        const ctx = canvas.getContext('2d');
+  _getPos(obj) {
+    return {
+      x: obj?.x ?? obj?.position?.x ?? obj?.sprite?.x ?? obj?.data?.INIT_POSITION?.x ?? 0,
+      y: obj?.y ?? obj?.position?.y ?? obj?.sprite?.y ?? obj?.data?.INIT_POSITION?.y ?? 0
+    };
+  }
 
-        // Obstacles + boundary walls
-        const OBS = [
-            { x: W*.25, y: H*.25, w: W*.12, h: H*.08 },
-            { x: W*.55, y: H*.55, w: W*.12, h: H*.08 },
-            { x: W*.35, y: H*.60, w: W*.10, h: H*.08 },
-            { x: W*.60, y: H*.20, w: W*.10, h: H*.08 },
-            { x: 0,   y: 0,   w: 4, h: H },
-            { x: W-4, y: 0,   w: 4, h: H },
-            { x: 0,   y: 0,   w: W, h: 4 },
-            { x: 0,   y: H-4, w: W, h: 4 },
-        ];
-
-        const PR = 12, LR = 15;
-        let p, l, keys, over, t0, elapsed, best, tick;
-        best = 0;
-
-        const reset = () => {
-            p       = { x: W*.08, y: H*.5, dir: 1 };
-            l       = { x: W*.90, y: H*.5, dir: -1 };
-            keys    = {};
-            over    = false;
-            t0      = Date.now();
-            elapsed = 0;
-            tick    = 0;
-        };
-        reset();
-
-        // Input
-        window.addEventListener('keydown', e => {
-            keys[e.key.toLowerCase()] = true;
-            if (['arrowup','arrowdown','arrowleft','arrowright'].includes(e.key.toLowerCase())) e.preventDefault();
-        });
-        window.addEventListener('keyup', e => {
-            keys[e.key.toLowerCase()] = false;
-            if (e.key.toLowerCase() === 'r' && over) reset();
-        });
-
-        // Circle vs rect collision
-        const blocked = (cx, cy, r) => OBS.some(o => {
-            const nx = Math.max(o.x, Math.min(cx, o.x+o.w));
-            const ny = Math.max(o.y, Math.min(cy, o.y+o.h));
-            return (cx-nx)**2 + (cy-ny)**2 < r*r;
-        });
-
-        // Draw court
-        const drawCourt = () => {
-            const g = ctx.createLinearGradient(0,0,W,0);
-            g.addColorStop(0, '#b5651d'); g.addColorStop(.5, '#cd853f'); g.addColorStop(1, '#b5651d');
-            ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
-            ctx.strokeStyle = 'rgba(90,40,0,.2)'; ctx.lineWidth = 1;
-            for (let x = 0; x < W; x += W/28) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-            ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 2;
-            const pad = 20;
-            ctx.strokeRect(pad, pad, W-pad*2, H-pad*2);
-            ctx.beginPath(); ctx.moveTo(W/2,pad); ctx.lineTo(W/2,H-pad); ctx.stroke();
-            ctx.beginPath(); ctx.arc(W/2, H/2, H*.13, 0, Math.PI*2); ctx.stroke();
-        };
-
-        // Draw bench obstacles
-        const drawObs = () => OBS.slice(0,4).forEach(o => {
-            ctx.fillStyle = '#7a5230'; ctx.fillRect(o.x, o.y, o.w, o.h*.4);
-            ctx.fillStyle = '#4a2f10';
-            [.1,.5,.82].forEach(fx => ctx.fillRect(o.x+o.w*fx, o.y+o.h*.4, o.w*.1, o.h*.55));
-        });
-
-        // Draw stick-figure player
-        const drawPlayer = (x, y, jersey, num, dir) => {
-            ctx.save(); ctx.translate(Math.round(x), Math.round(y));
-            ctx.fillStyle = 'rgba(0,0,0,.25)';
-            ctx.beginPath(); ctx.ellipse(0,4,10,3,0,0,Math.PI*2); ctx.fill();
-            ctx.fillStyle = '#111'; ctx.fillRect(-9,-5,8,5); ctx.fillRect(1,-5,8,5);
-            ctx.fillStyle = jersey; ctx.fillRect(-9,-20,18,15); ctx.fillRect(-10,-38,20,18);
-            ctx.fillStyle = '#c8784a'; ctx.fillRect(-15,-37,5,13); ctx.fillRect(10,-37,5,13);
-            ctx.fillStyle = '#fff'; ctx.font = 'bold 9px monospace';
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(num, 0, -28);
-            ctx.fillStyle = '#c8784a'; ctx.fillRect(-3,-41,6,4);
-            ctx.beginPath(); ctx.arc(0,-50,9,0,Math.PI*2); ctx.fill();
-            ctx.fillStyle = '#111'; ctx.fillRect(dir*2,-52,3,3);
-            ctx.restore();
-        };
-
-        // Draw bouncing basketball
-        const drawBall = (x, y) => {
-            const b = Math.sin(tick*.22)*5;
-            ctx.save(); ctx.translate(Math.round(x), Math.round(y+b));
-            ctx.fillStyle = 'rgba(0,0,0,.2)';
-            ctx.beginPath(); ctx.ellipse(0,14-b*.4,8,2.5,0,0,Math.PI*2); ctx.fill();
-            ctx.fillStyle = '#e65100'; ctx.beginPath(); ctx.arc(0,0,9,0,Math.PI*2); ctx.fill();
-            ctx.strokeStyle = '#111'; ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.moveTo(-9,0); ctx.lineTo(9,0); ctx.stroke();
-            ctx.beginPath(); ctx.arc(0,0,9,0,Math.PI); ctx.stroke();
-            ctx.restore();
-        };
-
-        // Update game state
-        const update = () => {
-            if (over) return;
-            elapsed = (Date.now() - t0) / 1000;
-            tick++;
-
-            let dx = 0, dy = 0;
-            if (keys['w'] || keys['arrowup'])    dy = -3.5;
-            if (keys['s'] || keys['arrowdown'])  dy =  3.5;
-            if (keys['a'] || keys['arrowleft'])  dx = -3.5;
-            if (keys['d'] || keys['arrowright']) dx =  3.5;
-            if (dx && dy) { dx *= .707; dy *= .707; }
-            if (dx) p.dir = dx > 0 ? 1 : -1;
-            if (!blocked(p.x+dx, p.y,    PR)) p.x += dx;
-            if (!blocked(p.x,    p.y+dy, PR)) p.y += dy;
-
-            const spd = Math.min(1.5 + elapsed*.04, 4);
-            const ddx = p.x - l.x, ddy = p.y - l.y;
-            const dist = Math.sqrt(ddx*ddx + ddy*ddy);
-            if (dist > 1) {
-                const mx = (ddx/dist)*spd, my = (ddy/dist)*spd;
-                if (!blocked(l.x+mx, l.y+my, LR)) { l.x += mx; l.y += my; }
-                else { if (!blocked(l.x+mx, l.y, LR)) l.x += mx; if (!blocked(l.x, l.y+my, LR)) l.y += my; }
-                l.dir = ddx >= 0 ? 1 : -1;
-            }
-            if (dist < PR+LR+2) { over = true; if (elapsed > best) best = elapsed; }
-        };
-
-        // Render frame
-        const render = () => {
-            ctx.clearRect(0,0,W,H);
-            drawCourt(); drawObs();
-            drawBall(p.x + p.dir*20, p.y - 10);
-            drawPlayer(p.x, p.y, '#e53935', '11', p.dir);
-            drawPlayer(l.x, l.y, '#552583', '23', l.dir);
-
-            // HUD
-            ctx.fillStyle = 'rgba(0,0,0,.75)';
-            ctx.beginPath(); ctx.roundRect(W/2-150, 6, 300, 36, 8); ctx.fill();
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            ctx.fillStyle = '#fff'; ctx.font = `bold ${Math.round(W*.018)}px monospace`;
-            ctx.fillText(`⏱ ${elapsed.toFixed(1)}s`, W/2, 24);
-            ctx.fillStyle = '#fdb927'; ctx.font = 'bold 12px monospace';
-            ctx.textAlign = 'right'; ctx.fillText(`Best: ${best.toFixed(1)}s`, W/2+145, 24);
-
-            const spd = Math.min(1.5 + elapsed*.04, 4);
-            if (spd > 2.8) {
-                ctx.fillStyle = `rgba(230,50,50,${Math.min((spd-2.8)*.5,.9)})`;
-                ctx.font = 'bold 13px monospace'; ctx.textAlign = 'center';
-                ctx.fillText('⚡ LeBron is heating up!', W/2, 54);
-            }
-
-            // Game over card
-            if (over) {
-                ctx.fillStyle = 'rgba(0,0,0,.75)'; ctx.fillRect(0,0,W,H);
-                const bw = Math.min(420, W*.7), bh = 200, bx = (W-bw)/2, by = (H-bh)/2;
-                ctx.fillStyle = '#0d0d1a'; ctx.strokeStyle = '#fdb927'; ctx.lineWidth = 3;
-                ctx.beginPath(); ctx.roundRect(bx,by,bw,bh,16); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#fdb927'; ctx.beginPath(); ctx.roundRect(bx,by,bw,7,[16,16,0,0]); ctx.fill();
-                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillStyle = '#fdb927'; ctx.font = `bold ${Math.round(bw*.065)}px monospace`;
-                ctx.fillText('🏀 LeBron stole the ball!', W/2, by+55);
-                ctx.fillStyle = '#ff6f00'; ctx.font = `bold ${Math.round(bw*.05)}px monospace`;
-                ctx.fillText(`Survived  ${elapsed.toFixed(1)}s`, W/2, by+105);
-                ctx.fillStyle = '#888'; ctx.font = `${Math.round(bw*.035)}px monospace`;
-                ctx.fillText(`Best: ${best.toFixed(1)}s`, W/2, by+145);
-                ctx.fillStyle = '#ccc'; ctx.fillText('Press R to play again', W/2, by+178);
-            }
-        };
-
-        (function loop() { update(); render(); requestAnimationFrame(loop); })();
+  _setPos(obj, x, y) {
+    if ('x' in obj) obj.x = x;
+    if ('y' in obj) obj.y = y;
+    if (obj.position) {
+      obj.position.x = x;
+      obj.position.y = y;
     }
+    if (obj.sprite) {
+      obj.sprite.x = x;
+      obj.sprite.y = y;
+    }
+    if (obj.data?.INIT_POSITION) {
+      obj.data.INIT_POSITION.x = x;
+      obj.data.INIT_POSITION.y = y;
+    }
+  }
+
+  _updateBronChase(bron, player, dt) {
+    const p = this._getPos(player);
+    const b = this._getPos(bron);
+
+    const dx = p.x - b.x;
+    const dy = p.y - b.y;
+    const dist = Math.hypot(dx, dy);
+
+    if (dist < 1) return;
+
+    const elapsed = (performance.now() - this._startTime) / 1000;
+    const speed = Math.min(140 + elapsed * 18, 320);
+
+    let mx = (dx / dist) * speed * dt;
+    let my = (dy / dist) * speed * dt;
+
+    const nextX = b.x + mx;
+    const nextY = b.y + my;
+
+    const tryMove = this._resolveBarrierCollision(bron, nextX, nextY);
+    this._setPos(bron, tryMove.x, tryMove.y);
+
+    if (dx >= 0) {
+      if (bron.direction) bron.direction = 'right';
+      if (bron.facing) bron.facing = 'right';
+    } else {
+      if (bron.direction) bron.direction = 'left';
+      if (bron.facing) bron.facing = 'left';
+    }
+  }
+
+  _resolveBarrierCollision(obj, x, y) {
+    const barriers = this.classes
+      .filter(entry => entry.class === Barrier)
+      .map(entry => entry.data);
+
+    const hitboxW = 28;
+    const hitboxH = 28;
+
+    const rect = {
+      left: x - hitboxW / 2,
+      right: x + hitboxW / 2,
+      top: y - hitboxH / 2,
+      bottom: y + hitboxH / 2
+    };
+
+    for (const b of barriers) {
+      const overlaps =
+        rect.right > b.x &&
+        rect.left < b.x + b.width &&
+        rect.bottom > b.y &&
+        rect.top < b.y + b.height;
+
+      if (overlaps) {
+        return this._getPos(obj);
+      }
+    }
+
+    return { x, y };
+  }
+
+  _isTouching(a, b) {
+    const pa = this._getPos(a);
+    const pb = this._getPos(b);
+    return Math.hypot(pa.x - pb.x, pa.y - pb.y) < 42;
+  }
+
+  _createHudCanvas(container) {
+    const old = container.querySelector('.basketball-hud-canvas');
+    if (old) old.remove();
+
+    const hud = document.createElement('canvas');
+    hud.className = 'basketball-hud-canvas';
+    hud.width = this.gameEnv.innerWidth || 800;
+    hud.height = this.gameEnv.innerHeight || 580;
+    hud.style.position = 'absolute';
+    hud.style.left = '0';
+    hud.style.top = '0';
+    hud.style.width = '100%';
+    hud.style.height = '100%';
+    hud.style.pointerEvents = 'none';
+    hud.style.zIndex = '20';
+
+    container.style.position = 'relative';
+    container.appendChild(hud);
+
+    this._hudCanvas = hud;
+    this._hudCtx = hud.getContext('2d');
+  }
+
+  _drawHud(elapsed, best, heatingUp, gameOver) {
+    if (!this._hudCtx || !this._hudCanvas) return;
+
+    const ctx = this._hudCtx;
+    const W = this._hudCanvas.width;
+    const H = this._hudCanvas.height;
+
+    ctx.clearRect(0, 0, W, H);
+
+    ctx.fillStyle = 'rgba(0,0,0,0.75)';
+    ctx.fillRect(W / 2 - 150, 8, 300, 38);
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `bold ${Math.max(14, Math.round(W * 0.018))}px monospace`;
+    ctx.fillText(`Time: ${elapsed.toFixed(1)}s`, W / 2, 27);
+
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#fdb927';
+    ctx.font = 'bold 12px monospace';
+    ctx.fillText(`Best: ${best.toFixed(1)}s`, W / 2 + 140, 27);
+
+    if (heatingUp && !gameOver) {
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(230,50,50,0.9)';
+      ctx.font = 'bold 13px monospace';
+      ctx.fillText('LeBron is heating up!', W / 2, 58);
+    }
+
+    if (gameOver) {
+      const bw = Math.min(420, W * 0.72);
+      const bh = 200;
+      const bx = (W - bw) / 2;
+      const by = (H - bh) / 2;
+
+      ctx.fillStyle = 'rgba(0,0,0,0.72)';
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.fillStyle = '#0d0d1a';
+      ctx.strokeStyle = '#fdb927';
+      ctx.lineWidth = 3;
+      ctx.fillRect(bx, by, bw, bh);
+      ctx.strokeRect(bx, by, bw, bh);
+
+      ctx.fillStyle = '#fdb927';
+      ctx.fillRect(bx, by, bw, 8);
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      ctx.fillStyle = '#fdb927';
+      ctx.font = `bold ${Math.round(bw * 0.065)}px monospace`;
+      ctx.fillText('LeBron stole the ball!', W / 2, by + 55);
+
+      ctx.fillStyle = '#ff6f00';
+      ctx.font = `bold ${Math.round(bw * 0.05)}px monospace`;
+      ctx.fillText(`Survived ${elapsed.toFixed(1)}s`, W / 2, by + 105);
+
+      ctx.fillStyle = '#999';
+      ctx.font = `${Math.round(bw * 0.035)}px monospace`;
+      ctx.fillText(`Best: ${best.toFixed(1)}s`, W / 2, by + 145);
+
+      ctx.fillStyle = '#ddd';
+      ctx.fillText('Press R to restart', W / 2, by + 176);
+    }
+  }
+
+  _attachResetKey() {
+    const handler = (e) => {
+      if (e.key.toLowerCase() !== 'r' || !this._gameOver) return;
+
+      const player = this._findObjectById('BasketballPlayer');
+      const bron = this._findObjectById('LeBron');
+
+      if (player) {
+        const px = Math.round((this.gameEnv.innerWidth || 800) * 0.08);
+        const py = Math.round((this.gameEnv.innerHeight || 580) * 0.5);
+        this._setPos(player, px, py);
+      }
+
+      if (bron) {
+        const bx = Math.round((this.gameEnv.innerWidth || 800) * 0.90);
+        const by = Math.round((this.gameEnv.innerHeight || 580) * 0.5);
+        this._setPos(bron, bx, by);
+      }
+
+      this._gameOver = false;
+      this._freezeElapsed = 0;
+      this._startTime = performance.now();
+    };
+
+    document.addEventListener('keydown', handler);
+    this._cleanupFns.push(() => document.removeEventListener('keydown', handler));
+  }
+
+  destroy() {
+    if (this._raf) {
+      cancelAnimationFrame(this._raf);
+      this._raf = null;
+    }
+
+    this._cleanupFns.forEach(fn => fn());
+    this._cleanupFns = [];
+
+    if (this._hudCanvas) {
+      this._hudCanvas.remove();
+      this._hudCanvas = null;
+      this._hudCtx = null;
+    }
+  }
 }
 
 export default GameLevelBasketball;
