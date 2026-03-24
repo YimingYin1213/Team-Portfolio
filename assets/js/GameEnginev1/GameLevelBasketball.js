@@ -32,13 +32,13 @@ class GameLevelBasketball {
 
     const bgData = {
       name: 'basketball_court',
-      src: path + '/images/gamify/BballCourt.png',
+      src: path + '/images/gamebuilder/bg/BballCourt.png',
       pixels: { height: 580, width: 900 }
     };
 
     const playerData = {
       id: 'BasketballPlayer',
-      src: path + '/images/gamify/BasketballPlayer.png',
+      src: path + '/images/gamebuilder/sprites/BasketballPlayer.png',
       SCALE_FACTOR: 4,
       STEP_FACTOR: 1100,
       ANIMATION_RATE: 120,
@@ -63,7 +63,7 @@ class GameLevelBasketball {
     const bronData = {
       id: 'LeBron',
       greeting: 'LeBron stole the ball!',
-      src: path + '/images/gamify/bron.png',
+      src: path + '/images/gamebuilder/sprites/bron.png',
       SCALE_FACTOR: 3.5,
       ANIMATION_RATE: 200,
       INIT_POSITION: { x: Math.round(width * 0.90), y: Math.round(height * 0.5) },
