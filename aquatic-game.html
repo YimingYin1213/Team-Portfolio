@@ -38,11 +38,7 @@ permalink: /games/aquatic.html
 
     <script type="module">
       const configuredBase = '{{ site.baseurl }}';
-      const firstSegment = window.location.pathname.split('/')[1];
-      const inferredBase = firstSegment ? `/${firstSegment}` : '';
-      const path = (configuredBase && window.location.pathname.startsWith(configuredBase + '/'))
-        ? configuredBase
-        : inferredBase;
+      const path = configuredBase || '';
       const baseUrl = window.location.origin + path;
 
       async function boot() {

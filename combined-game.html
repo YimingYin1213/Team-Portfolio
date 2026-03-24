@@ -100,8 +100,7 @@ permalink: /games/combined.html
     </div>
 
     <script type="module">
-      const inferredBase = window.location.pathname.startsWith('/Team-Portfolio/') ? '/Team-Portfolio' : '';
-      const path = '{{ site.baseurl }}' || inferredBase;
+      const path = '{{ site.baseurl }}' || '';
       const baseUrl = window.location.origin + path;
 
       async function boot() {
