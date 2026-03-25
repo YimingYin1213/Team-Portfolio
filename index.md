@@ -1,53 +1,494 @@
 ---
-layout: post 
-title: Portfolio Home 
-hide: true
-show_reading_time: false
+layout: null
+permalink: /
 ---
 
-Hi! My name is [Your Full Name]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enter Team Space</title>
+  <link rel="canonical" href="{{ site.url }}{{ site.baseurl }}/team-space-portal">
+  <style>
+    :root {
+      --bg-1: #040814;
+      --bg-2: #09162c;
+      --accent: #6be7ff;
+      --accent-2: #8e7dff;
+      --panel: rgba(8, 15, 32, 0.82);
+      --text: #eefaff;
+      --muted: #96b8d7;
+      --success: #7dffb3;
+    }
 
-### Development Environment
+    * {
+      box-sizing: border-box;
+    }
 
-> Coding starts with tools, explore these tools and procedures with a click.
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Inter, "Segoe UI", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(107, 231, 255, 0.16), transparent 28%),
+        radial-gradient(circle at 80% 20%, rgba(142, 125, 255, 0.18), transparent 24%),
+        linear-gradient(180deg, var(--bg-2), var(--bg-1));
+      overflow: hidden;
+    }
 
-<div style="display: flex; flex-wrap: wrap; gap: 10px;">
-    <a href="https://opencodingsociety.com" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border: 1px solid #FA8072; border-radius: 6px; font-weight: 700;">
-        <img src="{{ '/favicon.ico' | relative_url }}" alt="OCS logo" style="width: 16px; height: 16px;">
-        OCS
-    </a>
-    <a href="https://github.com/Open-Coding-Society/portfolio" style=" text-decoration: none; display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border: 1px solid #FFF; border-radius: 6px; font-weight: 700;">
-        <img src="https://github.githubassets.com/favicons/favicon.svg" alt="GitHub logo" style="width: 16px; height: 16px;">
-        GitHub
-    </a>
-    <a href="https://vscode.dev/" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border: 1px solid #007ACC; border-radius: 6px; font-weight: 700;">
-        <img src="https://vscode.dev/favicon.ico" alt="VSCode logo" style="width: 16px; height: 16px;">
-        VSCode.dev
-    </a>
-</div>
+    body.launching .launch-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
 
-<br>
+    body.launching .scene {
+      transform: scale(1.04);
+      filter: blur(3px);
+    }
 
-### Class Progress
+    .scene {
+      position: relative;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      transition: transform 900ms ease, filter 900ms ease;
+    }
 
-> Here is my progress through coding, click to see these online
+    .stars,
+    .stars::before,
+    .stars::after {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 15% 30%, rgba(255,255,255,.95) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 75% 20%, rgba(255,255,255,.85) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 45% 80%, rgba(107,231,255,.85) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 60% 55%, rgba(255,255,255,.7) 0 1px, transparent 1.5px),
+        radial-gradient(circle at 30% 60%, rgba(142,125,255,.9) 0 1px, transparent 1.5px);
+      background-size: 320px 320px;
+      content: "";
+      animation: drift 18s linear infinite;
+      opacity: 0.65;
+    }
 
-<div style="display: flex; flex-wrap: wrap; gap: 10px;">
-    <a href="{{site.baseurl}}/snake" style="text-decoration: none;">
-        <div style="background-color: #00FF00; color: black; padding: 10px 20px; border-radius: 5px; font-weight: bold;">
-            Snake
+    .stars::before {
+      transform: scale(1.2);
+      animation-duration: 28s;
+      opacity: 0.35;
+    }
+
+    .stars::after {
+      transform: scale(1.4);
+      animation-duration: 40s;
+      opacity: 0.2;
+    }
+
+    @keyframes drift {
+      from { transform: translateY(0); }
+      to { transform: translateY(40px); }
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      width: min(960px, 100%);
+      display: grid;
+      gap: 24px;
+      justify-items: center;
+    }
+
+    .rocket-wrap {
+      position: relative;
+      width: 220px;
+      height: 260px;
+      display: grid;
+      place-items: center;
+      filter: drop-shadow(0 0 30px rgba(107, 231, 255, 0.2));
+      animation: float 3.8s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-14px); }
+    }
+
+    .rocket-glow {
+      position: absolute;
+      inset: auto 30px 10px;
+      height: 34px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(107,231,255,0.5), transparent 70%);
+      filter: blur(8px);
+    }
+
+    .rocket {
+      position: relative;
+      width: 110px;
+      height: 210px;
+    }
+
+    .rocket-body {
+      position: absolute;
+      inset: 24px 20px 42px;
+      border-radius: 55px 55px 28px 28px;
+      background: linear-gradient(180deg, #f7fcff 0%, #bfd8ff 52%, #8bb4ff 100%);
+      border: 2px solid rgba(255,255,255,0.55);
+      overflow: hidden;
+    }
+
+    .rocket-body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+      transform: translateX(-120%);
+      animation: shimmer 3s linear infinite;
+    }
+
+    @keyframes shimmer {
+      to { transform: translateX(120%); }
+    }
+
+    .rocket-nose {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      top: 0;
+      height: 72px;
+      background: linear-gradient(180deg, #77efff, #598cff);
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    }
+
+    .rocket-window {
+      position: absolute;
+      top: 70px;
+      left: 50%;
+      width: 34px;
+      height: 34px;
+      margin-left: -17px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #ffffff, #79e8ff 55%, #224d88 100%);
+      border: 3px solid rgba(255,255,255,0.75);
+      box-shadow: 0 0 18px rgba(107,231,255,.55);
+    }
+
+    .rocket-stripe {
+      position: absolute;
+      left: 26px;
+      right: 26px;
+      top: 120px;
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+
+    .rocket-fin,
+    .rocket-fin::before {
+      position: absolute;
+      bottom: 44px;
+      width: 28px;
+      height: 56px;
+      background: linear-gradient(180deg, #6f8cff, #2f4678);
+      border-radius: 16px;
+    }
+
+    .rocket-fin.left {
+      left: 6px;
+      transform: skewY(18deg);
+    }
+
+    .rocket-fin.right {
+      right: 6px;
+      transform: skewY(-18deg);
+    }
+
+    .rocket-engine {
+      position: absolute;
+      bottom: 26px;
+      left: 50%;
+      width: 28px;
+      height: 28px;
+      margin-left: -14px;
+      border-radius: 0 0 12px 12px;
+      background: linear-gradient(180deg, #526a9c, #29344a);
+    }
+
+    .flame {
+      position: absolute;
+      left: 50%;
+      bottom: -6px;
+      width: 32px;
+      height: 64px;
+      margin-left: -16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), #6be7ff 20%, #7d87ff 55%, transparent 100%);
+      clip-path: polygon(50% 0%, 85% 35%, 68% 100%, 50% 82%, 32% 100%, 15% 35%);
+      filter: blur(0.3px);
+      animation: flamePulse 0.9s ease-in-out infinite;
+    }
+
+    @keyframes flamePulse {
+      0%, 100% { transform: scaleY(0.92); opacity: 0.9; }
+      50% { transform: scaleY(1.12); opacity: 1; }
+    }
+
+    .panel {
+      width: min(720px, 100%);
+      padding: 28px;
+      border-radius: 28px;
+      background: var(--panel);
+      border: 1px solid rgba(107,231,255,0.25);
+      box-shadow: 0 20px 80px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.04);
+      backdrop-filter: blur(20px);
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(107,231,255,0.35);
+      color: var(--accent);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 4vw, 4.4rem);
+      line-height: 1.05;
+    }
+
+    .gradient {
+      background: linear-gradient(90deg, #fff, #90f4ff 42%, #9f8dff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      margin: 16px auto 0;
+      max-width: 58ch;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 24px 0;
+    }
+
+    .status-pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .status-pill strong {
+      color: var(--success);
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .enter-btn,
+    .direct-link {
+      appearance: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      border-radius: 16px;
+      padding: 16px 22px;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+    }
+
+    .enter-btn {
+      color: #031220;
+      background: linear-gradient(90deg, #6be7ff, #9a84ff);
+      box-shadow: 0 14px 36px rgba(107,231,255,0.28);
+    }
+
+    .enter-btn:hover,
+    .direct-link:hover {
+      transform: translateY(-2px);
+    }
+
+    .direct-link {
+      color: var(--text);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .launch-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 6;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at center, rgba(107,231,255,0.18), transparent 20%),
+        linear-gradient(180deg, rgba(2,6,14,0.4), rgba(2,6,14,0.98));
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 700ms ease;
+    }
+
+    .warp {
+      position: relative;
+      width: min(72vw, 520px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 1px solid rgba(107,231,255,0.32);
+      box-shadow: 0 0 0 12px rgba(107,231,255,0.04), 0 0 60px rgba(107,231,255,0.22);
+      overflow: hidden;
+    }
+
+    .warp::before,
+    .warp::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent, rgba(107,231,255,0.8), transparent, rgba(142,125,255,0.75), transparent);
+      animation: spin 1.4s linear infinite;
+    }
+
+    .warp::after {
+      inset: 18%;
+      animation-direction: reverse;
+      animation-duration: 1.1s;
+      filter: blur(2px);
+    }
+
+    .warp-core {
+      position: absolute;
+      inset: 26%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.95), rgba(107,231,255,0.85) 30%, rgba(107,231,255,0.2) 62%, transparent 78%);
+      animation: pulse 800ms ease-in-out infinite;
+    }
+
+    .launch-text {
+      position: absolute;
+      bottom: 10%;
+      width: 100%;
+      text-align: center;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #d9fbff;
+      font-size: 0.84rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(0.92); opacity: 0.7; }
+      50% { transform: scale(1.06); opacity: 1; }
+    }
+
+    @media (max-width: 640px) {
+      .panel {
+        padding: 22px;
+      }
+
+      .rocket-wrap {
+        transform: scale(0.9);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="launch-overlay" id="launchOverlay" aria-hidden="true">
+    <div class="warp">
+      <div class="warp-core"></div>
+      <div class="launch-text">Teleporting to Team Space</div>
+    </div>
+  </div>
+
+  <main class="scene" id="scene">
+    <div class="stars"></div>
+
+    <section class="content">
+      <div class="rocket-wrap" aria-hidden="true">
+        <div class="rocket-glow"></div>
+        <div class="rocket">
+          <div class="rocket-nose"></div>
+          <div class="rocket-body"></div>
+          <div class="rocket-window"></div>
+          <div class="rocket-stripe"></div>
+          <div class="rocket-fin left"></div>
+          <div class="rocket-fin right"></div>
+          <div class="rocket-engine"></div>
+          <div class="flame"></div>
         </div>
-    </a>
-    <a href="{{site.baseurl}}/gamify/parallax" style="text-decoration: none;">
-        <div style="background-color: #3c1de8; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold;">
-           Fish
-        </div>
-    </a>
-    <a href="{{site.baseurl}}/gamify/water" style="text-decoration: none;">
-        <div style="background-color: #b71dc5; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold;">
-           Squid
-        </div>
-    </a>
-</div>
+      </div>
 
-<br>
+      <div class="panel">
+        <div class="eyebrow">teamspace.opencodingsociety.com</div>
+        <h1>Launch into <span class="gradient">Team Space</span></h1>
+        <p class="subtitle">
+          Your portal is standing by. Tap the launch panel below to enter the galaxy hub,
+          fire the rocket engines, and warp into the full Team Space experience.
+        </p>
+
+        <div class="status-bar">
+          <div class="status-pill"><strong>Rocket:</strong> online</div>
+          <div class="status-pill"><strong>Portal core:</strong> stable</div>
+          <div class="status-pill"><strong>Destination:</strong> Team Space</div>
+        </div>
+
+        <div class="controls">
+          <button class="enter-btn" id="enterPortalBtn" type="button">Enter Team Space</button>
+          <a class="direct-link" href="{{ site.baseurl }}/team-space-portal">Skip animation</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const enterBtn = document.getElementById('enterPortalBtn');
+    const destination = '{{ site.baseurl }}/team-space-portal';
+    let isLaunching = false;
+
+    function launchPortal() {
+      if (isLaunching) return;
+      isLaunching = true;
+      document.body.classList.add('launching');
+      enterBtn.disabled = true;
+      enterBtn.textContent = 'Launching…';
+
+      window.setTimeout(() => {
+        window.location.href = destination;
+      }, 1650);
+    }
+
+    enterBtn.addEventListener('click', launchPortal);
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && !isLaunching) {
+        launchPortal();
+      }
+    });
+  </script>
+</body>
+</html>
