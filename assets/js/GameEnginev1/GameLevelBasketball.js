@@ -499,4 +499,5 @@ class GameLevelBasketball {
   }
 }
 
-export { GameControl };
+export default GameLevelBasketball;
+export const gameLevelClasses = [GameLevelBasketball];
