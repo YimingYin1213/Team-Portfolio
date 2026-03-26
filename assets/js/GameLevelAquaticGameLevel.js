@@ -19,6 +19,10 @@ import Collectible from './GameEnginev1/essentials/Collectible.js';
 class GameLevelAquaticGameLevel {
     constructor(gameEnv) {
         this.gameEnv = gameEnv;
+        this._leaderboardPanel = null;
+        this._leaderboardList = null;
+        this._refreshLeaderboard = null;
+        this._cleanupFns = [];
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
         const height = gameEnv.innerHeight;
@@ -375,6 +379,8 @@ class GameLevelAquaticGameLevel {
     }
 
     initialize() {
+        this._mountRandomLeaderboard();
+
         const mermaid = this.gameEnv?.gameObjects?.find(
             obj => obj?.spriteData?.id === 'Mermaid'
         );
@@ -399,6 +405,154 @@ class GameLevelAquaticGameLevel {
             this.canvas.style.top = `${this.gameEnv.top + this.position.y}px`;
             this.canvas.style.zIndex = (this.data && this.data.zIndex !== undefined) ? this.data.zIndex : "10";
         };
+    }
+
+    _buildRandomLeaderboardData() {
+        const names = ['Yiming', 'Kai', 'Arjun', 'Lance', 'Mia', 'Rhea', 'Noah', 'Ava'];
+        const titles = ['Star Collector', 'Reef Runner', 'Bubble Scout', 'Ocean Explorer'];
+
+        return names
+            .map((name, index) => ({
+                name,
+                title: titles[index % titles.length],
+                score: Math.floor(Math.random() * 250) + 50,
+                time: (Math.random() * 90 + 20).toFixed(1)
+            }))
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 5);
+    }
+
+    _renderLeaderboardEntries(entries) {
+        if (!this._leaderboardList) return;
+
+        this._leaderboardList.innerHTML = '';
+
+        entries.forEach((entry, index) => {
+            const row = document.createElement('div');
+            Object.assign(row.style, {
+                display: 'grid',
+                gridTemplateColumns: '34px 1fr auto',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '8px 10px',
+                borderRadius: '10px',
+                background: index === 0
+                    ? 'rgba(255, 215, 64, 0.18)'
+                    : 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(125, 226, 255, 0.12)'
+            });
+
+            const rank = document.createElement('div');
+            rank.textContent = `#${index + 1}`;
+            Object.assign(rank.style, {
+                color: index === 0 ? '#ffe082' : '#7de2ff',
+                fontWeight: '700'
+            });
+
+            const details = document.createElement('div');
+            details.innerHTML = `<strong>${entry.name}</strong><div style="font-size:11px; color:#b9f0ff; margin-top:2px;">${entry.title}</div>`;
+
+            const stats = document.createElement('div');
+            stats.innerHTML = `<strong>${entry.score}</strong><div style="font-size:11px; color:#d8fbff; margin-top:2px; text-align:right;">${entry.time}s</div>`;
+
+            row.appendChild(rank);
+            row.appendChild(details);
+            row.appendChild(stats);
+            this._leaderboardList.appendChild(row);
+        });
+    }
+
+    _mountRandomLeaderboard() {
+        const container = this.gameEnv?.gameContainer;
+        if (!container) return;
+
+        const existing = container.querySelector('.aquatic-random-leaderboard');
+        if (existing) existing.remove();
+
+        const panel = document.createElement('div');
+        panel.className = 'aquatic-random-leaderboard';
+        Object.assign(panel.style, {
+            position: 'absolute',
+            top: '18px',
+            right: '18px',
+            width: 'min(260px, 32vw)',
+            minWidth: '220px',
+            padding: '14px',
+            borderRadius: '16px',
+            background: 'linear-gradient(180deg, rgba(5, 26, 44, 0.92), rgba(2, 11, 28, 0.92))',
+            border: '1px solid rgba(125, 226, 255, 0.28)',
+            boxShadow: '0 14px 30px rgba(0, 0, 0, 0.3)',
+            color: '#e6fbff',
+            fontFamily: 'Inter, "Segoe UI", sans-serif',
+            zIndex: '25'
+        });
+
+        const title = document.createElement('div');
+        title.textContent = 'Random Ocean Leaderboard';
+        Object.assign(title.style, {
+            fontSize: '15px',
+            fontWeight: '700',
+            color: '#7de2ff',
+            marginBottom: '4px'
+        });
+
+        const subtitle = document.createElement('div');
+        subtitle.textContent = 'Mock scores for class demos';
+        Object.assign(subtitle.style, {
+            fontSize: '11px',
+            color: '#b9f0ff',
+            marginBottom: '12px'
+        });
+
+        const list = document.createElement('div');
+        Object.assign(list.style, {
+            display: 'grid',
+            gap: '8px'
+        });
+
+        const refreshButton = document.createElement('button');
+        refreshButton.textContent = 'Refresh Scores';
+        Object.assign(refreshButton.style, {
+            marginTop: '12px',
+            width: '100%',
+            padding: '10px 12px',
+            borderRadius: '10px',
+            border: 'none',
+            background: 'linear-gradient(90deg, #35b9ff, #5cf0ff)',
+            color: '#032030',
+            fontWeight: '700',
+            cursor: 'pointer',
+            pointerEvents: 'auto'
+        });
+
+        container.style.position = 'relative';
+
+        this._leaderboardPanel = panel;
+        this._leaderboardList = list;
+        this._refreshLeaderboard = () => this._renderLeaderboardEntries(this._buildRandomLeaderboardData());
+
+        refreshButton.addEventListener('click', this._refreshLeaderboard);
+        this._cleanupFns.push(() => refreshButton.removeEventListener('click', this._refreshLeaderboard));
+
+        this._renderLeaderboardEntries(this._buildRandomLeaderboardData());
+
+        panel.appendChild(title);
+        panel.appendChild(subtitle);
+        panel.appendChild(list);
+        panel.appendChild(refreshButton);
+        container.appendChild(panel);
+    }
+
+    destroy() {
+        this._cleanupFns.forEach(fn => fn());
+        this._cleanupFns = [];
+
+        if (this._leaderboardPanel) {
+            this._leaderboardPanel.remove();
+            this._leaderboardPanel = null;
+            this._leaderboardList = null;
+            this._refreshLeaderboard = null;
+        }
     }
 
 }
