@@ -12,6 +12,10 @@ layout: null
     <meta name="author" content="Team Space">
     <meta name="description" content="Team Space CSSE Portfolio Hub - Interactive galaxy navigation">
     <title>Team Space (CSSE) - Portfolio Hub</title>
+    <!-- CodeMirror (only loaded where needed) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
     <style>
         * {
             margin: 0 !important;
@@ -494,12 +498,13 @@ layout: null
         /* Rocket styles */
         .rocket-container {
             position: fixed !important;
-            left: calc(100% - 100px) !important;
-            top: calc(100% - 150px) !important;
+            left: calc(100% - 132px) !important;
+            top: calc(100% - 180px) !important;
             z-index: 999 !important;
             user-select: none !important;
-            width: 84px !important;
-            height: 112px !important;
+            width: 108px !important;
+            height: 138px !important;
+            pointer-events: none !important;
             transition: transform 0.18s ease, filter 0.18s ease !important;
         }
 
@@ -514,126 +519,134 @@ layout: null
 
         .rocket {
             position: relative !important;
-            width: 84px !important;
-            height: 112px !important;
-            cursor: grab !important;
+            width: 108px !important;
+            height: 138px !important;
             animation: rocketFloat 3s ease-in-out infinite !important;
-        }
-
-        .rocket:active {
-            cursor: grabbing !important;
+            transform-origin: 50% 58% !important;
         }
 
         .rocket-body {
             position: absolute !important;
-            width: 52px !important;
-            height: 72px !important;
-            background: linear-gradient(180deg, #ffe0f0 0%, #ff8a80 35%, #ff6b9d 70%, #d94b80 100%) !important;
-            border-radius: 26px 26px 18px 18px !important;
-            left: 16px !important;
-            top: 10px !important;
-            border: 2px solid rgba(255, 255, 255, 0.45) !important;
-            box-shadow: 0 0 20px rgba(255, 107, 157, 0.6), inset 0 0 18px rgba(255, 255, 255, 0.25) !important;
+            width: 60px !important;
+            height: 88px !important;
+            background: linear-gradient(180deg, #fff4fd 0%, #ffbfdb 25%, #ff78b0 58%, #f14d93 100%) !important;
+            border-radius: 34px 34px 26px 26px !important;
+            left: 24px !important;
+            top: 14px !important;
+            border: 2px solid rgba(255, 255, 255, 0.55) !important;
+            box-shadow: 0 0 26px rgba(255, 107, 157, 0.5), inset 0 0 18px rgba(255, 255, 255, 0.55) !important;
         }
 
         .rocket-nose {
             position: absolute !important;
-            top: -16px !important;
+            top: -20px !important;
             left: 50% !important;
             transform: translateX(-50%) !important;
             width: 0 !important;
             height: 0 !important;
-            border-left: 18px solid transparent !important;
-            border-right: 18px solid transparent !important;
-            border-bottom: 26px solid #ffd1e6 !important;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.35)) !important;
+            border-left: 20px solid transparent !important;
+            border-right: 20px solid transparent !important;
+            border-bottom: 32px solid #ffe7f5 !important;
+            filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.5)) !important;
         }
 
         .rocket-window {
             position: absolute !important;
-            width: 22px !important;
-            height: 22px !important;
+            width: 26px !important;
+            height: 26px !important;
             background: radial-gradient(circle at 35% 35%, #ffffff, #64b5f6) !important;
             border-radius: 50% !important;
-            left: 30px !important;
-            top: 20px !important;
-            border: 2px solid rgba(255, 255, 255, 0.6) !important;
-            box-shadow: inset 0 0 10px rgba(100, 181, 246, 0.5), 0 0 10px rgba(100, 181, 246, 0.5) !important;
+            left: 41px !important;
+            top: 26px !important;
+            border: 3px solid rgba(255, 255, 255, 0.75) !important;
+            box-shadow: inset 0 0 12px rgba(100, 181, 246, 0.55), 0 0 14px rgba(100, 181, 246, 0.5) !important;
         }
 
         .rocket-stripe {
             position: absolute !important;
-            left: 7px !important;
-            right: 7px !important;
-            height: 6px !important;
+            left: 8px !important;
+            right: 8px !important;
+            height: 7px !important;
             background: rgba(255, 255, 255, 0.55) !important;
             border-radius: 999px !important;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.3) !important;
         }
 
         .rocket-stripe-top {
-            top: 48px !important;
+            top: 58px !important;
         }
 
         .rocket-stripe-bottom {
-            top: 58px !important;
+            top: 70px !important;
             opacity: 0.75 !important;
         }
 
         .rocket-fins {
             position: absolute !important;
-            bottom: 8px !important;
+            bottom: 14px !important;
+            left: 24px !important;
+            width: 60px !important;
+            height: 34px !important;
+        }
+
+        .rocket-wing-core {
+            position: absolute !important;
             left: 16px !important;
+            bottom: 2px !important;
+            width: 28px !important;
+            height: 16px !important;
+            border-radius: 0 0 16px 16px !important;
+            background: linear-gradient(180deg, #ffd9ec, #ff78b0) !important;
+            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.4) !important;
         }
 
         .rocket-fin {
             position: absolute !important;
-            width: 0 !important;
-            height: 0 !important;
-            border-left: 12px solid transparent !important;
-            border-right: 12px solid transparent !important;
-            border-bottom: 22px solid #ff6b9d !important;
-            filter: drop-shadow(0 0 8px rgba(255, 107, 157, 0.4)) !important;
+            width: 22px !important;
+            height: 28px !important;
+            background: linear-gradient(180deg, #ff96c4, #ff4b97) !important;
+            clip-path: polygon(50% 0%, 100% 100%, 0% 100%) !important;
+            filter: drop-shadow(0 0 10px rgba(255, 107, 157, 0.45)) !important;
         }
 
         .rocket-fin-left {
-            left: -10px !important;
-            transform: skewX(-10deg) !important;
+            left: -8px !important;
+            transform: rotate(-14deg) !important;
         }
 
         .rocket-fin-right {
-            right: -10px !important;
-            transform: skewX(10deg) !important;
+            right: -8px !important;
+            transform: rotate(14deg) !important;
         }
 
         .rocket-engine {
             position: absolute !important;
-            bottom: 4px !important;
+            bottom: 8px !important;
             left: 50% !important;
             transform: translateX(-50%) !important;
-            width: 22px !important;
-            height: 14px !important;
+            width: 26px !important;
+            height: 16px !important;
             background: linear-gradient(180deg, #b0bec5, #546e7a) !important;
-            border-radius: 0 0 10px 10px !important;
+            border-radius: 0 0 12px 12px !important;
             border: 1px solid rgba(255, 255, 255, 0.35) !important;
         }
 
         .rocket-flame {
             position: absolute !important;
-            bottom: -28px !important;
+            bottom: -40px !important;
             left: 50% !important;
             transform: translateX(-50%) !important;
-            width: 26px !important;
-            height: 34px !important;
+            width: 30px !important;
+            height: 42px !important;
             background: linear-gradient(180deg, #fff176 0%, #ff9800 45%, #ff5722 75%, transparent 100%) !important;
-            border-radius: 50% 50% 0 0 !important;
-            filter: blur(2px) drop-shadow(0 0 8px rgba(255, 152, 0, 0.6)) !important;
+            border-radius: 50% 50% 30% 30% !important;
+            filter: blur(2px) drop-shadow(0 0 12px rgba(255, 152, 0, 0.7)) !important;
             animation: flame 0.3s ease-in-out infinite !important;
         }
 
         @keyframes rocketFloat {
-            0%, 100% { transform: translateY(0px) rotate(-15deg); }
-            50% { transform: translateY(-20px) rotate(-15deg); }
+            0%, 100% { transform: translateY(0px) rotate(-12deg); }
+            50% { transform: translateY(-16px) rotate(-12deg); }
         }
 
         @keyframes flame {
@@ -649,17 +662,18 @@ layout: null
 
         .rocket-tooltip {
             position: absolute !important;
-            bottom: 128px !important;
-            right: 0 !important;
-            background: rgba(0, 0, 0, 0.8) !important;
+            bottom: 154px !important;
+            right: -8px !important;
+            background: rgba(7, 16, 35, 0.88) !important;
             color: #81d4fa !important;
-            padding: 8px 12px !important;
-            border-radius: 5px !important;
+            padding: 10px 14px !important;
+            border-radius: 10px !important;
             white-space: nowrap !important;
             font-size: 0.85rem !important;
             opacity: 0 !important;
             transition: opacity 0.3s !important;
             border: 1px solid rgba(129, 212, 250, 0.6) !important;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25) !important;
         }
 
         .rocket-container:hover .rocket-tooltip {
@@ -1044,7 +1058,7 @@ layout: null
 
     <!-- Controllable Rocket -->
     <div class="rocket-container" id="rocketContainer">
-        <div class="rocket-tooltip">Use arrow keys or WASD to move the rocket!</div>
+        <div class="rocket-tooltip">List view: follow the cursor. Traveler view: use WASD or arrows.</div>
         <div class="rocket" id="rocket">
             <div class="rocket-body">
                 <div class="rocket-nose"></div>
@@ -1053,6 +1067,7 @@ layout: null
                 <div class="rocket-stripe rocket-stripe-bottom"></div>
             </div>
             <div class="rocket-fins">
+                <div class="rocket-wing-core"></div>
                 <div class="rocket-fin rocket-fin-left"></div>
                 <div class="rocket-fin rocket-fin-right"></div>
             </div>
@@ -1644,6 +1659,28 @@ export default GameLevelAquaticGameLevel;</code></pre>
                         `
                     },
                     {
+                        title: "Arjun's Seek CSS1",
+                        description: 'Seek game arrays and booleans breakdown from Arjun\'s notebook',
+                        link: '{{ site.baseurl }}/blog/arjun-seek-arrays-booleans',
+                        content: `
+                            <h3>Arjun's Seek CSS1</h3>
+                            <p>This blog post explains how CS concepts like arrays, booleans, control structures, and operators appear in <strong>GameLevelSeek.js</strong>.</p>
+
+                            <h3>What It Covers</h3>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>Iteration and conditionals used in the Seek level</li>
+                                <li>Data types such as numbers, strings, arrays, booleans, and objects</li>
+                                <li>Operators used in level logic and player interactions</li>
+                                <li>An embedded playable Seek game runner</li>
+                            </ul>
+
+                            <h3>Notebook Post</h3>
+                            <p>This content comes from Arjun's notebook and is published as its own blog page in the portfolio.</p>
+                            <p><strong>Permalink:</strong> <code>/blog/arjun-seek-arrays-booleans</code></p>
+                            <p><a class="portal-button" href="{{ site.baseurl }}/blog/arjun-seek-arrays-booleans"><span class="spark"></span>Open Arjun's Seek CSS1</a></p>
+                        `
+                    },
+                    {
                         title: "Arjun's Game Blog V2",
                         description: 'Game development progress blog for a custom seek level',
                         content: `
@@ -1806,7 +1843,41 @@ Barrier
                 title: 'Trivia',
                 description: 'Unrelated topics/behind the scenes.',
                 icon: '🧠',
-                color: 'orange'
+                color: 'orange',
+                planets: [
+                    // paste new planet here
+                    // paste new planet here
+                    // paste new planet here
+                    // paste new planet here
+                    // paste new planet here
+                    // paste new planet here
+                    // paste new planet here
+                    // paste new planet here
+                    // paste new planet here
+                    // paste new planet here
+                    {
+                        title: '3/25 Deployment Debugging — Yiming',
+                        description: 'Yiming debugged the DNS switch deployment, added the homepage-to-portal transition, and refined the rocket model.',
+                        content: `
+                            <h3>3/25 Update</h3>
+                            <p>After switching the DNS setup for <strong>teamspace.opencodingsociety.com</strong>, <strong>Yiming</strong> debugged the deployed website to make sure the custom domain loaded the correct Team Space experience instead of landing in the wrong flow.</p>
+
+                            <h3>Deployment Debugging</h3>
+                            <p>Yiming checked how the deployed site behaved after the DNS change and verified that the homepage and portal routing still matched the intended custom-domain setup.</p>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>Reviewed the deployed behavior after the DNS switch</li>
+                                <li>Verified the custom-domain routing path into Team Space</li>
+                                <li>Tracked down issues between the deployed homepage and the portal destination</li>
+                            </ul>
+
+                            <h3>Portal Transition</h3>
+                            <p>Yiming added a transition between <strong>teamspace.opencodingsociety.com</strong> and <strong>/team-space-portal</strong> so entering the site feels more intentional and polished instead of acting like an abrupt redirect.</p>
+
+                            <h3>Rocket Model Refinement</h3>
+                            <p>Yiming also refined the rocket model to better match the Team Space theme and make the portal experience feel more interactive and visually cohesive.</p>
+                        `
+                    }
+                ]
             }
         ];
 
@@ -1978,12 +2049,15 @@ Barrier
 
         // Rocket control system
         const rocketState = {
-            x: window.innerWidth - 100,
-            y: window.innerHeight - 150,
+            x: window.innerWidth - 132,
+            y: window.innerHeight - 180,
             vx: 0,
             vy: 0,
             speed: 5,
-            friction: 0.95
+            friction: 0.95,
+            targetX: window.innerWidth - 132,
+            targetY: window.innerHeight - 180,
+            followMouse: true
         };
 
         const keys = {};
@@ -2091,41 +2165,51 @@ Barrier
             const rocket = document.getElementById('rocket');
             if (!rocket) return;
 
-            // Handle key presses - normalize to lowercase
-            if (keys['ArrowLeft'] || keys['a']) rocketState.vx -= rocketState.speed;
-            if (keys['ArrowRight'] || keys['d']) rocketState.vx += rocketState.speed;
-            if (keys['ArrowUp'] || keys['w']) rocketState.vy -= rocketState.speed;
-            if (keys['ArrowDown'] || keys['s']) rocketState.vy += rocketState.speed;
+            const rocketContainer = document.getElementById('rocketContainer');
+            if (!rocketContainer) return;
 
-            // Apply friction
-            rocketState.vx *= rocketState.friction;
-            rocketState.vy *= rocketState.friction;
+            if (currentView === 'traveler') {
+                rocketState.followMouse = false;
 
-            // Update position
-            rocketState.x += rocketState.vx;
-            rocketState.y += rocketState.vy;
+                if (keys['ArrowLeft'] || keys['a']) rocketState.vx -= rocketState.speed;
+                if (keys['ArrowRight'] || keys['d']) rocketState.vx += rocketState.speed;
+                if (keys['ArrowUp'] || keys['w']) rocketState.vy -= rocketState.speed;
+                if (keys['ArrowDown'] || keys['s']) rocketState.vy += rocketState.speed;
+
+                rocketState.vx *= rocketState.friction;
+                rocketState.vy *= rocketState.friction;
+
+                rocketState.x += rocketState.vx;
+                rocketState.y += rocketState.vy;
+            } else {
+                rocketState.followMouse = true;
+                const followStrength = 0.1;
+                const dx = rocketState.targetX - rocketState.x;
+                const dy = rocketState.targetY - rocketState.y;
+
+                rocketState.vx = dx * followStrength;
+                rocketState.vy = dy * followStrength;
+                rocketState.x += rocketState.vx;
+                rocketState.y += rocketState.vy;
+            }
 
             // Boundary constraints
-            rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 94));
-            rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 132));
+            rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 108));
+            rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 138));
 
-            // Update rocket container position
-            const rocketContainer = document.getElementById('rocketContainer');
-            if (rocketContainer) {
-                rocketContainer.style.left = rocketState.x + 'px';
-                rocketContainer.style.top = rocketState.y + 'px';
-            }
+            rocketContainer.style.left = rocketState.x + 'px';
+            rocketContainer.style.top = rocketState.y + 'px';
+
+            const tilt = currentView === 'traveler'
+                ? Math.max(-22, Math.min(22, rocketState.vx * 1.3 - 12))
+                : Math.max(-20, Math.min(10, rocketState.vx * 0.9 - 12));
+            rocket.style.transform = `rotate(${tilt}deg)`;
 
             updateTravelerHud();
             updateDockingState();
 
             requestAnimationFrame(updateRocketPosition);
         }
-
-        // Mouse dragging for rocket
-        let isDraggingRocket = false;
-        let dragOffsetX = 0;
-        let dragOffsetY = 0;
 
         document.addEventListener('keydown', (e) => {
             if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'enter'].includes(e.key.toLowerCase())) {
@@ -2151,35 +2235,18 @@ Barrier
             }
         });
 
-        // Rocket dragging
-        document.addEventListener('mousedown', (e) => {
-            const rocketContainer = document.getElementById('rocketContainer');
-            if (rocketContainer && rocketContainer.contains(e.target)) {
-                isDraggingRocket = true;
-                dragOffsetX = e.clientX - rocketState.x;
-                dragOffsetY = e.clientY - rocketState.y;
-            }
-        });
-
         document.addEventListener('mousemove', (e) => {
-            if (isDraggingRocket) {
-                rocketState.x = e.clientX - dragOffsetX;
-                rocketState.y = e.clientY - dragOffsetY;
-
-                // Boundary constraints
-                rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 94));
-                rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 132));
-
-                const rocketContainer = document.getElementById('rocketContainer');
-                if (rocketContainer) {
-                    rocketContainer.style.left = rocketState.x + 'px';
-                    rocketContainer.style.top = rocketState.y + 'px';
-                }
+            if (currentView !== 'traveler' && rocketState.followMouse) {
+                rocketState.targetX = Math.max(0, Math.min(e.clientX + 28, window.innerWidth - 108));
+                rocketState.targetY = Math.max(0, Math.min(e.clientY - 72, window.innerHeight - 138));
             }
         });
 
-        document.addEventListener('mouseup', () => {
-            isDraggingRocket = false;
+        window.addEventListener('resize', () => {
+            rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 108));
+            rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 138));
+            rocketState.targetX = Math.max(0, Math.min(rocketState.targetX, window.innerWidth - 108));
+            rocketState.targetY = Math.max(0, Math.min(rocketState.targetY, window.innerHeight - 138));
         });
 
         // View management system
@@ -2202,6 +2269,11 @@ Barrier
                 interactableTargets: [],
                 activeDockTarget: null
             };
+            rocketState.followMouse = true;
+            rocketState.vx = 0;
+            rocketState.vy = 0;
+            rocketState.targetX = window.innerWidth - 132;
+            rocketState.targetY = window.innerHeight - 180;
             setTravelerTargets([]);
         }
 
@@ -2218,8 +2290,13 @@ Barrier
             travelerModeState.activeGalaxyIndex = null;
             Object.keys(keys).forEach(key => keys[key] = false);
             window.focus();
+            rocketState.followMouse = false;
+            rocketState.vx = 0;
+            rocketState.vy = 0;
             rocketState.x = window.innerWidth - 120;
             rocketState.y = window.innerHeight - 180;
+            rocketState.targetX = rocketState.x;
+            rocketState.targetY = rocketState.y;
             
             initializeTravelerView();
         }
