@@ -61,23 +61,24 @@ class GameLevelBasketball {
     };
 
     const bronData = {
-      id: 'LeBron',
-      greeting: 'LeBron stole the ball!',
-      src: path + '/images/gamebuilder/sprites/bron.png',
-      SCALE_FACTOR: 3.5,
-      ANIMATION_RATE: 200,
-      INIT_POSITION: { x: Math.round(width * 0.90), y: Math.round(height * 0.5) },
-      pixels: { height: 1, width: 1 },
-      orientation: { rows: 1, columns: 1 },
+  id: 'LeBron',
+  greeting: 'LeBron stole the ball!',
+  src: path + '/images/gamebuilder/sprites/bron.png',
+  SCALE_FACTOR: 3.5,
+  ANIMATION_RATE: 200,
+  INIT_POSITION: { x: Math.round(width * 0.90), y: Math.round(height * 0.5) },
+  pixels: { height: 1350, width: 1080 },  // ← actual image size
+  orientation: { rows: 1, columns: 1 },   // ← single image, 1 frame
 
-      down: { row: 0, start: 0, columns: 1 },
-      right: { row: 0, start: 0, columns: 1 },
-      left: { row: 0, start: 0, columns: 1 },
-      up: { row: 0, start: 0, columns: 1 },
-      upRight: { row: 0, start: 0, columns: 1 },
-      downRight: { row: 0, start: 0, columns: 1 },
-      upLeft: { row: 0, start: 0, columns: 1 },
-      downLeft: { row: 0, start: 0, columns: 1 },
+  down:      { row: 0, start: 0, columns: 1 },
+  right:     { row: 0, start: 0, columns: 1 },
+  left:      { row: 0, start: 0, columns: 1 },
+  up:        { row: 0, start: 0, columns: 1 },
+  upRight:   { row: 0, start: 0, columns: 1 },
+  downRight: { row: 0, start: 0, columns: 1 },
+  upLeft:    { row: 0, start: 0, columns: 1 },
+  downLeft:  { row: 0, start: 0, columns: 1 },
+  // rest stays the same...
 
       hitbox: { widthPercentage: 0.65, heightPercentage: 0.75 },
 
