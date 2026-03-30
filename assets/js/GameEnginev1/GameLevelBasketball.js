@@ -1,11 +1,3 @@
-// Basketball Evasion Game Level
-// How to use this file:
-// 1) Save as assets/js/GameEnginev1/levels/GameLevelBasketball.js in your repo.
-// 2) Reference it in your runner. Example:
-//    import GameLevelBasketball from '/assets/js/GameEnginev1/levels/GameLevelBasketball.js';
-//    export const gameLevelClasses = [GameLevelBasketball];
-// 3) Ensure images exist and paths resolve via 'path' provided by the engine.
-
 import GameEnvBackground from './essentials/GameEnvBackground.js';
 import Player from './essentials/Player.js';
 import Npc from './essentials/Npc.js';
@@ -14,80 +6,95 @@ import Barrier from './essentials/Barrier.js';
 class GameLevelBasketball {
   constructor(gameEnv) {
     this.gameEnv = gameEnv;
-    this.classes = [];
 
-    this._started = false;
-    this._raf = null;
-    this._lastTime = 0;
-    this._startTime = 0;
-    this._bestTime = 0;
-    this._gameOver = false;
-    this._hudCanvas = null;
-    this._hudCtx = null;
-    this._cleanupFns = [];
-
-    const path = gameEnv.path;
     const width = gameEnv.innerWidth || 800;
     const height = gameEnv.innerHeight || 580;
+    const path = gameEnv.path;
 
-    const bgData = {
-      name: 'basketball_court',
-      src: path + '/images/gamebuilder/bg/BballCourt.png',
+    // Core game state
+    this.levelDurationSeconds = 45;
+    this.remainingSeconds = this.levelDurationSeconds;
+    this.bestTimeSeconds = 0;
+    this.levelWon = false;
+    this.levelLost = false;
+    this.lastTimestamp = 0;
+    this.startTimestamp = 0;
+    this.frameDelta = 0;
+
+    // Dribbling state
+    this.dribblePhase = 0;
+    this.dribbleFrequency = 10;
+
+    // DOM/UI refs
+    this.hudCanvas = null;
+    this.hudCtx = null;
+
+    // Keep these for fast lookup and restart
+    this.playerStart = {
+      x: Math.round(width * 0.08),
+      y: Math.round(height * 0.5)
+    };
+    this.lebronStart = {
+      x: Math.round(width * 0.9),
+      y: Math.round(height * 0.5)
+    };
+
+    // Background setup (Aquatic-style data pattern)
+    const image_src_court = path + '/images/gamebuilder/bg/BballCourt.png';
+    const image_data_court = {
+      id: 'Basketball-Court',
+      src: image_src_court,
       pixels: { height: 580, width: 900 }
     };
 
-    const playerData = {
+    // Player setup
+    const sprite_src_player = path + '/images/gamebuilder/sprites/BasketballPlayer.png';
+    const sprite_data_player = {
       id: 'BasketballPlayer',
-      src: path + '/images/gamebuilder/sprites/BasketballPlayer.png',
+      greeting: 'Keep dribbling and protect the ball!',
+      src: sprite_src_player,
       SCALE_FACTOR: 4,
       STEP_FACTOR: 1100,
       ANIMATION_RATE: 120,
-      INIT_POSITION: { x: Math.round(width * 0.08), y: Math.round(height * 0.5) },
+      INIT_POSITION: { ...this.playerStart },
       pixels: { height: 512, width: 384 },
       orientation: { rows: 4, columns: 3 },
-
       down: { row: 0, start: 0, columns: 3 },
       left: { row: 1, start: 0, columns: 3 },
       right: { row: 2, start: 0, columns: 3 },
       up: { row: 3, start: 0, columns: 3 },
-
       downRight: { row: 2, start: 0, columns: 3 },
       downLeft: { row: 1, start: 0, columns: 3 },
       upRight: { row: 2, start: 0, columns: 3 },
       upLeft: { row: 1, start: 0, columns: 3 },
-
-      hitbox: { widthPercentage: 0.45, heightPercentage: 0.60 },
+      hitbox: { widthPercentage: 0.45, heightPercentage: 0.6 },
       keypress: { up: 87, left: 65, down: 83, right: 68 }
     };
 
-    const bronData = {
-  id: 'LeBron',
-  greeting: 'LeBron stole the ball!',
-  src: path + '/images/gamebuilder/sprites/bron.png',
-  SCALE_FACTOR: 3.5,
-  ANIMATION_RATE: 200,
-  INIT_POSITION: { x: Math.round(width * 0.90), y: Math.round(height * 0.5) },
-  pixels: { height: 1350, width: 1080 },  // ← actual image size
-  orientation: { rows: 1, columns: 1 },   // ← single image, 1 frame
-
-  down:      { row: 0, start: 0, columns: 1 },
-  right:     { row: 0, start: 0, columns: 1 },
-  left:      { row: 0, start: 0, columns: 1 },
-  up:        { row: 0, start: 0, columns: 1 },
-  upRight:   { row: 0, start: 0, columns: 1 },
-  downRight: { row: 0, start: 0, columns: 1 },
-  upLeft:    { row: 0, start: 0, columns: 1 },
-  downLeft:  { row: 0, start: 0, columns: 1 },
-  // rest stays the same...
-
+    // LeBron setup
+    const sprite_src_lebron = path + '/images/gamebuilder/sprites/bron.png';
+    const sprite_data_lebron = {
+      id: 'LeBron',
+      greeting: 'LeBron stole the ball!',
+      src: sprite_src_lebron,
+      SCALE_FACTOR: 3.5,
+      ANIMATION_RATE: 200,
+      INIT_POSITION: { ...this.lebronStart },
+      pixels: { height: 1350, width: 1080 },
+      orientation: { rows: 1, columns: 1 },
+      down: { row: 0, start: 0, columns: 1 },
+      left: { row: 0, start: 0, columns: 1 },
+      right: { row: 0, start: 0, columns: 1 },
+      up: { row: 0, start: 0, columns: 1 },
+      downRight: { row: 0, start: 0, columns: 1 },
+      downLeft: { row: 0, start: 0, columns: 1 },
+      upRight: { row: 0, start: 0, columns: 1 },
+      upLeft: { row: 0, start: 0, columns: 1 },
       hitbox: { widthPercentage: 0.65, heightPercentage: 0.75 },
-
-      dialogues: ['LeBron stole the ball! Press Reset to try again.'],
+      dialogues: ['LeBron stole the ball! Press R to restart.'],
       reaction: function () {
         if (this.dialogueSystem) {
           this.showReactionDialogue();
-        } else {
-          console.log(this.greeting);
         }
       },
       interact: function () {
@@ -97,6 +104,7 @@ class GameLevelBasketball {
       }
     };
 
+    // Court barriers/walls
     const barrier_1 = {
       id: 'barrier_1',
       x: Math.round(width * 0.25),
@@ -122,8 +130,8 @@ class GameLevelBasketball {
     const barrier_3 = {
       id: 'barrier_3',
       x: Math.round(width * 0.35),
-      y: Math.round(height * 0.60),
-      width: Math.round(width * 0.10),
+      y: Math.round(height * 0.6),
+      width: Math.round(width * 0.1),
       height: Math.round(height * 0.08),
       visible: false,
       hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
@@ -132,9 +140,9 @@ class GameLevelBasketball {
 
     const barrier_4 = {
       id: 'barrier_4',
-      x: Math.round(width * 0.60),
-      y: Math.round(height * 0.20),
-      width: Math.round(width * 0.10),
+      x: Math.round(width * 0.6),
+      y: Math.round(height * 0.2),
+      width: Math.round(width * 0.1),
       height: Math.round(height * 0.08),
       visible: false,
       hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
@@ -145,7 +153,7 @@ class GameLevelBasketball {
       id: 'wall_top',
       x: 0,
       y: 0,
-      width: width,
+      width,
       height: 8,
       visible: false,
       hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
@@ -156,7 +164,7 @@ class GameLevelBasketball {
       id: 'wall_bottom',
       x: 0,
       y: height - 8,
-      width: width,
+      width,
       height: 8,
       visible: false,
       hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
@@ -168,7 +176,7 @@ class GameLevelBasketball {
       x: 0,
       y: 0,
       width: 8,
-      height: height,
+      height,
       visible: false,
       hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
       fromOverlay: false
@@ -179,16 +187,16 @@ class GameLevelBasketball {
       x: width - 8,
       y: 0,
       width: 8,
-      height: height,
+      height,
       visible: false,
       hitbox: { widthPercentage: 1.0, heightPercentage: 1.0 },
       fromOverlay: false
     };
 
     this.classes = [
-      { class: GameEnvBackground, data: bgData },
-      { class: Player, data: playerData },
-      { class: Npc, data: bronData },
+      { class: GameEnvBackground, data: image_data_court },
+      { class: Player, data: sprite_data_player },
+      { class: Npc, data: sprite_data_lebron },
       { class: Barrier, data: barrier_1 },
       { class: Barrier, data: barrier_2 },
       { class: Barrier, data: barrier_3 },
@@ -199,174 +207,235 @@ class GameLevelBasketball {
       { class: Barrier, data: wall_right }
     ];
 
-    setTimeout(() => this._startCustomLogic(), 250);
+    this.handleRestartKey = this.handleRestartKey.bind(this);
   }
 
-  _startCustomLogic() {
-    if (this._started) return;
-    this._started = true;
+  initialize() {
+    this.startTimestamp = performance.now();
+    this.lastTimestamp = this.startTimestamp;
+    this.createHudCanvas();
+    document.addEventListener('keydown', this.handleRestartKey);
+  }
 
-    const env = this.gameEnv;
-    const container = env?.gameContainer;
-    if (!container) return;
+  update() {
+    if (!this.lastTimestamp) {
+      this.lastTimestamp = performance.now();
+    }
 
-    this._createHudCanvas(container);
+    const now = performance.now();
+    this.frameDelta = Math.min((now - this.lastTimestamp) / 1000, 0.05);
+    this.lastTimestamp = now;
 
-    this._startTime = performance.now();
-    this._lastTime = performance.now();
+    const player = this.findObjectById('BasketballPlayer');
+    const lebron = this.findObjectById('LeBron');
 
-    const loop = (now) => {
-      this._raf = requestAnimationFrame(loop);
+    if (!player || !lebron) {
+      this.drawHud();
+      return;
+    }
 
-      const dt = Math.min((now - this._lastTime) / 1000, 0.05);
-      this._lastTime = now;
+    if (!this.levelWon && !this.levelLost) {
+      this.updateCountdown(now);
+      this.updateLeBronChase(lebron, player);
+      this.updateDribble(player);
 
-      const player = this._findObjectById('BasketballPlayer');
-      const bron = this._findObjectById('LeBron');
-
-      if (!player || !bron) {
-        this._drawHud(0, this._bestTime, false, false);
-        return;
-      }
-
-      const elapsed = this._gameOver ? (this._freezeElapsed || 0) : (now - this._startTime) / 1000;
-
-      if (!this._gameOver) {
-        this._updateBronChase(bron, player, dt);
-
-        if (this._isTouching(bron, player)) {
-          this._gameOver = true;
-          this._freezeElapsed = elapsed;
-          this._bestTime = Math.max(this._bestTime, elapsed);
-
-          if (typeof bron.showReactionDialogue === 'function') {
-            bron.showReactionDialogue();
-          } else if (typeof bron.interact === 'function') {
-            bron.interact();
-          }
+      if (this.isTouching(lebron, player)) {
+        this.levelLost = true;
+        this.bestTimeSeconds = Math.max(this.bestTimeSeconds, this.getSurvivalTimeSeconds());
+        if (typeof lebron.showReactionDialogue === 'function') {
+          lebron.showReactionDialogue();
         }
       }
 
-      const speed = Math.min(140 + elapsed * 18, 320);
-      this._drawHud(elapsed, this._bestTime, speed > 230, this._gameOver);
-    };
-
-    this._raf = requestAnimationFrame(loop);
-    this._attachResetKey();
-  }
-
-  _findObjectById(id) {
-    const candidates = [];
-
-    if (Array.isArray(this.gameEnv?.gameObjects)) candidates.push(...this.gameEnv.gameObjects);
-    if (Array.isArray(this.gameEnv?.objects)) candidates.push(...this.gameEnv.objects);
-    if (Array.isArray(this.gameEnv?.gameObjectList)) candidates.push(...this.gameEnv.gameObjectList);
-    if (Array.isArray(this.gameEnv?.currentObjects)) candidates.push(...this.gameEnv.currentObjects);
-    if (Array.isArray(this.gameEnv?.sprites)) candidates.push(...this.gameEnv.sprites);
-
-    for (const obj of candidates) {
-      if (!obj) continue;
-      if (obj.id === id) return obj;
-      if (obj?.data?.id === id) return obj;
-    }
-
-    return null;
-  }
-
-  _getPos(obj) {
-    return {
-      x: obj?.x ?? obj?.position?.x ?? obj?.sprite?.x ?? obj?.data?.INIT_POSITION?.x ?? 0,
-      y: obj?.y ?? obj?.position?.y ?? obj?.sprite?.y ?? obj?.data?.INIT_POSITION?.y ?? 0
-    };
-  }
-
-  _setPos(obj, x, y) {
-    if ('x' in obj) obj.x = x;
-    if ('y' in obj) obj.y = y;
-    if (obj.position) {
-      obj.position.x = x;
-      obj.position.y = y;
-    }
-    if (obj.sprite) {
-      obj.sprite.x = x;
-      obj.sprite.y = y;
-    }
-    if (obj.data?.INIT_POSITION) {
-      obj.data.INIT_POSITION.x = x;
-      obj.data.INIT_POSITION.y = y;
-    }
-  }
-
-  _updateBronChase(bron, player, dt) {
-    const p = this._getPos(player);
-    const b = this._getPos(bron);
-
-    const dx = p.x - b.x;
-    const dy = p.y - b.y;
-    const dist = Math.hypot(dx, dy);
-
-    if (dist < 1) return;
-
-    const elapsed = (performance.now() - this._startTime) / 1000;
-    const speed = Math.min(140 + elapsed * 18, 320);
-
-    let mx = (dx / dist) * speed * dt;
-    let my = (dy / dist) * speed * dt;
-
-    const nextX = b.x + mx;
-    const nextY = b.y + my;
-
-    const tryMove = this._resolveBarrierCollision(bron, nextX, nextY);
-    this._setPos(bron, tryMove.x, tryMove.y);
-
-    if (dx >= 0) {
-      if (bron.direction) bron.direction = 'right';
-      if (bron.facing) bron.facing = 'right';
-    } else {
-      if (bron.direction) bron.direction = 'left';
-      if (bron.facing) bron.facing = 'left';
-    }
-  }
-
-  _resolveBarrierCollision(obj, x, y) {
-    const barriers = this.classes
-      .filter(entry => entry.class === Barrier)
-      .map(entry => entry.data);
-
-    const hitboxW = 28;
-    const hitboxH = 28;
-
-    const rect = {
-      left: x - hitboxW / 2,
-      right: x + hitboxW / 2,
-      top: y - hitboxH / 2,
-      bottom: y + hitboxH / 2
-    };
-
-    for (const b of barriers) {
-      const overlaps =
-        rect.right > b.x &&
-        rect.left < b.x + b.width &&
-        rect.bottom > b.y &&
-        rect.top < b.y + b.height;
-
-      if (overlaps) {
-        return this._getPos(obj);
+      if (this.remainingSeconds <= 0) {
+        this.levelWon = true;
+        this.bestTimeSeconds = Math.max(this.bestTimeSeconds, this.levelDurationSeconds);
       }
     }
 
-    return { x, y };
+    this.drawHud(player);
   }
 
-  _isTouching(a, b) {
-    const pa = this._getPos(a);
-    const pb = this._getPos(b);
-    return Math.hypot(pa.x - pb.x, pa.y - pb.y) < 42;
+  updateCountdown(now) {
+    const elapsed = (now - this.startTimestamp) / 1000;
+    this.remainingSeconds = Math.max(0, this.levelDurationSeconds - elapsed);
   }
 
-  _createHudCanvas(container) {
-    const old = container.querySelector('.basketball-hud-canvas');
-    if (old) old.remove();
+  updateLeBronChase(lebron, player) {
+    const p = this.getPos(player);
+    const b = this.getPos(lebron);
+
+    const dx = p.x - b.x;
+    const dy = p.y - b.y;
+    const distance = Math.hypot(dx, dy);
+
+    if (distance < 1) return;
+
+    const elapsed = this.levelDurationSeconds - this.remainingSeconds;
+    const chaseSpeed = Math.min(2.2 + elapsed * 0.06, 5.8);
+
+    const nextX = b.x + (dx / distance) * chaseSpeed;
+    const nextY = b.y + (dy / distance) * chaseSpeed;
+
+    const moved = this.resolveBarrierCollision(nextX, nextY, lebron.width || 40, lebron.height || 40);
+
+    lebron.position.x = moved.x;
+    lebron.position.y = moved.y;
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+      lebron.direction = dx >= 0 ? 'right' : 'left';
+    } else {
+      lebron.direction = dy >= 0 ? 'down' : 'up';
+    }
+  }
+
+  updateDribble(player) {
+    this.dribblePhase += this.frameDelta * this.dribbleFrequency;
+
+    const isMoving = Math.abs(player.velocity?.x || 0) > 0 || Math.abs(player.velocity?.y || 0) > 0;
+    if (isMoving) {
+      this.dribblePhase += this.frameDelta * this.dribbleFrequency * 0.5;
+    }
+  }
+
+  resolveBarrierCollision(nextX, nextY, actorWidth, actorHeight) {
+    const barriers = this.gameEnv.gameObjects.filter((obj) => obj instanceof Barrier);
+
+    const actorRect = {
+      left: nextX,
+      right: nextX + actorWidth,
+      top: nextY,
+      bottom: nextY + actorHeight
+    };
+
+    for (const barrier of barriers) {
+      const barrierRect = {
+        left: barrier.x,
+        right: barrier.x + barrier.width,
+        top: barrier.y,
+        bottom: barrier.y + barrier.height
+      };
+
+      const overlaps =
+        actorRect.right > barrierRect.left &&
+        actorRect.left < barrierRect.right &&
+        actorRect.bottom > barrierRect.top &&
+        actorRect.top < barrierRect.bottom;
+
+      if (overlaps) {
+        return this.getPos(this.findObjectById('LeBron'));
+      }
+    }
+
+    // Keep LeBron inside court bounds
+    const maxX = (this.gameEnv.innerWidth || 800) - actorWidth;
+    const maxY = (this.gameEnv.innerHeight || 580) - actorHeight;
+
+    return {
+      x: Math.max(0, Math.min(nextX, maxX)),
+      y: Math.max(0, Math.min(nextY, maxY))
+    };
+  }
+
+  drawHud(player = null) {
+    if (!this.hudCtx || !this.hudCanvas) return;
+
+    const ctx = this.hudCtx;
+    const W = this.hudCanvas.width;
+    const H = this.hudCanvas.height;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Top timer box
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+    ctx.fillRect(W / 2 - 165, 8, 330, 42);
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `bold ${Math.max(14, Math.round(W * 0.018))}px monospace`;
+    ctx.fillText(`Clock: ${this.remainingSeconds.toFixed(1)}s`, W / 2, 29);
+
+    const speedWarning = this.remainingSeconds < 15 && !this.levelLost && !this.levelWon;
+    if (speedWarning) {
+      ctx.fillStyle = 'rgba(255, 70, 70, 0.95)';
+      ctx.font = 'bold 13px monospace';
+      ctx.fillText('LeBron is turning it up!', W / 2, 58);
+    }
+
+    // Dribbling ball visual (tracks player)
+    if (player && !this.levelLost) {
+      const p = this.getPos(player);
+      const movingRight = ['right', 'upRight', 'downRight'].includes(player.direction);
+      const sideOffset = movingRight ? Math.max(18, player.width * 0.28) : -Math.max(18, player.width * 0.18);
+      const bounce = Math.abs(Math.sin(this.dribblePhase)) * Math.max(18, (player.height || 60) * 0.45);
+      const ballX = p.x + sideOffset;
+      const ballY = p.y + (player.height || 60) - 8 - bounce;
+
+      ctx.beginPath();
+      ctx.arc(ballX, ballY, 10, 0, Math.PI * 2);
+      ctx.fillStyle = '#d97a1f';
+      ctx.fill();
+      ctx.strokeStyle = '#5b2b0b';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Simple seam lines for a ball look
+      ctx.beginPath();
+      ctx.moveTo(ballX - 8, ballY);
+      ctx.lineTo(ballX + 8, ballY);
+      ctx.moveTo(ballX, ballY - 8);
+      ctx.lineTo(ballX, ballY + 8);
+      ctx.strokeStyle = '#7a3d10';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    if (this.levelLost || this.levelWon) {
+      const bw = Math.min(460, W * 0.74);
+      const bh = 210;
+      const bx = (W - bw) / 2;
+      const by = (H - bh) / 2;
+
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.72)';
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.fillStyle = '#0d0d1a';
+      ctx.strokeStyle = '#fdb927';
+      ctx.lineWidth = 3;
+      ctx.fillRect(bx, by, bw, bh);
+      ctx.strokeRect(bx, by, bw, bh);
+
+      ctx.fillStyle = '#fdb927';
+      ctx.fillRect(bx, by, bw, 8);
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      ctx.fillStyle = '#fdb927';
+      ctx.font = `bold ${Math.round(bw * 0.06)}px monospace`;
+      const headline = this.levelWon ? 'Buzzer Beater! You Protected the Ball!' : 'LeBron Stole the Ball!';
+      ctx.fillText(headline, W / 2, by + 56);
+
+      ctx.fillStyle = '#ff6f00';
+      ctx.font = `bold ${Math.round(bw * 0.045)}px monospace`;
+      ctx.fillText(`Survived ${this.getSurvivalTimeSeconds().toFixed(1)}s`, W / 2, by + 106);
+
+      ctx.fillStyle = '#cccccc';
+      ctx.font = `${Math.round(bw * 0.034)}px monospace`;
+      ctx.fillText(`Best: ${this.bestTimeSeconds.toFixed(1)}s`, W / 2, by + 144);
+      ctx.fillText('Press R to restart', W / 2, by + 176);
+    }
+  }
+
+  createHudCanvas() {
+    const container = this.gameEnv?.gameContainer;
+    if (!container) return;
+
+    const existingHud = container.querySelector('.basketball-hud-canvas');
+    if (existingHud) {
+      existingHud.remove();
+    }
 
     const hud = document.createElement('canvas');
     hud.className = 'basketball-hud-canvas';
@@ -383,119 +452,93 @@ class GameLevelBasketball {
     container.style.position = 'relative';
     container.appendChild(hud);
 
-    this._hudCanvas = hud;
-    this._hudCtx = hud.getContext('2d');
+    this.hudCanvas = hud;
+    this.hudCtx = hud.getContext('2d');
   }
 
-  _drawHud(elapsed, best, heatingUp, gameOver) {
-    if (!this._hudCtx || !this._hudCanvas) return;
+  handleRestartKey(event) {
+    if (event.key.toLowerCase() !== 'r') return;
+    if (!this.levelLost && !this.levelWon) return;
 
-    const ctx = this._hudCtx;
-    const W = this._hudCanvas.width;
-    const H = this._hudCanvas.height;
+    const player = this.findObjectById('BasketballPlayer');
+    const lebron = this.findObjectById('LeBron');
 
-    ctx.clearRect(0, 0, W, H);
-
-    ctx.fillStyle = 'rgba(0,0,0,0.75)';
-    ctx.fillRect(W / 2 - 150, 8, 300, 38);
-
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#ffffff';
-    ctx.font = `bold ${Math.max(14, Math.round(W * 0.018))}px monospace`;
-    ctx.fillText(`Time: ${elapsed.toFixed(1)}s`, W / 2, 27);
-
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#fdb927';
-    ctx.font = 'bold 12px monospace';
-    ctx.fillText(`Best: ${best.toFixed(1)}s`, W / 2 + 140, 27);
-
-    if (heatingUp && !gameOver) {
-      ctx.textAlign = 'center';
-      ctx.fillStyle = 'rgba(230,50,50,0.9)';
-      ctx.font = 'bold 13px monospace';
-      ctx.fillText('LeBron is heating up!', W / 2, 58);
+    if (player) {
+      player.position.x = this.playerStart.x;
+      player.position.y = this.playerStart.y;
+      player.velocity.x = 0;
+      player.velocity.y = 0;
     }
 
-    if (gameOver) {
-      const bw = Math.min(420, W * 0.72);
-      const bh = 200;
-      const bx = (W - bw) / 2;
-      const by = (H - bh) / 2;
-
-      ctx.fillStyle = 'rgba(0,0,0,0.72)';
-      ctx.fillRect(0, 0, W, H);
-
-      ctx.fillStyle = '#0d0d1a';
-      ctx.strokeStyle = '#fdb927';
-      ctx.lineWidth = 3;
-      ctx.fillRect(bx, by, bw, bh);
-      ctx.strokeRect(bx, by, bw, bh);
-
-      ctx.fillStyle = '#fdb927';
-      ctx.fillRect(bx, by, bw, 8);
-
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-
-      ctx.fillStyle = '#fdb927';
-      ctx.font = `bold ${Math.round(bw * 0.065)}px monospace`;
-      ctx.fillText('LeBron stole the ball!', W / 2, by + 55);
-
-      ctx.fillStyle = '#ff6f00';
-      ctx.font = `bold ${Math.round(bw * 0.05)}px monospace`;
-      ctx.fillText(`Survived ${elapsed.toFixed(1)}s`, W / 2, by + 105);
-
-      ctx.fillStyle = '#999';
-      ctx.font = `${Math.round(bw * 0.035)}px monospace`;
-      ctx.fillText(`Best: ${best.toFixed(1)}s`, W / 2, by + 145);
-
-      ctx.fillStyle = '#ddd';
-      ctx.fillText('Press R to restart', W / 2, by + 176);
+    if (lebron) {
+      lebron.position.x = this.lebronStart.x;
+      lebron.position.y = this.lebronStart.y;
+      lebron.velocity.x = 0;
+      lebron.velocity.y = 0;
+      lebron.direction = 'left';
     }
+
+    this.levelWon = false;
+    this.levelLost = false;
+    this.remainingSeconds = this.levelDurationSeconds;
+    this.startTimestamp = performance.now();
+    this.lastTimestamp = this.startTimestamp;
+    this.dribblePhase = 0;
   }
 
-  _attachResetKey() {
-    const handler = (e) => {
-      if (e.key.toLowerCase() !== 'r' || !this._gameOver) return;
+  getSurvivalTimeSeconds() {
+    return this.levelDurationSeconds - this.remainingSeconds;
+  }
 
-      const player = this._findObjectById('BasketballPlayer');
-      const bron = this._findObjectById('LeBron');
+  isTouching(a, b) {
+    const ar = this.getRect(a);
+    const br = this.getRect(b);
 
-      if (player) {
-        const px = Math.round((this.gameEnv.innerWidth || 800) * 0.08);
-        const py = Math.round((this.gameEnv.innerHeight || 580) * 0.5);
-        this._setPos(player, px, py);
-      }
+    return (
+      ar.left < br.right &&
+      ar.right > br.left &&
+      ar.top < br.bottom &&
+      ar.bottom > br.top
+    );
+  }
 
-      if (bron) {
-        const bx = Math.round((this.gameEnv.innerWidth || 800) * 0.90);
-        const by = Math.round((this.gameEnv.innerHeight || 580) * 0.5);
-        this._setPos(bron, bx, by);
-      }
+  getRect(obj) {
+    const pos = this.getPos(obj);
+    const width = obj.width || 40;
+    const height = obj.height || 40;
 
-      this._gameOver = false;
-      this._freezeElapsed = 0;
-      this._startTime = performance.now();
+    return {
+      left: pos.x,
+      right: pos.x + width,
+      top: pos.y,
+      bottom: pos.y + height
     };
+  }
 
-    document.addEventListener('keydown', handler);
-    this._cleanupFns.push(() => document.removeEventListener('keydown', handler));
+  getPos(obj) {
+    return {
+      x: obj?.position?.x ?? obj?.x ?? 0,
+      y: obj?.position?.y ?? obj?.y ?? 0
+    };
+  }
+
+  findObjectById(id) {
+    if (!this.gameEnv?.gameObjects) return null;
+
+    return (
+      this.gameEnv.gameObjects.find((obj) => obj?.spriteData?.id === id) ||
+      this.gameEnv.gameObjects.find((obj) => obj?.data?.id === id) ||
+      null
+    );
   }
 
   destroy() {
-    if (this._raf) {
-      cancelAnimationFrame(this._raf);
-      this._raf = null;
-    }
+    document.removeEventListener('keydown', this.handleRestartKey);
 
-    this._cleanupFns.forEach(fn => fn());
-    this._cleanupFns = [];
-
-    if (this._hudCanvas) {
-      this._hudCanvas.remove();
-      this._hudCanvas = null;
-      this._hudCtx = null;
+    if (this.hudCanvas) {
+      this.hudCanvas.remove();
+      this.hudCanvas = null;
+      this.hudCtx = null;
     }
   }
 }
