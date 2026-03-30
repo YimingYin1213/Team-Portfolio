@@ -142,6 +142,11 @@ class GameLevelAquaticGameLevel {
             const count = questState.starfishTotal;
             const padding = 90;
             const minDist = 80;
+            const minNpcDist = 140;
+            const npcPositions = [
+                mermaidNpc.INIT_POSITION,
+                slimeNpc.INIT_POSITION
+            ];
 
             const maxX = Math.max(padding + 1, width - padding);
             const maxY = Math.max(padding + 1, height - padding);
@@ -153,7 +158,9 @@ class GameLevelAquaticGameLevel {
                 const y = Math.floor(Math.random() * (maxY - padding) + padding);
 
                 const tooClose = positions.some(p => Math.hypot(p.x - x, p.y - y) < minDist);
-                if (!tooClose) positions.push({ x, y });
+                const tooCloseToNpc = npcPositions.some(npc => Math.hypot(npc.x - x, npc.y - y) < minNpcDist);
+
+                if (!tooClose && !tooCloseToNpc) positions.push({ x, y });
             }
 
             positions.forEach((pos, i) => {
