@@ -189,6 +189,30 @@ class GameLevelAquaticGameLevel {
                         this.showItemMessage();
                     }
                 };
+
+                // Give each starfish a subtle unique wiggle animation
+                const baseX = starfishData.INIT_POSITION.x;
+                const baseY = starfishData.INIT_POSITION.y;
+                const phase = Math.random() * Math.PI * 2;
+                const wiggleSpeed = 0.004 + Math.random() * 0.003;
+                const bobAmplitude = 5 + Math.random() * 2;
+                const rotateAmplitude = 10 + Math.random() * 4;
+                const originalUpdate = starfish.update.bind(starfish);
+
+                starfish.update = function() {
+                    originalUpdate();
+
+                    const t = performance.now() * wiggleSpeed + phase;
+                    const bobOffset = Math.sin(t) * bobAmplitude;
+                    const rotation = Math.sin(t * 1.25) * rotateAmplitude;
+
+                    this.position.y = baseY + bobOffset;
+                    if (this.canvas) {
+                        this.canvas.style.transformOrigin = 'center center';
+                        this.canvas.style.transform = `rotate(${rotation}deg)`;
+                    }
+                };
+
                 gameEnv.gameObjects.push(starfish);
             });
         };
