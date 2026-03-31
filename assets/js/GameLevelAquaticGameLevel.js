@@ -85,6 +85,83 @@ class GameLevelAquaticGameLevel {
             collected: 0
         };
 
+        this.sharkGameOver = false;
+
+        const showSharkGameOver = () => {
+            if (this.sharkGameOver) return;
+            this.sharkGameOver = true;
+
+            const existing = document.getElementById('aquatic-shark-gameover');
+            if (existing) existing.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = 'aquatic-shark-gameover';
+            Object.assign(overlay.style, {
+                position: 'fixed',
+                inset: '0',
+                background: 'rgba(4, 14, 28, 0.8)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: '10001'
+            });
+
+            const panel = document.createElement('div');
+            Object.assign(panel.style, {
+                width: 'min(520px, 92vw)',
+                borderRadius: '16px',
+                padding: '24px',
+                background: 'linear-gradient(180deg, rgba(8, 46, 74, 0.95), rgba(4, 18, 36, 0.95))',
+                border: '2px solid rgba(110, 206, 255, 0.8)',
+                boxShadow: '0 0 30px rgba(56, 183, 255, 0.35)',
+                color: '#e6fbff',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                textAlign: 'center'
+            });
+
+            const title = document.createElement('div');
+            title.textContent = 'Game Over';
+            Object.assign(title.style, {
+                fontSize: '18px',
+                marginBottom: '14px',
+                color: '#7de2ff',
+                textShadow: '0 0 12px rgba(125, 226, 255, 0.7)'
+            });
+
+            const body = document.createElement('div');
+            body.textContent = 'The shark got you. Press restart to try again.';
+            Object.assign(body.style, {
+                fontSize: '12px',
+                lineHeight: '1.6',
+                marginBottom: '20px'
+            });
+
+            const restart = document.createElement('button');
+            restart.textContent = 'Restart';
+            Object.assign(restart.style, {
+                width: '100%',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                border: 'none',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                fontSize: '12px',
+                background: 'linear-gradient(90deg, #35b9ff, #5cf0ff)',
+                color: '#032030',
+                cursor: 'pointer',
+                boxShadow: '0 6px 18px rgba(53, 185, 255, 0.4)'
+            });
+
+            restart.onclick = () => {
+                window.location.reload();
+            };
+
+            panel.appendChild(title);
+            panel.appendChild(body);
+            panel.appendChild(restart);
+            overlay.appendChild(panel);
+            document.body.appendChild(overlay);
+        };
+
         const createPixelStarfish = (primary, shadow) => {
             const size = 11;
             const scale = 3;
@@ -307,7 +384,7 @@ class GameLevelAquaticGameLevel {
 
         const mermaidNpc = {
             id: 'Mermaid',
-            greeting: "I've lost all my starfishes would you like to collect them for me?",
+            greeting: "I've lost all my starfishes. Will you collect them? Be careful, a shark is patrolling these waters!",
             // Mermaid spritesheet
             src: path + "/images/gamebuilder/sprites/Mermaid Spritesheet.png",
             SCALE_FACTOR: 6,
@@ -326,7 +403,7 @@ class GameLevelAquaticGameLevel {
             // Play row 2 on interaction, lock to a stable frame
             interactAnim: { row: 1, start: 0, columns: 1 },
             hitbox: { widthPercentage: 0.12, heightPercentage: 0.2 },
-            dialogues: ["I've lost all my starfishes would you like to collect them for me?"],
+            dialogues: ["I've lost all my starfishes. Will you collect them? Be careful, a shark is patrolling these waters!"],
             // prevent automatic collision reaction; only interact with E
             reaction: function() {},
             interact: function() {
@@ -359,12 +436,12 @@ class GameLevelAquaticGameLevel {
                         }, 500);
                         return;
                     }
-                    this.dialogueSystem.showDialogue('Please collect the starfishes scattered around the reef.', 'Mermaid', null);
+                    this.dialogueSystem.showDialogue('Please collect the starfishes scattered around the reef, and keep away from the shark.', 'Mermaid', null);
                     return;
                 }
 
                 this.dialogueSystem.showDialogue(
-                    "I've lost all my starfishes would you like to collect them for me?",
+                    "I've lost all my starfishes. Will you collect them? Be careful, a shark is patrolling these waters!",
                     'Mermaid',
                     null
                 );
@@ -387,6 +464,27 @@ class GameLevelAquaticGameLevel {
                     }
                 ]);
             }
+        };
+
+        const sharkNpc = {
+            id: 'Shark',
+            greeting: false,
+            src: path + "/images/gamebuilder/sprites/Shark.png",
+            SCALE_FACTOR: 5,
+            STEP_FACTOR: 200,
+            ANIMATION_RATE: 8,
+            INIT_POSITION: { x: 700, y: 180 },
+            orientation: { rows: 1, columns: 1 },
+            down: { row: 0, start: 0, columns: 1 },
+            right: { row: 0, start: 0, columns: 1 },
+            left: { row: 0, start: 0, columns: 1 },
+            up: { row: 0, start: 0, columns: 1 },
+            upRight: { row: 0, start: 0, columns: 1 },
+            downRight: { row: 0, start: 0, columns: 1 },
+            upLeft: { row: 0, start: 0, columns: 1 },
+            downLeft: { row: 0, start: 0, columns: 1 },
+            hitbox: { widthPercentage: 0.12, heightPercentage: 0.15 },
+            reaction: function() {}
         };
 
         // Collision walls adjusted so all starfish are reachable
@@ -413,6 +511,7 @@ class GameLevelAquaticGameLevel {
             { class: Player, data: playerData },
             { class: Npc, data: mermaidNpc },
             { class: Npc, data: slimeNpc },
+            { class: Npc, data: sharkNpc },
             { class: Barrier, data: dbarrier_1 },
             { class: Barrier, data: dbarrier_2 },
             { class: Barrier, data: dbarrier_3 }
@@ -423,27 +522,116 @@ class GameLevelAquaticGameLevel {
         const mermaid = this.gameEnv?.gameObjects?.find(
             obj => obj?.spriteData?.id === 'Mermaid'
         );
-        if (!mermaid) return;
+        if (mermaid) {
+            mermaid.setupCanvas = function() {
+                const pixels = this.spriteData?.pixels || { width: this.canvas.width, height: this.canvas.height };
+                const orientation = this.spriteData?.orientation || { rows: 1, columns: 1 };
+                const frameW = Math.max(1, Math.round(pixels.width / orientation.columns));
+                const frameH = Math.max(1, Math.round(pixels.height / orientation.rows));
+                const aspect = frameW / frameH;
 
-        mermaid.setupCanvas = function() {
-            const pixels = this.spriteData?.pixels || { width: this.canvas.width, height: this.canvas.height };
-            const orientation = this.spriteData?.orientation || { rows: 1, columns: 1 };
-            const frameW = Math.max(1, Math.round(pixels.width / orientation.columns));
-            const frameH = Math.max(1, Math.round(pixels.height / orientation.rows));
-            const aspect = frameW / frameH;
+                // Preserve sprite aspect ratio instead of forcing a square
+                const baseSize = this.size;
+                const width = baseSize * aspect;
+                const height = baseSize;
 
-            // Preserve sprite aspect ratio instead of forcing a square
-            const baseSize = this.size;
-            const width = baseSize * aspect;
-            const height = baseSize;
+                this.canvas.style.width = `${width}px`;
+                this.canvas.style.height = `${height}px`;
+                this.canvas.style.position = 'absolute';
+                this.canvas.style.left = `${this.position.x}px`;
+                this.canvas.style.top = `${this.gameEnv.top + this.position.y}px`;
+                this.canvas.style.zIndex = (this.data && this.data.zIndex !== undefined) ? this.data.zIndex : "10";
+            };
+        }
 
-            this.canvas.style.width = `${width}px`;
-            this.canvas.style.height = `${height}px`;
-            this.canvas.style.position = 'absolute';
-            this.canvas.style.left = `${this.position.x}px`;
-            this.canvas.style.top = `${this.gameEnv.top + this.position.y}px`;
-            this.canvas.style.zIndex = (this.data && this.data.zIndex !== undefined) ? this.data.zIndex : "10";
-        };
+        const shark = this.gameEnv?.gameObjects?.find(
+            obj => obj?.spriteData?.id === 'Shark'
+        );
+
+        if (shark) {
+            const randomDirection = () => {
+                const angle = Math.random() * Math.PI * 2;
+                return { x: Math.cos(angle), y: Math.sin(angle) };
+            };
+
+            const directionFromVector = (vx, vy) => {
+                const absX = Math.abs(vx);
+                const absY = Math.abs(vy);
+                if (absX < 0.05 && absY < 0.05) return 'right';
+                if (absX > absY * 1.5) return vx >= 0 ? 'right' : 'left';
+                if (absY > absX * 1.5) return vy >= 0 ? 'down' : 'up';
+                if (vx >= 0 && vy >= 0) return 'downRight';
+                if (vx >= 0 && vy < 0) return 'upRight';
+                if (vx < 0 && vy >= 0) return 'downLeft';
+                return 'upLeft';
+            };
+
+            const baseSpeed = Math.max(1.2, Math.min(this.gameEnv.innerWidth, this.gameEnv.innerHeight) * 0.0035);
+            const initialVector = randomDirection();
+
+            shark._motion = {
+                vector: initialVector,
+                speed: baseSpeed,
+                nextTurnAt: performance.now() + 1200 + Math.random() * 1200
+            };
+
+            shark.update = () => {
+                if (this.sharkGameOver) {
+                    shark.draw();
+                    return;
+                }
+
+                const now = performance.now();
+                if (now >= shark._motion.nextTurnAt) {
+                    shark._motion.vector = randomDirection();
+                    shark._motion.nextTurnAt = now + 1200 + Math.random() * 1200;
+                }
+
+                shark.position.x += shark._motion.vector.x * shark._motion.speed;
+                shark.position.y += shark._motion.vector.y * shark._motion.speed;
+
+                // Bounce at bounds while keeping straight-line motion between turns.
+                if (shark.position.x < 0) {
+                    shark.position.x = 0;
+                    shark._motion.vector.x = Math.abs(shark._motion.vector.x);
+                } else if (shark.position.x + shark.width > this.gameEnv.innerWidth) {
+                    shark.position.x = this.gameEnv.innerWidth - shark.width;
+                    shark._motion.vector.x = -Math.abs(shark._motion.vector.x);
+                }
+
+                if (shark.position.y < 0) {
+                    shark.position.y = 0;
+                    shark._motion.vector.y = Math.abs(shark._motion.vector.y);
+                } else if (shark.position.y + shark.height > this.gameEnv.innerHeight) {
+                    shark.position.y = this.gameEnv.innerHeight - shark.height;
+                    shark._motion.vector.y = -Math.abs(shark._motion.vector.y);
+                }
+
+                shark.direction = directionFromVector(shark._motion.vector.x, shark._motion.vector.y);
+                shark.draw();
+
+                const player = this.gameEnv?.gameObjects?.find(
+                    obj => obj?.spriteData?.id === 'playerData'
+                );
+
+                if (!player || !player.canvas || !shark.canvas) return;
+
+                shark.isCollision(player);
+                if (shark.collisionData?.hit) {
+                    player.velocity.x = 0;
+                    player.velocity.y = 0;
+                    if (player.pressedKeys) player.pressedKeys = {};
+                    showSharkGameOver();
+                }
+            };
+        }
+    }
+
+    destroy() {
+        const gameOver = document.getElementById('aquatic-shark-gameover');
+        if (gameOver) gameOver.remove();
+        const quest = document.getElementById('aquatic-quest-window');
+        if (quest) quest.remove();
     }
 
 }
