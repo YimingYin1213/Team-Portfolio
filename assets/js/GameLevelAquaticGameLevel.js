@@ -323,18 +323,32 @@ class GameLevelAquaticGameLevel {
             downRight: { row: 0, start: 0, columns: 3 },
             upLeft: { row: 0, start: 0, columns: 3 },
             downLeft: { row: 0, start: 0, columns: 3 },
+            // Play row 2 on interaction, lock to a stable frame
+            interactAnim: { row: 1, start: 0, columns: 1 },
             hitbox: { widthPercentage: 0.12, heightPercentage: 0.2 },
             dialogues: ["I've lost all my starfishes would you like to collect them for me?"],
             // prevent automatic collision reaction; only interact with E
             reaction: function() {},
             interact: function() {
                 if (!this.dialogueSystem) return;
+
+                // Trigger second-row animation whenever interaction starts
+                this.direction = 'interactAnim';
+                this.frameIndex = 0;
+                this.frameCounter = 0;
+                if (this._interactAnimResetTimeout) {
+                    clearTimeout(this._interactAnimResetTimeout);
+                }
+                this._interactAnimResetTimeout = setTimeout(() => {
+                    this.direction = 'down';
+                }, 1200);
+
                 if (questState.accepted) {
                     if (questState.collected >= questState.starfishTotal) {
                         this.dialogueSystem.showDialogue(
                             "Thank you for finding them all! Our waters are safe again.",
                             'Mermaid',
-                            this.spriteData?.src || null
+                            null
                         );
                         // End level after gratitude message
                         setTimeout(() => {
@@ -345,14 +359,14 @@ class GameLevelAquaticGameLevel {
                         }, 500);
                         return;
                     }
-                    this.dialogueSystem.showDialogue('Please collect the starfishes scattered around the reef.', 'Mermaid', this.spriteData?.src || null);
+                    this.dialogueSystem.showDialogue('Please collect the starfishes scattered around the reef.', 'Mermaid', null);
                     return;
                 }
 
                 this.dialogueSystem.showDialogue(
                     "I've lost all my starfishes would you like to collect them for me?",
                     'Mermaid',
-                    this.spriteData?.src || null
+                    null
                 );
 
                 this.dialogueSystem.addButtons([
