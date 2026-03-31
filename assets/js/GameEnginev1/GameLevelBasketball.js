@@ -4,11 +4,11 @@ import Npc from './essentials/Npc.js';
 
 class GameLevelBasketball {
   constructor(gameEnv) {
+    this.gameEnv = gameEnv;
     const width = gameEnv.innerWidth;
     const height = gameEnv.innerHeight;
     const path = gameEnv.path;
 
-    // Background data (simple Desert/Aquatic-style setup)
     const image_src_court = path + '/images/gamebuilder/bg/BballCourt.png';
     const image_data_court = {
       id: 'BasketballCourt',
@@ -16,53 +16,56 @@ class GameLevelBasketball {
       pixels: { height: 580, width: 900 }
     };
 
-    // Player data (scaled down so it stays fully visible)
-    const sprite_src_player = path + '/images/gamebuilder/sprites/BasketballPlayer.png';
+    // Player data — using astro.png (teacher-provided, confirmed working)
+    const sprite_src_player = path + '/images/gamebuilder/sprites/astro.png';
     const sprite_data_player = {
       id: 'BasketballPlayer',
       greeting: 'Ball handler ready.',
       src: sprite_src_player,
-      SCALE_FACTOR: 8,
+      SCALE_FACTOR: 6,
       STEP_FACTOR: 1000,
       ANIMATION_RATE: 80,
-      INIT_POSITION: { x: Math.round(width * 0.12), y: Math.round(height * 0.65) },
-      pixels: { height: 512, width: 384 },
+      INIT_POSITION: { x: 150, y: Math.round(height * 0.55) },
+      pixels: { height: 308, width: 128 },
       orientation: { rows: 4, columns: 3 },
-      down: { row: 0, start: 0, columns: 3 },
-      left: { row: 1, start: 0, columns: 3 },
-      right: { row: 2, start: 0, columns: 3 },
-      up: { row: 3, start: 0, columns: 3 },
+      down:      { row: 0, start: 0, columns: 3 },
+      left:      { row: 1, start: 0, columns: 3 },
+      right:     { row: 2, start: 0, columns: 3 },
+      up:        { row: 3, start: 0, columns: 3 },
       downRight: { row: 2, start: 0, columns: 3 },
-      downLeft: { row: 1, start: 0, columns: 3 },
-      upRight: { row: 2, start: 0, columns: 3 },
-      upLeft: { row: 1, start: 0, columns: 3 },
+      downLeft:  { row: 1, start: 0, columns: 3 },
+      upRight:   { row: 2, start: 0, columns: 3 },
+      upLeft:    { row: 1, start: 0, columns: 3 },
       hitbox: { widthPercentage: 0.45, heightPercentage: 0.5 },
       keypress: { up: 87, left: 65, down: 83, right: 68 }
     };
 
-    // LeBron data (static NPC for now, we can add chase next)
+    // LeBron data — fixed scale and sprite sheet orientation
     const sprite_src_lebron = path + '/images/gamebuilder/sprites/bron.png';
     const sprite_data_lebron = {
       id: 'LeBron',
       greeting: 'You reached LeBron.',
       src: sprite_src_lebron,
-      SCALE_FACTOR: 7,
+      SCALE_FACTOR: 6,
       ANIMATION_RATE: 120,
-      INIT_POSITION: { x: Math.round(width * 0.72), y: Math.round(height * 0.62) },
-      pixels: { height: 1350, width: 1080 },
-      orientation: { rows: 1, columns: 1 },
-      down: { row: 0, start: 0, columns: 1 },
+      INIT_POSITION: { x: Math.round(width * 0.72), y: Math.round(height * 0.55) },
+      pixels: { height: 768, width: 432 },
+      orientation: { rows: 4, columns: 3 },
+      down:      { row: 0, start: 0, columns: 3 },
+      left:      { row: 1, start: 0, columns: 3 },
+      right:     { row: 2, start: 0, columns: 3 },
+      up:        { row: 3, start: 0, columns: 3 },
+      downRight: { row: 2, start: 0, columns: 3 },
+      downLeft:  { row: 1, start: 0, columns: 3 },
+      upRight:   { row: 2, start: 0, columns: 3 },
+      upLeft:    { row: 1, start: 0, columns: 3 },
       hitbox: { widthPercentage: 0.6, heightPercentage: 0.6 },
       dialogues: ['LeBron is in the gym.'],
       reaction: function () {
-        if (this.dialogueSystem) {
-          this.showReactionDialogue();
-        }
+        if (this.dialogueSystem) this.showReactionDialogue();
       },
       interact: function () {
-        if (this.dialogueSystem) {
-          this.showRandomDialogue();
-        }
+        if (this.dialogueSystem) this.showRandomDialogue();
       }
     };
 
@@ -71,6 +74,31 @@ class GameLevelBasketball {
       { class: Player, data: sprite_data_player },
       { class: Npc, data: sprite_data_lebron }
     ];
+  }
+
+  update() {
+    const player = this.findById('BasketballPlayer');
+    const lebron = this.findById('LeBron');
+    if (!player || !lebron) return;
+
+    const dx = player.position.x - lebron.position.x;
+    const dy = player.position.y - lebron.position.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist < 1) return;
+
+    const speed = 1.7;
+    lebron.position.x += (dx / dist) * speed;
+    lebron.position.y += (dy / dist) * speed;
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+      lebron.direction = dx >= 0 ? 'right' : 'left';
+    } else {
+      lebron.direction = dy >= 0 ? 'down' : 'up';
+    }
+  }
+
+  findById(id) {
+    return this.gameEnv.gameObjects.find((obj) => obj?.spriteData?.id === id) || null;
   }
 }
 
