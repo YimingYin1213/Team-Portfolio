@@ -73,19 +73,84 @@ class GameLevelAquaticGameLevel {
             reaction: function() {},
             interact: function() {
                 if (!this.dialogueSystem) return;
+                const q1 = questState.firstQuest;
+                const q2 = questState.secondQuest;
 
-                const clearDialogueActionButtons = () => {
-                    const dialogueBox = this.dialogueSystem?.dialogueBox;
-                    if (!dialogueBox) return;
+                if (q2.pendingSlimeCompletion) {
+                    this.dialogueSystem.showDialogue(
+                        "You've saved the ocean, you may go onto the lands now!",
+                        'Slime',
+                        null
+                    );
+                    clearDialogueActionButtons(this.dialogueSystem);
+                    this.dialogueSystem.addButtons([
+                        {
+                            text: 'Complete Level',
+                            primary: true,
+                            action: () => {
+                                q2.pendingSlimeCompletion = false;
+                                updateQuestHud();
+                                const gameControl = this.gameEnv?.gameControl;
+                                const level = gameControl?.currentLevel;
+                                if (level) {
+                                    level.levelCompleted = true;
+                                    level.continue = false;
+                                }
+                            }
+                        },
+                        {
+                            text: 'Close',
+                            action: () => this.dialogueSystem.closeDialogue()
+                        }
+                    ]);
+                    return;
+                }
 
-                    const avatarElement = document.getElementById(`dialogue-avatar-${this.dialogueSystem.id}`);
-                    const buttonContainers = dialogueBox.querySelectorAll('div[style*="display: flex"]');
+                if (q1.completed && !q2.accepted) {
+                    this.dialogueSystem.showDialogue(
+                        'The upper sea is full of plastics and drifting garbage. Will you take Aquatic Quest #2 and clean it?',
+                        'Slime',
+                        null
+                    );
+                    clearDialogueActionButtons(this.dialogueSystem);
+                    this.dialogueSystem.addButtons([
+                        {
+                            text: 'Accept Quest #2',
+                            primary: true,
+                            action: async () => {
+                                q2.offered = true;
+                                q2.accepted = true;
+                                q2.collected = 0;
+                                this.dialogueSystem.closeDialogue();
+                                updateQuestHud();
+                                await transitionToSurface();
+                            }
+                        },
+                        {
+                            text: 'Later',
+                            action: () => this.dialogueSystem.closeDialogue()
+                        }
+                    ]);
+                    return;
+                }
 
-                    buttonContainers.forEach((container) => {
-                        if (avatarElement && container.contains(avatarElement)) return;
-                        container.remove();
-                    });
-                };
+                if (q2.accepted && q2.inSurface) {
+                    this.dialogueSystem.showDialogue(
+                        'Keep collecting every piece of floating trash above the water!',
+                        'Slime',
+                        null
+                    );
+                    return;
+                }
+
+                if (q2.accepted && !q2.completed) {
+                    this.dialogueSystem.showDialogue(
+                        'The surface still needs cleaning. Finish removing every trash item.',
+                        'Slime',
+                        null
+                    );
+                    return;
+                }
 
                 const showStoryStep = (step) => {
                     if (step === 0) {
@@ -94,7 +159,7 @@ class GameLevelAquaticGameLevel {
                             'Slime',
                             null
                         );
-                        clearDialogueActionButtons();
+                        clearDialogueActionButtons(this.dialogueSystem);
                         this.dialogueSystem.addButtons([
                             {
                                 text: 'Continue',
@@ -111,7 +176,7 @@ class GameLevelAquaticGameLevel {
                             'Slime',
                             null
                         );
-                        clearDialogueActionButtons();
+                        clearDialogueActionButtons(this.dialogueSystem);
                         this.dialogueSystem.addButtons([
                             {
                                 text: 'Continue',
@@ -127,7 +192,7 @@ class GameLevelAquaticGameLevel {
                         'Slime',
                         null
                     );
-                    clearDialogueActionButtons();
+                    clearDialogueActionButtons(this.dialogueSystem);
                     this.dialogueSystem.addButtons([
                         {
                             text: 'Close',
@@ -142,7 +207,7 @@ class GameLevelAquaticGameLevel {
                     'Slime',
                     null
                 );
-                clearDialogueActionButtons();
+                clearDialogueActionButtons(this.dialogueSystem);
 
                 this.dialogueSystem.addButtons([
                     {
@@ -159,11 +224,983 @@ class GameLevelAquaticGameLevel {
         };
 
         const questState = {
-            accepted: false,
-            started: false,
-            starfishTotal: 8,
-            collected: 0
+            firstQuest: {
+                accepted: false,
+                started: false,
+                completed: false,
+                starfishTotal: 8,
+                collected: 0
+            },
+            secondQuest: {
+                offered: false,
+                accepted: false,
+                started: false,
+                inSurface: false,
+                returning: false,
+                completed: false,
+                pendingSlimeCompletion: false,
+                trashTotal: 12,
+                collected: 0
+            }
         };
+
+        const modeParam = new URLSearchParams(window.location.search).get('mode');
+        this.gameMode = modeParam === 'challenge' ? 'challenge' : 'story';
+
+        const challengeState = {
+            wave: 1,
+            waveTarget: 14,
+            collectedThisWave: 0,
+            score: 0,
+            lastSavedScore: 0,
+            leaderboardKey: 'aquatic_challenge_leaderboard_v1'
+        };
+
+        this.questState = questState;
+        this.challengeState = challengeState;
+        this.levelCompleted = false;
+        this.playerLock = false;
+        this.surfaceTrashIds = [];
+        this.challengeStarfishIds = [];
+
+        const getPlayer = () => this.gameEnv?.gameObjects?.find(
+            obj => obj?.spriteData?.id === 'playerData'
+        );
+
+        const clearDialogueActionButtons = (dialogueSystem) => {
+            if (!dialogueSystem?.dialogueBox) return;
+
+            const dialogueBox = dialogueSystem.dialogueBox;
+            const avatarElement = document.getElementById(`dialogue-avatar-${dialogueSystem.id}`);
+            const buttonContainers = dialogueBox.querySelectorAll('div[style*="display: flex"]');
+
+            buttonContainers.forEach((container) => {
+                if (avatarElement && container.contains(avatarElement)) return;
+                container.remove();
+            });
+        };
+
+        const updateQuestHud = () => {
+            if (this.gameMode === 'challenge') return;
+
+            const hud = document.getElementById('aquatic-quest-hud');
+            if (!hud) return;
+
+            const title = document.getElementById('aquatic-quest-hud-title');
+            const progress = document.getElementById('aquatic-quest-hud-progress');
+            const status = document.getElementById('aquatic-quest-hud-status');
+
+            const q1 = questState.firstQuest;
+            const q2 = questState.secondQuest;
+
+            if (!q1.accepted) {
+                title.textContent = 'Quest Progress';
+                progress.textContent = 'Starfish: 0 / ' + q1.starfishTotal;
+                status.textContent = 'Talk to Mermaid to begin.';
+                return;
+            }
+
+            if (!q1.completed) {
+                title.textContent = 'Quest Progress';
+                progress.textContent = 'Starfish: ' + q1.collected + ' / ' + q1.starfishTotal;
+                status.textContent = q1.collected >= q1.starfishTotal
+                    ? 'Return to Mermaid for turn-in.'
+                    : 'Quest #1: Collect all starfishes.';
+                return;
+            }
+
+            if (!q2.accepted) {
+                title.textContent = 'Quest Progress';
+                progress.textContent = 'Starfish: ' + q1.collected + ' / ' + q1.starfishTotal;
+                status.textContent = 'Quest #1 complete. Talk to Slime for quest #2.';
+                return;
+            }
+
+            title.textContent = 'Ocean Recovery Tracker';
+            progress.textContent = 'Trash Removed: ' + q2.collected + ' / ' + q2.trashTotal;
+            status.textContent = q2.pendingSlimeCompletion
+                ? 'Return to Slime to finish level.'
+                : (q2.inSurface ? 'Quest #2 active above water.' : 'Quest #2 in progress.');
+        };
+
+        const ensureQuestHud = () => {
+            if (this.gameMode === 'challenge') return;
+
+            const existing = document.getElementById('aquatic-quest-hud');
+            if (existing) {
+                updateQuestHud();
+                return;
+            }
+
+            const hud = document.createElement('div');
+            hud.id = 'aquatic-quest-hud';
+            Object.assign(hud.style, {
+                position: 'fixed',
+                top: '14px',
+                left: '14px',
+                zIndex: '10020',
+                minWidth: '290px',
+                maxWidth: 'min(92vw, 420px)',
+                padding: '14px 16px',
+                borderRadius: '14px',
+                color: '#e9fbff',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                background: 'linear-gradient(160deg, rgba(8, 45, 72, 0.92), rgba(3, 16, 34, 0.92))',
+                border: '2px solid rgba(126, 219, 255, 0.72)',
+                boxShadow: '0 8px 24px rgba(16, 132, 181, 0.38)'
+            });
+
+            const title = document.createElement('div');
+            title.id = 'aquatic-quest-hud-title';
+            Object.assign(title.style, {
+                fontSize: '11px',
+                color: '#86e6ff',
+                marginBottom: '8px'
+            });
+
+            const progress = document.createElement('div');
+            progress.id = 'aquatic-quest-hud-progress';
+            Object.assign(progress.style, {
+                fontSize: '12px',
+                marginBottom: '8px',
+                lineHeight: '1.4'
+            });
+
+            const status = document.createElement('div');
+            status.id = 'aquatic-quest-hud-status';
+            Object.assign(status.style, {
+                fontSize: '10px',
+                color: '#b8f2ff',
+                lineHeight: '1.5'
+            });
+
+            hud.appendChild(title);
+            hud.appendChild(progress);
+            hud.appendChild(status);
+            document.body.appendChild(hud);
+
+            updateQuestHud();
+        };
+
+        const loadChallengeLeaderboard = () => {
+            try {
+                const raw = localStorage.getItem(challengeState.leaderboardKey);
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (err) {
+                return [];
+            }
+        };
+
+        const saveChallengeLeaderboard = (scores) => {
+            try {
+                localStorage.setItem(challengeState.leaderboardKey, JSON.stringify(scores));
+            } catch (err) {
+                return;
+            }
+        };
+
+        const renderChallengeLeaderboard = () => {
+            const list = document.getElementById('aquatic-challenge-list');
+            if (!list) return;
+
+            const scores = loadChallengeLeaderboard();
+            list.innerHTML = '';
+
+            if (!scores.length) {
+                const li = document.createElement('li');
+                li.textContent = 'No saved scores yet.';
+                li.style.opacity = '0.85';
+                list.appendChild(li);
+                return;
+            }
+
+            scores.slice(0, 8).forEach((entry) => {
+                const li = document.createElement('li');
+                const dateText = entry.date ? new Date(entry.date).toLocaleDateString() : 'today';
+                li.textContent = `${entry.name}: ${entry.score} (${dateText})`;
+                li.style.marginBottom = '6px';
+                list.appendChild(li);
+            });
+        };
+
+        const updateChallengeHud = () => {
+            if (this.gameMode !== 'challenge') return;
+            const score = document.getElementById('aquatic-challenge-score');
+            const wave = document.getElementById('aquatic-challenge-wave');
+            const progress = document.getElementById('aquatic-challenge-progress');
+            if (!score || !wave || !progress) return;
+
+            score.textContent = `Score: ${challengeState.score}`;
+            wave.textContent = `Wave: ${challengeState.wave}`;
+            progress.textContent = `Collected: ${challengeState.collectedThisWave} / ${challengeState.waveTarget}`;
+        };
+
+        const showTopMenuNotice = (message) => {
+            const existing = document.getElementById('aquatic-top-menu-notice');
+            if (existing) existing.remove();
+
+            const note = document.createElement('div');
+            note.id = 'aquatic-top-menu-notice';
+            note.textContent = message;
+            Object.assign(note.style, {
+                position: 'fixed',
+                top: '64px',
+                right: '14px',
+                zIndex: '10051',
+                maxWidth: 'min(88vw, 360px)',
+                padding: '10px 12px',
+                borderRadius: '10px',
+                border: '1px solid rgba(138, 214, 249, 0.8)',
+                background: 'rgba(2, 24, 45, 0.92)',
+                color: '#d7f5ff',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                fontSize: '10px',
+                lineHeight: '1.5',
+                boxShadow: '0 8px 18px rgba(0, 0, 0, 0.35)',
+                opacity: '0',
+                transition: 'opacity 180ms ease'
+            });
+
+            document.body.appendChild(note);
+            requestAnimationFrame(() => {
+                note.style.opacity = '1';
+            });
+
+            setTimeout(() => {
+                note.style.opacity = '0';
+                setTimeout(() => note.remove(), 200);
+            }, 1700);
+        };
+
+        const saveCurrentChallengeScore = () => {
+            if (challengeState.score <= challengeState.lastSavedScore) return;
+
+            const input = document.getElementById('aquatic-challenge-name');
+            const playerName = (input?.value || '').trim() || 'Diver';
+            const scores = loadChallengeLeaderboard();
+            scores.push({
+                name: playerName.slice(0, 16),
+                score: challengeState.score,
+                date: new Date().toISOString()
+            });
+            scores.sort((a, b) => b.score - a.score);
+            saveChallengeLeaderboard(scores.slice(0, 20));
+            challengeState.lastSavedScore = challengeState.score;
+            renderChallengeLeaderboard();
+        };
+
+        const toggleChallengeLeaderboard = () => {
+            if (this.gameMode !== 'challenge') {
+                showTopMenuNotice('Leaderboard is available in Challenge mode.');
+                return;
+            }
+
+            const hud = document.getElementById('aquatic-challenge-hud');
+            if (!hud) {
+                ensureChallengeHud();
+                showTopMenuNotice('Leaderboard opened.');
+                return;
+            }
+
+            const isHidden = hud.style.display === 'none';
+            hud.style.display = isHidden ? 'block' : 'none';
+            showTopMenuNotice(isHidden ? 'Leaderboard opened.' : 'Leaderboard hidden.');
+        };
+
+        const switchToChallengeMode = () => {
+            if (this.gameMode === 'challenge') {
+                showTopMenuNotice('Already in Challenge mode.');
+                return;
+            }
+
+            const nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.set('mode', 'challenge');
+            window.location.href = nextUrl.toString();
+        };
+
+        const switchToStoryMode = () => {
+            if (this.gameMode === 'story') {
+                showTopMenuNotice('Already in Story mode.');
+                return;
+            }
+
+            const nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.set('mode', 'story');
+            window.location.href = nextUrl.toString();
+        };
+
+        const clearChallengeStarfish = () => {
+            this.challengeStarfishIds.forEach((id) => {
+                const obj = this.gameEnv?.gameObjects?.find((item) => item?.spriteData?.id === id);
+                if (obj?.destroy) obj.destroy();
+            });
+            this.challengeStarfishIds = [];
+        };
+
+        const showChallengeWaveComplete = () => {
+            const existing = document.getElementById('aquatic-challenge-wave-complete');
+            if (existing) existing.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = 'aquatic-challenge-wave-complete';
+            Object.assign(overlay.style, {
+                position: 'fixed',
+                inset: '0',
+                background: 'rgba(2, 10, 25, 0.72)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: '10021'
+            });
+
+            const panel = document.createElement('div');
+            Object.assign(panel.style, {
+                width: 'min(500px, 92vw)',
+                padding: '22px',
+                borderRadius: '16px',
+                border: '2px solid rgba(130, 220, 255, 0.85)',
+                background: 'linear-gradient(180deg, rgba(9,50,80,0.95), rgba(4,20,40,0.95))',
+                color: '#e6fbff',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                textAlign: 'center'
+            });
+
+            const title = document.createElement('div');
+            title.textContent = 'Wave Cleared';
+            title.style.fontSize = '16px';
+            title.style.marginBottom = '12px';
+
+            const body = document.createElement('div');
+            body.textContent = `Current score: ${challengeState.score}`;
+            body.style.fontSize = '11px';
+            body.style.marginBottom = '16px';
+
+            const next = document.createElement('button');
+            next.textContent = 'Next Wave';
+            Object.assign(next.style, {
+                width: '100%',
+                padding: '10px',
+                borderRadius: '10px',
+                border: 'none',
+                marginBottom: '10px',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                fontSize: '11px',
+                background: 'linear-gradient(90deg, #35b9ff, #5cf0ff)',
+                color: '#032030',
+                cursor: 'pointer'
+            });
+
+            const save = document.createElement('button');
+            save.textContent = 'Save Score';
+            Object.assign(save.style, {
+                width: '100%',
+                padding: '10px',
+                borderRadius: '10px',
+                border: '1px solid rgba(156, 220, 255, 0.8)',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                fontSize: '11px',
+                background: 'rgba(6, 40, 67, 0.8)',
+                color: '#c6f3ff',
+                cursor: 'pointer'
+            });
+
+            next.onclick = () => {
+                overlay.remove();
+                challengeState.wave += 1;
+                challengeState.waveTarget += 2;
+                challengeState.collectedThisWave = 0;
+                startChallengeWave();
+                updateChallengeHud();
+            };
+
+            save.onclick = () => {
+                saveCurrentChallengeScore();
+            };
+
+            panel.appendChild(title);
+            panel.appendChild(body);
+            panel.appendChild(next);
+            panel.appendChild(save);
+            overlay.appendChild(panel);
+            document.body.appendChild(overlay);
+        };
+
+        const ensureChallengeHud = () => {
+            if (this.gameMode !== 'challenge') return;
+
+            const existing = document.getElementById('aquatic-challenge-hud');
+            if (existing) {
+                updateChallengeHud();
+                renderChallengeLeaderboard();
+                return;
+            }
+
+            const hud = document.createElement('div');
+            hud.id = 'aquatic-challenge-hud';
+            Object.assign(hud.style, {
+                position: 'fixed',
+                top: '14px',
+                left: '14px',
+                zIndex: '10020',
+                minWidth: '320px',
+                maxWidth: 'min(92vw, 420px)',
+                padding: '14px 16px',
+                borderRadius: '14px',
+                color: '#e9fbff',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                background: 'linear-gradient(160deg, rgba(8, 45, 72, 0.94), rgba(3, 16, 34, 0.94))',
+                border: '2px solid rgba(126, 219, 255, 0.75)',
+                boxShadow: '0 8px 24px rgba(16, 132, 181, 0.38)'
+            });
+
+            const title = document.createElement('div');
+            title.textContent = 'Challenge Leaderboard';
+            title.style.fontSize = '11px';
+            title.style.color = '#86e6ff';
+            title.style.marginBottom = '8px';
+
+            const score = document.createElement('div');
+            score.id = 'aquatic-challenge-score';
+            score.style.fontSize = '12px';
+            score.style.marginBottom = '6px';
+
+            const wave = document.createElement('div');
+            wave.id = 'aquatic-challenge-wave';
+            wave.style.fontSize = '10px';
+            wave.style.marginBottom = '6px';
+
+            const progress = document.createElement('div');
+            progress.id = 'aquatic-challenge-progress';
+            progress.style.fontSize = '10px';
+            progress.style.marginBottom = '10px';
+
+            const name = document.createElement('input');
+            name.id = 'aquatic-challenge-name';
+            name.placeholder = 'Player name';
+            Object.assign(name.style, {
+                width: '100%',
+                marginBottom: '8px',
+                padding: '8px',
+                borderRadius: '8px',
+                border: '1px solid rgba(138, 214, 249, 0.8)',
+                background: 'rgba(1, 24, 44, 0.7)',
+                color: '#d8f7ff',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                fontSize: '10px'
+            });
+
+            const saveBtn = document.createElement('button');
+            saveBtn.textContent = 'Save Score';
+            Object.assign(saveBtn.style, {
+                width: '100%',
+                marginBottom: '8px',
+                padding: '10px',
+                borderRadius: '10px',
+                border: 'none',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                fontSize: '10px',
+                background: 'linear-gradient(90deg, #35b9ff, #5cf0ff)',
+                color: '#032030',
+                cursor: 'pointer'
+            });
+            saveBtn.onclick = () => saveCurrentChallengeScore();
+
+            const clearBtn = document.createElement('button');
+            clearBtn.textContent = 'Clear Leaderboard';
+            Object.assign(clearBtn.style, {
+                width: '100%',
+                marginBottom: '10px',
+                padding: '8px',
+                borderRadius: '10px',
+                border: '1px solid rgba(138, 214, 249, 0.8)',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                fontSize: '10px',
+                background: 'rgba(2, 27, 50, 0.7)',
+                color: '#c6f3ff',
+                cursor: 'pointer'
+            });
+            clearBtn.onclick = () => {
+                saveChallengeLeaderboard([]);
+                renderChallengeLeaderboard();
+            };
+
+            const list = document.createElement('ol');
+            list.id = 'aquatic-challenge-list';
+            Object.assign(list.style, {
+                margin: '0',
+                paddingLeft: '18px',
+                fontSize: '10px',
+                lineHeight: '1.6',
+                maxHeight: '170px',
+                overflowY: 'auto'
+            });
+
+            hud.appendChild(title);
+            hud.appendChild(score);
+            hud.appendChild(wave);
+            hud.appendChild(progress);
+            hud.appendChild(name);
+            hud.appendChild(saveBtn);
+            hud.appendChild(clearBtn);
+            hud.appendChild(list);
+            document.body.appendChild(hud);
+
+            updateChallengeHud();
+            renderChallengeLeaderboard();
+        };
+
+        const ensureTopMenuBar = () => {
+            const existing = document.getElementById('aquatic-top-menubar');
+            if (existing) return;
+
+            const bar = document.createElement('div');
+            bar.id = 'aquatic-top-menubar';
+            Object.assign(bar.style, {
+                position: 'fixed',
+                top: '12px',
+                right: '14px',
+                zIndex: '10050',
+                display: 'flex',
+                gap: '8px',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                justifyContent: 'flex-end',
+                maxWidth: 'min(95vw, 560px)',
+                padding: '8px',
+                borderRadius: '12px',
+                border: '1px solid rgba(130, 220, 255, 0.6)',
+                background: 'rgba(1, 20, 40, 0.82)',
+                backdropFilter: 'blur(4px)'
+            });
+
+            const createButton = (label, isPrimary = false) => {
+                const btn = document.createElement('button');
+                btn.textContent = label;
+                Object.assign(btn.style, {
+                    padding: '8px 10px',
+                    borderRadius: '9px',
+                    border: isPrimary ? 'none' : '1px solid rgba(138, 214, 249, 0.75)',
+                    background: isPrimary
+                        ? 'linear-gradient(90deg, #35b9ff, #5cf0ff)'
+                        : 'rgba(6, 40, 67, 0.82)',
+                    color: isPrimary ? '#032030' : '#c7f3ff',
+                    fontFamily: "'Press Start 2P', cursive, monospace",
+                    fontSize: '9px',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                });
+                return btn;
+            };
+
+            const toggleLeaderboardBtn = createButton('Toggle Leaderboard');
+            toggleLeaderboardBtn.onclick = () => toggleChallengeLeaderboard();
+
+            const saveScoreBtn = createButton('Save Score');
+            saveScoreBtn.onclick = () => {
+                if (this.gameMode !== 'challenge') {
+                    showTopMenuNotice('Score saving is available in Challenge mode.');
+                    return;
+                }
+                const before = challengeState.lastSavedScore;
+                saveCurrentChallengeScore();
+                showTopMenuNotice(
+                    challengeState.lastSavedScore > before
+                        ? 'Score saved to leaderboard.'
+                        : 'No new score to save yet.'
+                );
+            };
+
+            const switchStoryBtn = createButton('Story Mode');
+            switchStoryBtn.onclick = () => switchToStoryMode();
+
+            const switchChallengeBtn = createButton('Challenge Mode', true);
+            switchChallengeBtn.onclick = () => switchToChallengeMode();
+
+            if (this.gameMode === 'challenge') {
+                switchChallengeBtn.textContent = 'Challenge Active';
+                switchChallengeBtn.style.opacity = '0.78';
+                switchStoryBtn.style.opacity = '1';
+            } else {
+                switchStoryBtn.textContent = 'Story Active';
+                switchStoryBtn.style.opacity = '0.78';
+            }
+
+            bar.appendChild(toggleLeaderboardBtn);
+            bar.appendChild(saveScoreBtn);
+            bar.appendChild(switchStoryBtn);
+            bar.appendChild(switchChallengeBtn);
+            document.body.appendChild(bar);
+        };
+
+        const startChallengeWave = () => {
+            if (this.gameMode !== 'challenge') return;
+            clearChallengeStarfish();
+            spawnStarfish(challengeState.waveTarget, true);
+            updateChallengeHud();
+        };
+
+        const setBackground = (src) => {
+            const backgroundObject = this.gameEnv?.gameObjects?.find(
+                obj => obj?.constructor?.name === 'GameEnvBackground'
+            );
+            if (!backgroundObject) return;
+
+            if (!backgroundObject.image) backgroundObject.image = new Image();
+            backgroundObject.image.src = src;
+        };
+
+        const transitionOverlay = (label) => {
+            const existing = document.getElementById('aquatic-transition-overlay');
+            if (existing) existing.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = 'aquatic-transition-overlay';
+            Object.assign(overlay.style, {
+                position: 'fixed',
+                inset: '0',
+                background: 'radial-gradient(circle at center, rgba(167, 241, 255, 0.18), rgba(1, 8, 18, 0.88))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: '10030',
+                opacity: '0',
+                transition: 'opacity 320ms ease'
+            });
+
+            const text = document.createElement('div');
+            text.textContent = label;
+            Object.assign(text.style, {
+                color: '#cbf6ff',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                fontSize: '12px',
+                textAlign: 'center',
+                textShadow: '0 0 10px rgba(148, 245, 255, 0.9)'
+            });
+
+            overlay.appendChild(text);
+            document.body.appendChild(overlay);
+
+            requestAnimationFrame(() => {
+                overlay.style.opacity = '1';
+            });
+
+            return overlay;
+        };
+
+        const animatePlayerSwim = (targetY) => {
+            const player = getPlayer();
+            if (!player) return Promise.resolve();
+
+            this.playerLock = true;
+            player.velocity.x = 0;
+            player.velocity.y = 0;
+            player.pressedKeys = {};
+            player.direction = targetY < player.position.y ? 'up' : 'down';
+
+            return new Promise((resolve) => {
+                const step = () => {
+                    const current = player.position.y;
+                    const delta = targetY - current;
+                    if (Math.abs(delta) <= 2) {
+                        player.position.y = targetY;
+                        resolve();
+                        return;
+                    }
+
+                    player.position.y += Math.sign(delta) * 5;
+                    requestAnimationFrame(step);
+                };
+                requestAnimationFrame(step);
+            });
+        };
+
+        const createDetailedTrashSprites = () => {
+            const makeCanvas = () => {
+                const c = document.createElement('canvas');
+                c.width = 72;
+                c.height = 72;
+                return c;
+            };
+
+            const toDataUrl = (drawFn) => {
+                const c = makeCanvas();
+                const ctx = c.getContext('2d');
+                drawFn(ctx, c.width, c.height);
+                return c.toDataURL();
+            };
+
+            const bottle = toDataUrl((ctx, w, h) => {
+                ctx.clearRect(0, 0, w, h);
+                ctx.fillStyle = 'rgba(207, 240, 252, 0.88)';
+                ctx.strokeStyle = 'rgba(120, 189, 216, 0.95)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.roundRect(24, 14, 22, 10, 3);
+                ctx.fill();
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.roundRect(20, 22, 30, 34, 7);
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = 'rgba(56, 150, 210, 0.85)';
+                ctx.fillRect(23, 35, 24, 8);
+                ctx.fillStyle = 'rgba(235, 249, 255, 0.4)';
+                ctx.fillRect(24, 25, 5, 24);
+            });
+
+            const can = toDataUrl((ctx, w, h) => {
+                ctx.clearRect(0, 0, w, h);
+                const grd = ctx.createLinearGradient(0, 20, 0, 58);
+                grd.addColorStop(0, '#cfd7de');
+                grd.addColorStop(0.5, '#9ca8b1');
+                grd.addColorStop(1, '#7d8a95');
+                ctx.fillStyle = grd;
+                ctx.strokeStyle = '#5c6872';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.roundRect(18, 18, 36, 38, 8);
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = '#dce3e8';
+                ctx.beginPath();
+                ctx.ellipse(36, 18, 18, 5, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#f15b5b';
+                ctx.fillRect(22, 30, 28, 10);
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(24, 33, 24, 2);
+            });
+
+            const bag = toDataUrl((ctx, w, h) => {
+                ctx.clearRect(0, 0, w, h);
+                ctx.fillStyle = 'rgba(245, 245, 245, 0.85)';
+                ctx.strokeStyle = 'rgba(146, 164, 176, 0.95)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(18, 22);
+                ctx.quadraticCurveTo(16, 9, 28, 11);
+                ctx.quadraticCurveTo(36, 15, 44, 11);
+                ctx.quadraticCurveTo(56, 9, 54, 22);
+                ctx.lineTo(50, 54);
+                ctx.quadraticCurveTo(36, 62, 22, 54);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = 'rgba(99, 124, 142, 0.35)';
+                ctx.fillRect(24, 32, 24, 12);
+            });
+
+            const sixPackRing = toDataUrl((ctx, w, h) => {
+                ctx.clearRect(0, 0, w, h);
+                ctx.strokeStyle = 'rgba(245, 240, 225, 0.95)';
+                ctx.lineWidth = 4;
+                const centers = [
+                    [24, 25], [36, 25], [48, 25],
+                    [24, 39], [36, 39], [48, 39]
+                ];
+                centers.forEach(([x, y]) => {
+                    ctx.beginPath();
+                    ctx.arc(x, y, 8, 0, Math.PI * 2);
+                    ctx.stroke();
+                });
+            });
+
+            const carton = toDataUrl((ctx, w, h) => {
+                ctx.clearRect(0, 0, w, h);
+                ctx.fillStyle = '#d6a066';
+                ctx.strokeStyle = '#8e6338';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.roundRect(19, 18, 34, 36, 4);
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = '#be7f41';
+                ctx.fillRect(19, 32, 34, 8);
+                ctx.fillStyle = '#f4d7b6';
+                ctx.fillRect(23, 23, 12, 6);
+                ctx.fillRect(37, 23, 12, 6);
+            });
+
+            return [bottle, can, bag, sixPackRing, carton];
+        };
+
+        const trashSprites = createDetailedTrashSprites();
+
+        const setWorldNpcVisibility = (visible) => {
+            const ids = ['Mermaid', 'Random Slime', 'Shark'];
+            (this.gameEnv?.gameObjects || []).forEach((obj) => {
+                if (!obj?.spriteData?.id || !ids.includes(obj.spriteData.id) || !obj.canvas) return;
+                obj.canvas.style.display = visible ? 'block' : 'none';
+            });
+        };
+
+        const spawnSurfaceTrash = () => {
+            if (questState.secondQuest.inSurface === false) return;
+
+            const padding = 80;
+            const positions = [];
+            const count = questState.secondQuest.trashTotal;
+            const maxX = Math.max(padding + 1, width - padding);
+            const maxY = Math.max(100, height - 90);
+            let attempts = 0;
+
+            while (positions.length < count && attempts < 600) {
+                attempts += 1;
+                const x = Math.floor(Math.random() * (maxX - padding) + padding);
+                const y = Math.floor(Math.random() * (maxY - 90) + 90);
+                const tooClose = positions.some((p) => Math.hypot(p.x - x, p.y - y) < 64);
+                if (!tooClose) positions.push({ x, y });
+            }
+
+            positions.forEach((pos, i) => {
+                const trashData = {
+                    id: `surface_trash_${i}`,
+                    src: trashSprites[i % trashSprites.length],
+                    SCALE_FACTOR: 18,
+                    STEP_FACTOR: 0,
+                    ANIMATION_RATE: 1,
+                    INIT_POSITION: { x: pos.x, y: pos.y },
+                    pixels: { height: 72, width: 72 },
+                    orientation: { rows: 1, columns: 1 },
+                    hitbox: { widthPercentage: 0.38, heightPercentage: 0.38 },
+                    greeting: 'Trash removed from the ocean surface!',
+                    dialogues: ['Trash removed from the ocean surface!'],
+                    reaction: function() {},
+                    showReactionDialogue: function() {
+                        if (typeof this.showItemMessage === 'function') {
+                            this.showItemMessage();
+                        }
+                    },
+                    interact: function() {
+                        if (questState.secondQuest.completed) {
+                            this.destroy();
+                            return;
+                        }
+                        questState.secondQuest.collected += 1;
+                        updateQuestHud();
+                        if (questState.secondQuest.collected >= questState.secondQuest.trashTotal) {
+                            transitionBackUnderwater();
+                        }
+                        this.destroy();
+                    }
+                };
+
+                const trash = new Collectible(trashData, gameEnv);
+                const baseX = pos.x;
+                const baseY = pos.y;
+                const phase = Math.random() * Math.PI * 2;
+                const driftDir = Math.random() > 0.5 ? 1 : -1;
+                const driftSpeed = 0.18 + Math.random() * 0.26;
+                const bobAmplitude = 4 + Math.random() * 4;
+                const rotateAmplitude = 6 + Math.random() * 8;
+                const originalUpdate = trash.update.bind(trash);
+
+                trash.update = function() {
+                    originalUpdate();
+
+                    const t = performance.now() * 0.0018 + phase;
+                    const bob = Math.sin(t * 2.1) * bobAmplitude;
+                    const drift = Math.sin(t * 0.55) * 26 * driftDir;
+                    const rotation = Math.sin(t * 1.7) * rotateAmplitude;
+
+                    this.position.x = baseX + drift * driftSpeed;
+                    this.position.y = baseY + bob;
+
+                    if (this.canvas) {
+                        this.canvas.style.transformOrigin = 'center center';
+                        this.canvas.style.transform = `rotate(${rotation}deg)`;
+                        this.canvas.style.filter = 'drop-shadow(0 6px 4px rgba(0,0,0,0.25))';
+                    }
+                };
+
+                this.surfaceTrashIds.push(trashData.id);
+                gameEnv.gameObjects.push(trash);
+            });
+        };
+
+        const clearSurfaceTrash = () => {
+            this.surfaceTrashIds.forEach((id) => {
+                const obj = this.gameEnv?.gameObjects?.find((item) => item?.spriteData?.id === id);
+                if (obj?.destroy) obj.destroy();
+            });
+            this.surfaceTrashIds = [];
+        };
+
+        const transitionToSurface = async () => {
+            const q2 = questState.secondQuest;
+            if (q2.inSurface || q2.returning || q2.completed) return;
+
+            q2.started = true;
+            q2.inSurface = true;
+            updateQuestHud();
+
+            const overlay = transitionOverlay('Swimming to the surface...');
+            await animatePlayerSwim(14);
+            setBackground(path + '/images/gamebuilder/bg/Above the water.png');
+            setWorldNpcVisibility(false);
+
+            const player = getPlayer();
+            if (player) {
+                player.position.x = Math.min(this.gameEnv.innerWidth - player.width - 20, Math.max(20, player.position.x));
+                player.position.y = Math.max(80, this.gameEnv.innerHeight * 0.32);
+            }
+
+            spawnSurfaceTrash();
+            if (overlay) {
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.remove(), 350);
+            }
+            this.playerLock = false;
+            updateQuestHud();
+        };
+
+        const transitionBackUnderwater = async () => {
+            const q2 = questState.secondQuest;
+            if (!q2.inSurface || q2.returning || q2.completed) return;
+
+            q2.returning = true;
+            updateQuestHud();
+
+            const overlay = transitionOverlay('Diving back underwater...');
+            await animatePlayerSwim(12);
+
+            setBackground(path + '/images/gamebuilder/bg/Aquatic.png');
+            setWorldNpcVisibility(true);
+            clearSurfaceTrash();
+
+            const player = getPlayer();
+            if (player) {
+                player.position.x = 240;
+                player.position.y = 60;
+            }
+
+            await animatePlayerSwim(300);
+
+            q2.inSurface = false;
+            q2.returning = false;
+            q2.completed = true;
+            q2.pendingSlimeCompletion = true;
+            this.playerLock = false;
+
+            if (overlay) {
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.remove(), 350);
+            }
+
+            updateQuestHud();
+        };
+
+        this.updateQuestHud = updateQuestHud;
+        this.ensureQuestHud = ensureQuestHud;
+        this.ensureChallengeHud = ensureChallengeHud;
+        this.startChallengeWave = startChallengeWave;
+        this.saveCurrentChallengeScore = saveCurrentChallengeScore;
+        this.ensureTopMenuBar = ensureTopMenuBar;
+        this.toggleChallengeLeaderboard = toggleChallengeLeaderboard;
+        this.switchToChallengeMode = switchToChallengeMode;
+        this.clearSurfaceTrash = clearSurfaceTrash;
+        this.clearChallengeStarfish = clearChallengeStarfish;
 
         this.sharkGameOverShown = false;
 
@@ -209,15 +1246,33 @@ class GameLevelAquaticGameLevel {
             });
 
             const body = document.createElement('div');
-            body.textContent = "You've been eaten by shark. You can replay.";
+            body.textContent = this.gameMode === 'challenge'
+                ? `You've been eaten by shark. Final score: ${challengeState.score}.`
+                : "You've been eaten by shark. You can replay.";
             Object.assign(body.style, {
                 fontSize: '12px',
                 lineHeight: '1.6',
                 marginBottom: '20px'
             });
 
+            const save = document.createElement('button');
+            save.textContent = 'Save Score';
+            Object.assign(save.style, {
+                width: '100%',
+                padding: '12px 16px',
+                borderRadius: '12px',
+                border: '1px solid rgba(156, 220, 255, 0.8)',
+                marginBottom: '10px',
+                fontFamily: "'Press Start 2P', cursive, monospace",
+                fontSize: '12px',
+                background: 'rgba(6, 40, 67, 0.8)',
+                color: '#c6f3ff',
+                cursor: 'pointer',
+                display: this.gameMode === 'challenge' ? 'block' : 'none'
+            });
+
             const restart = document.createElement('button');
-            restart.textContent = 'Replay';
+            restart.textContent = this.gameMode === 'challenge' ? 'Replay Challenge' : 'Replay';
             Object.assign(restart.style, {
                 width: '100%',
                 padding: '12px 16px',
@@ -235,8 +1290,13 @@ class GameLevelAquaticGameLevel {
                 window.location.reload();
             };
 
+            save.onclick = () => {
+                saveCurrentChallengeScore();
+            };
+
             panel.appendChild(title);
             panel.appendChild(body);
+            if (this.gameMode === 'challenge') panel.appendChild(save);
             panel.appendChild(restart);
             overlay.appendChild(panel);
             document.body.appendChild(overlay);
@@ -291,12 +1351,22 @@ class GameLevelAquaticGameLevel {
             createPixelStarfish('#7bdff2', '#4fb6cc')
         ];
 
-        const spawnStarfish = () => {
-            if (questState.started) return;
-            questState.started = true;
+        const spawnStarfish = (countOverride, forceRespawn = false) => {
+            const q1 = questState.firstQuest;
+            const isChallengeMode = this.gameMode === 'challenge';
+
+            if (!isChallengeMode) {
+                if (q1.started && !forceRespawn) return;
+                q1.started = true;
+                updateQuestHud();
+            }
+
+            if (isChallengeMode) {
+                clearChallengeStarfish();
+            }
 
             const positions = [];
-            const count = questState.starfishTotal;
+            const count = countOverride || (isChallengeMode ? challengeState.waveTarget : q1.starfishTotal);
             const padding = 90;
             const minDist = 80;
             const minNpcDist = 140;
@@ -315,14 +1385,15 @@ class GameLevelAquaticGameLevel {
                 const y = Math.floor(Math.random() * (maxY - padding) + padding);
 
                 const tooClose = positions.some(p => Math.hypot(p.x - x, p.y - y) < minDist);
-                const tooCloseToNpc = npcPositions.some(npc => Math.hypot(npc.x - x, npc.y - y) < minNpcDist);
+                const tooCloseToNpc = !isChallengeMode && npcPositions.some(npc => Math.hypot(npc.x - x, npc.y - y) < minNpcDist);
 
                 if (!tooClose && !tooCloseToNpc) positions.push({ x, y });
             }
 
             positions.forEach((pos, i) => {
+                const itemId = isChallengeMode ? `challenge_starfish_${challengeState.wave}_${i}` : `starfish_${i}`;
                 const starfishData = {
-                    id: `starfish_${i}`,
+                    id: itemId,
                     src: starfishSprites[i % starfishSprites.length],
                     SCALE_FACTOR: 20,
                     STEP_FACTOR: 0,
@@ -341,7 +1412,18 @@ class GameLevelAquaticGameLevel {
                         }
                     },
                     interact: function() {
-                        questState.collected += 1;
+                        if (isChallengeMode) {
+                            challengeState.score += 1;
+                            challengeState.collectedThisWave += 1;
+                            updateChallengeHud();
+                            if (challengeState.collectedThisWave >= challengeState.waveTarget) {
+                                showChallengeWaveComplete();
+                            }
+                        } else {
+                            const q1State = questState.firstQuest;
+                            q1State.collected += 1;
+                            updateQuestHud();
+                        }
                         this.destroy();
                     }
                 };
@@ -377,6 +1459,7 @@ class GameLevelAquaticGameLevel {
                     }
                 };
 
+                if (isChallengeMode) this.challengeStarfishIds.push(itemId);
                 gameEnv.gameObjects.push(starfish);
             });
         };
@@ -427,7 +1510,7 @@ class GameLevelAquaticGameLevel {
             });
 
             const detail = document.createElement('div');
-            detail.textContent = `Starfishes to collect: ${questState.starfishTotal}`;
+            detail.textContent = `Starfishes to collect: ${questState.firstQuest.starfishTotal}`;
             Object.assign(detail.style, {
                 fontSize: '11px',
                 color: '#b9f0ff',
@@ -452,6 +1535,7 @@ class GameLevelAquaticGameLevel {
             confirm.onclick = () => {
                 overlay.remove();
                 spawnStarfish();
+                updateQuestHud();
             };
 
             panel.appendChild(title);
@@ -488,6 +1572,8 @@ class GameLevelAquaticGameLevel {
             reaction: function() {},
             interact: function() {
                 if (!this.dialogueSystem) return;
+                const q1 = questState.firstQuest;
+                const q2 = questState.secondQuest;
 
                 // Trigger second-row animation whenever interaction starts
                 this.direction = 'interactAnim';
@@ -500,22 +1586,36 @@ class GameLevelAquaticGameLevel {
                     this.direction = 'down';
                 }, 1200);
 
-                if (questState.accepted) {
-                    if (questState.collected >= questState.starfishTotal) {
+                if (q1.accepted) {
+                    if (q1.collected >= q1.starfishTotal && !q1.completed) {
+                        q1.completed = true;
+                        updateQuestHud();
                         this.dialogueSystem.showDialogue(
-                            "Thank you for finding them all! Our waters are safe again.",
+                            "Thank you for finding them all! The lower reef is recovering. Go tell Slime and ask about the next mission.",
                             'Mermaid',
                             null
                         );
-                        // End level after gratitude message
-                        setTimeout(() => {
-                            const gameControl = this.gameEnv?.gameControl;
-                            if (gameControl?.currentLevel) {
-                                gameControl.currentLevel.continue = false;
-                            }
-                        }, 500);
                         return;
                     }
+
+                    if (q1.completed && !q2.accepted) {
+                        this.dialogueSystem.showDialogue(
+                            'I can already feel the water clearing. Slime knows where the next danger is - talk to Slime for Aquatic Quest #2.',
+                            'Mermaid',
+                            null
+                        );
+                        return;
+                    }
+
+                    if (q2.accepted && !q2.completed) {
+                        this.dialogueSystem.showDialogue(
+                            'You are doing great. Clear the floating trash on the surface, then return to Slime.',
+                            'Mermaid',
+                            null
+                        );
+                        return;
+                    }
+
                     this.dialogueSystem.showDialogue('Please collect the starfishes scattered around the reef, and keep away from the shark.', 'Mermaid', null);
                     return;
                 }
@@ -525,15 +1625,17 @@ class GameLevelAquaticGameLevel {
                     'Mermaid',
                     null
                 );
+                clearDialogueActionButtons(this.dialogueSystem);
 
                 this.dialogueSystem.addButtons([
                     {
                         text: 'Accept',
                         primary: true,
                         action: () => {
-                            questState.accepted = true;
+                            q1.accepted = true;
                             this.dialogueSystem.closeDialogue();
                             showQuestWindow();
+                            updateQuestHud();
                         }
                     },
                     {
@@ -599,6 +1701,32 @@ class GameLevelAquaticGameLevel {
     }
 
     initialize() {
+        this.ensureTopMenuBar?.();
+
+        if (this.gameMode === 'challenge') {
+            this.ensureChallengeHud?.();
+        } else {
+            this.ensureQuestHud?.();
+        }
+
+        const player = this.gameEnv?.gameObjects?.find(
+            obj => obj?.spriteData?.id === 'playerData'
+        );
+        if (player && !player._aquaticLockWrapped) {
+            const originalUpdate = player.update.bind(player);
+            player.update = () => {
+                if (this.playerLock) {
+                    player.velocity.x = 0;
+                    player.velocity.y = 0;
+                    player.pressedKeys = {};
+                    player.draw();
+                    return;
+                }
+                originalUpdate();
+            };
+            player._aquaticLockWrapped = true;
+        }
+
         const mermaid = this.gameEnv?.gameObjects?.find(
             obj => obj?.spriteData?.id === 'Mermaid'
         );
@@ -622,6 +1750,26 @@ class GameLevelAquaticGameLevel {
                 this.canvas.style.top = `${this.gameEnv.top + this.position.y}px`;
                 this.canvas.style.zIndex = (this.data && this.data.zIndex !== undefined) ? this.data.zIndex : "10";
             };
+        }
+
+        if (this.gameMode === 'challenge') {
+            const mermaidNpc = this.gameEnv?.gameObjects?.find(
+                obj => obj?.spriteData?.id === 'Mermaid'
+            );
+            const slimeNpc = this.gameEnv?.gameObjects?.find(
+                obj => obj?.spriteData?.id === 'Random Slime'
+            );
+
+            [mermaidNpc, slimeNpc].forEach((npc) => {
+                if (!npc) return;
+                if (npc.canvas) npc.canvas.style.display = 'none';
+                npc.position.x = -10000;
+                npc.position.y = -10000;
+                npc.interact = function() {};
+                npc.reaction = function() {};
+            });
+
+            this.startChallengeWave?.();
         }
 
         const shark = this.gameEnv?.gameObjects?.find(
@@ -718,6 +1866,13 @@ class GameLevelAquaticGameLevel {
             };
 
             shark.update = () => {
+                const q2 = this.questState?.secondQuest;
+                if (this.levelCompleted || q2?.inSurface || q2?.returning || q2?.completed) {
+                    if (shark.canvas) shark.canvas.style.display = 'none';
+                    return;
+                }
+
+                if (shark.canvas) shark.canvas.style.display = 'block';
 
                 const now = performance.now();
                 if (now >= shark._motion.nextTurnAt) {
@@ -765,10 +1920,24 @@ class GameLevelAquaticGameLevel {
     }
 
     destroy() {
+        const topMenu = document.getElementById('aquatic-top-menubar');
+        if (topMenu) topMenu.remove();
+        const topMenuNotice = document.getElementById('aquatic-top-menu-notice');
+        if (topMenuNotice) topMenuNotice.remove();
         const gameOver = document.getElementById('aquatic-shark-gameover');
         if (gameOver) gameOver.remove();
         const quest = document.getElementById('aquatic-quest-window');
         if (quest) quest.remove();
+        const hud = document.getElementById('aquatic-quest-hud');
+        if (hud) hud.remove();
+        const challengeHud = document.getElementById('aquatic-challenge-hud');
+        if (challengeHud) challengeHud.remove();
+        const waveComplete = document.getElementById('aquatic-challenge-wave-complete');
+        if (waveComplete) waveComplete.remove();
+        const transition = document.getElementById('aquatic-transition-overlay');
+        if (transition) transition.remove();
+        this.clearSurfaceTrash?.();
+        this.clearChallengeStarfish?.();
     }
 
 }
