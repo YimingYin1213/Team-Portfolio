@@ -74,6 +74,19 @@ class GameLevelAquaticGameLevel {
             interact: function() {
                 if (!this.dialogueSystem) return;
 
+                const clearDialogueActionButtons = () => {
+                    const dialogueBox = this.dialogueSystem?.dialogueBox;
+                    if (!dialogueBox) return;
+
+                    const avatarElement = document.getElementById(`dialogue-avatar-${this.dialogueSystem.id}`);
+                    const buttonContainers = dialogueBox.querySelectorAll('div[style*="display: flex"]');
+
+                    buttonContainers.forEach((container) => {
+                        if (avatarElement && container.contains(avatarElement)) return;
+                        container.remove();
+                    });
+                };
+
                 const showStoryStep = (step) => {
                     if (step === 0) {
                         this.dialogueSystem.showDialogue(
@@ -81,6 +94,7 @@ class GameLevelAquaticGameLevel {
                             'Slime',
                             null
                         );
+                        clearDialogueActionButtons();
                         this.dialogueSystem.addButtons([
                             {
                                 text: 'Continue',
@@ -97,6 +111,7 @@ class GameLevelAquaticGameLevel {
                             'Slime',
                             null
                         );
+                        clearDialogueActionButtons();
                         this.dialogueSystem.addButtons([
                             {
                                 text: 'Continue',
@@ -112,6 +127,7 @@ class GameLevelAquaticGameLevel {
                         'Slime',
                         null
                     );
+                    clearDialogueActionButtons();
                     this.dialogueSystem.addButtons([
                         {
                             text: 'Close',
@@ -126,6 +142,7 @@ class GameLevelAquaticGameLevel {
                     'Slime',
                     null
                 );
+                clearDialogueActionButtons();
 
                 this.dialogueSystem.addButtons([
                     {
