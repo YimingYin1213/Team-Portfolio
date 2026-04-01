@@ -85,11 +85,11 @@ class GameLevelAquaticGameLevel {
             collected: 0
         };
 
-        this.sharkGameOver = false;
+        this.sharkGameOverShown = false;
 
         const showSharkGameOver = () => {
-            if (this.sharkGameOver) return;
-            this.sharkGameOver = true;
+            if (this.sharkGameOverShown) return;
+            this.sharkGameOverShown = true;
 
             const existing = document.getElementById('aquatic-shark-gameover');
             if (existing) existing.remove();
@@ -129,7 +129,7 @@ class GameLevelAquaticGameLevel {
             });
 
             const body = document.createElement('div');
-            body.textContent = 'The shark got you. Press restart to try again.';
+            body.textContent = "You've been eaten by shark. You can replay.";
             Object.assign(body.style, {
                 fontSize: '12px',
                 lineHeight: '1.6',
@@ -137,7 +137,7 @@ class GameLevelAquaticGameLevel {
             });
 
             const restart = document.createElement('button');
-            restart.textContent = 'Restart';
+            restart.textContent = 'Replay';
             Object.assign(restart.style, {
                 width: '100%',
                 padding: '12px 16px',
@@ -476,11 +476,11 @@ class GameLevelAquaticGameLevel {
             INIT_POSITION: { x: 700, y: 180 },
             orientation: { rows: 1, columns: 1 },
             down: { row: 0, start: 0, columns: 1 },
-            right: { row: 0, start: 0, columns: 1 },
+            right: { row: 0, start: 0, columns: 1, mirror: true },
             left: { row: 0, start: 0, columns: 1 },
             up: { row: 0, start: 0, columns: 1 },
-            upRight: { row: 0, start: 0, columns: 1 },
-            downRight: { row: 0, start: 0, columns: 1 },
+            upRight: { row: 0, start: 0, columns: 1, mirror: true },
+            downRight: { row: 0, start: 0, columns: 1, mirror: true },
             upLeft: { row: 0, start: 0, columns: 1 },
             downLeft: { row: 0, start: 0, columns: 1 },
             hitbox: { widthPercentage: 0.12, heightPercentage: 0.15 },
@@ -575,11 +575,69 @@ class GameLevelAquaticGameLevel {
                 nextTurnAt: performance.now() + 1200 + Math.random() * 1200
             };
 
+            const getRect = (obj) => {
+                const x = obj?.position?.x ?? obj?.x ?? 0;
+                const y = obj?.position?.y ?? obj?.y ?? 0;
+                const w = obj?.width ?? 0;
+                const h = obj?.height ?? 0;
+                return { x, y, w, h };
+            };
+
+            const intersects = (a, b) => {
+                return (
+                    a.x < b.x + b.w &&
+                    a.x + a.w > b.x &&
+                    a.y < b.y + b.h &&
+                    a.y + a.h > b.y
+                );
+            };
+
+            const resolveSharkCollisions = () => {
+                const sharkRect = getRect(shark);
+                const blockers = (this.gameEnv?.gameObjects || []).filter(obj => {
+                    if (!obj || obj === shark || !obj.canvas) return false;
+                    if (obj?.spriteData?.id === 'Shark') return false;
+                    if (obj?.spriteData?.id === 'playerData') return false;
+                    if (obj?.spriteData?.id?.startsWith('starfish_')) return false;
+                    const type = obj?.constructor?.name;
+                    return type === 'Npc' || type === 'Barrier';
+                });
+
+                blockers.forEach(blocker => {
+                    const otherRect = getRect(blocker);
+                    if (!intersects(sharkRect, otherRect)) return;
+
+                    const overlapX = Math.min(
+                        sharkRect.x + sharkRect.w - otherRect.x,
+                        otherRect.x + otherRect.w - sharkRect.x
+                    );
+                    const overlapY = Math.min(
+                        sharkRect.y + sharkRect.h - otherRect.y,
+                        otherRect.y + otherRect.h - sharkRect.y
+                    );
+
+                    if (overlapX < overlapY) {
+                        if (sharkRect.x < otherRect.x) {
+                            shark.position.x -= overlapX;
+                        } else {
+                            shark.position.x += overlapX;
+                        }
+                        shark._motion.vector.x *= -1;
+                    } else {
+                        if (sharkRect.y < otherRect.y) {
+                            shark.position.y -= overlapY;
+                        } else {
+                            shark.position.y += overlapY;
+                        }
+                        shark._motion.vector.y *= -1;
+                    }
+
+                    sharkRect.x = shark.position.x;
+                    sharkRect.y = shark.position.y;
+                });
+            };
+
             shark.update = () => {
-                if (this.sharkGameOver) {
-                    shark.draw();
-                    return;
-                }
 
                 const now = performance.now();
                 if (now >= shark._motion.nextTurnAt) {
@@ -607,6 +665,8 @@ class GameLevelAquaticGameLevel {
                     shark._motion.vector.y = -Math.abs(shark._motion.vector.y);
                 }
 
+                resolveSharkCollisions();
+
                 shark.direction = directionFromVector(shark._motion.vector.x, shark._motion.vector.y);
                 shark.draw();
 
@@ -618,9 +678,6 @@ class GameLevelAquaticGameLevel {
 
                 shark.isCollision(player);
                 if (shark.collisionData?.hit) {
-                    player.velocity.x = 0;
-                    player.velocity.y = 0;
-                    if (player.pressedKeys) player.pressedKeys = {};
                     showSharkGameOver();
                 }
             };
