@@ -53,7 +53,7 @@ class GameLevelAquaticGameLevel {
 
         const slimeNpc = {
             id: 'Random Slime',
-            greeting: '^$%#^@&!^# (Slime Language) Did I see a human?',
+            greeting: "I've been living under the sea for thousands of years, do you wonder why?",
             src: path + "/images/gamebuilder/sprites/slime.png",
             SCALE_FACTOR: 8,
             ANIMATION_RATE: 50,
@@ -69,12 +69,75 @@ class GameLevelAquaticGameLevel {
             upLeft: { row: Math.min(2, 4 - 1), start: 0, columns: 3 },
             downLeft: { row: 0, start: 0, columns: 3 },
             hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-            dialogues: ['^$%#^@&!^# (Slime Language) Did I see a human?'],
-            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
+            dialogues: ["I've been living under the sea for thousands of years, do you wonder why?"],
+            reaction: function() {},
             interact: function() {
-                if (this.dialogueSystem) {
-                    this.showReactionDialogue();
-                }
+                if (!this.dialogueSystem) return;
+
+                const showStoryStep = (step) => {
+                    if (step === 0) {
+                        this.dialogueSystem.showDialogue(
+                            'Before the modern human society, the ocean remained peace and clean, but then, everything has shifted.',
+                            'Slime',
+                            null
+                        );
+                        this.dialogueSystem.addButtons([
+                            {
+                                text: 'Continue',
+                                primary: true,
+                                action: () => showStoryStep(1)
+                            }
+                        ]);
+                        return;
+                    }
+
+                    if (step === 1) {
+                        this.dialogueSystem.showDialogue(
+                            "countless plastics, useless metals, were thrown into the ocean. I've been consuming them to protect this part of the ocean.",
+                            'Slime',
+                            null
+                        );
+                        this.dialogueSystem.addButtons([
+                            {
+                                text: 'Continue',
+                                primary: true,
+                                action: () => showStoryStep(2)
+                            }
+                        ]);
+                        return;
+                    }
+
+                    this.dialogueSystem.showDialogue(
+                        'Please protect the ocean :(',
+                        'Slime',
+                        null
+                    );
+                    this.dialogueSystem.addButtons([
+                        {
+                            text: 'Close',
+                            primary: true,
+                            action: () => this.dialogueSystem.closeDialogue()
+                        }
+                    ]);
+                };
+
+                this.dialogueSystem.showDialogue(
+                    "I've been living under the sea for thousands of years, do you wonder why?",
+                    'Slime',
+                    null
+                );
+
+                this.dialogueSystem.addButtons([
+                    {
+                        text: 'Yes',
+                        primary: true,
+                        action: () => showStoryStep(0)
+                    },
+                    {
+                        text: 'No',
+                        action: () => this.dialogueSystem.closeDialogue()
+                    }
+                ]);
             }
         };
 
