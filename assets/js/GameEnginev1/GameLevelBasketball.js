@@ -1,6 +1,7 @@
 import GameEnvBackground from './essentials/GameEnvBackground.js';
 import Player from './essentials/Player.js';
 import Npc from './essentials/Npc.js';
+import Coin from './Coin.js';
 
 class GameLevelBasketball {
   constructor(gameEnv) {
@@ -12,9 +13,12 @@ class GameLevelBasketball {
     this.chaserStart = { x: Math.round(width * 0.72), y: Math.round(height * 0.55) };
 
     this.caught = false;
+    this.caughtAt = 0;
+    this.roundResetDelayMs = 1400;
     this.startTime = 0;
     this.currentTime = 0;
-    this.bestTime = 0;
+    this.bestTime = this.loadBestTime();
+    this.bestCoins = this.loadBestCoins();
     this.timeHud = null;
     this.messageHud = null;
     this.handleRestartKey = this.handleRestartKey.bind(this);
@@ -80,14 +84,40 @@ class GameLevelBasketball {
       }
     };
 
+    const coin_1 = {
+      id: 'coin_1',
+      INIT_POSITION: { x: Math.round(width * 0.25), y: Math.round(height * 0.35) },
+      SCALE_FACTOR: 18,
+      value: 1
+    };
+
+    const coin_2 = {
+      id: 'coin_2',
+      INIT_POSITION: { x: Math.round(width * 0.50), y: Math.round(height * 0.65) },
+      SCALE_FACTOR: 18,
+      value: 1
+    };
+
+    const coin_3 = {
+      id: 'coin_3',
+      INIT_POSITION: { x: Math.round(width * 0.72), y: Math.round(height * 0.28) },
+      SCALE_FACTOR: 18,
+      value: 1
+    };
+
     this.classes = [
       { class: GameEnvBackground, data: image_data_court },
       { class: Player, data: sprite_data_player },
-      { class: Npc, data: sprite_data_chaser }
+      { class: Npc, data: sprite_data_chaser },
+      { class: Coin, data: coin_1 },
+      { class: Coin, data: coin_2 },
+      { class: Coin, data: coin_3 }
     ];
   }
 
   initialize() {
+    if (!this.gameEnv.stats) this.gameEnv.stats = {};
+    this.gameEnv.stats.coinsCollected = 0;
     this.startTime = performance.now();
     this.currentTime = 0;
     this.createHud();
@@ -105,7 +135,12 @@ class GameLevelBasketball {
       this.updateHud();
     }
 
-    if (this.caught) return;
+    if (this.caught) {
+      if (performance.now() - this.caughtAt >= this.roundResetDelayMs) {
+        this.resetRound();
+      }
+      return;
+    }
 
     const dx = player.position.x - lebron.position.x;
     const dy = player.position.y - lebron.position.y;
@@ -128,7 +163,11 @@ class GameLevelBasketball {
 
     if (this.isHitboxCollision(player, lebron)) {
       this.caught = true;
+      this.caughtAt = performance.now();
       this.bestTime = Math.max(this.bestTime, this.currentTime);
+      this.bestCoins = Math.max(this.bestCoins, this.getCoinsCollected());
+      this.saveBestTime();
+      this.saveBestCoins();
       this.showCaughtMessage();
       this.updateHud();
     }
@@ -168,6 +207,7 @@ class GameLevelBasketball {
   createHud() {
     const container = this.gameEnv.container || this.gameEnv.gameContainer;
     if (!container) return;
+    const safeTop = Math.max(16, (this.gameEnv.top || 0) + 72);
 
     const oldTimer = container.querySelector('#basketball-time-hud');
     if (oldTimer) oldTimer.remove();
@@ -177,17 +217,20 @@ class GameLevelBasketball {
     this.timeHud = document.createElement('div');
     this.timeHud.id = 'basketball-time-hud';
     Object.assign(this.timeHud.style, {
-      position: 'absolute',
-      top: '12px',
-      left: '12px',
-      zIndex: '1000',
-      padding: '8px 12px',
+      position: 'fixed',
+      top: `${safeTop}px`,
+      left: '16px',
+      zIndex: '20000',
+      padding: '10px 14px',
       color: '#fff',
-      background: 'rgba(0,0,0,0.65)',
+      background: 'rgba(0,0,0,0.78)',
       borderRadius: '8px',
       fontFamily: 'monospace',
-      fontSize: '14px',
-      fontWeight: '700'
+      fontSize: '15px',
+      fontWeight: '700',
+      border: '1px solid rgba(255,255,255,0.2)',
+      boxShadow: '0 6px 18px rgba(0,0,0,0.35)',
+      pointerEvents: 'none'
     });
     container.appendChild(this.timeHud);
 
@@ -215,20 +258,26 @@ class GameLevelBasketball {
 
   updateHud() {
     if (!this.timeHud) return;
-    this.timeHud.textContent = `Time: ${this.currentTime.toFixed(1)}s | Best: ${this.bestTime.toFixed(1)}s`;
+    this.timeHud.textContent =
+      `Time: ${this.currentTime.toFixed(1)}s | Best: ${this.bestTime.toFixed(1)}s | ` +
+      `Coins: ${this.getCoinsCollected()} | Best Coins: ${this.bestCoins}`;
   }
 
   showCaughtMessage() {
     if (!this.messageHud) return;
-    this.messageHud.innerHTML = 'LeBron stole the ball!<br>Press R to restart';
+    this.messageHud.innerHTML = 'Kirby stole the ball!<br>Resetting round...';
     this.messageHud.style.display = 'block';
   }
 
   handleRestartKey(event) {
     if (event.key.toLowerCase() !== 'r' || !this.caught) return;
+    this.resetRound();
+  }
 
+  resetRound() {
     const player = this.findById('BasketballPlayer');
     const lebron = this.findById('LeBron');
+    const coins = this.gameEnv.gameObjects.filter((obj) => String(obj?.spriteData?.id || '').startsWith('coin_'));
 
     if (player) {
       player.position.x = this.playerStart.x;
@@ -246,11 +295,52 @@ class GameLevelBasketball {
       lebron.direction = 'left';
     }
 
+    coins.forEach((coin) => {
+      if (typeof coin.randomizePosition === 'function') {
+        coin.randomizePosition();
+      }
+    });
+
     this.caught = false;
+    this.caughtAt = 0;
     this.startTime = performance.now();
     this.currentTime = 0;
+    if (!this.gameEnv.stats) this.gameEnv.stats = {};
+    this.gameEnv.stats.coinsCollected = 0;
     if (this.messageHud) this.messageHud.style.display = 'none';
     this.updateHud();
+  }
+
+  getCoinsCollected() {
+    return Number(this.gameEnv?.stats?.coinsCollected || 0);
+  }
+
+  loadBestTime() {
+    try {
+      return Number(localStorage.getItem('basketball_best_time') || 0);
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  saveBestTime() {
+    try {
+      localStorage.setItem('basketball_best_time', String(this.bestTime));
+    } catch (_) {}
+  }
+
+  loadBestCoins() {
+    try {
+      return Number(localStorage.getItem('basketball_best_coins') || 0);
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  saveBestCoins() {
+    try {
+      localStorage.setItem('basketball_best_coins', String(this.bestCoins));
+    } catch (_) {}
   }
 
   destroy() {
