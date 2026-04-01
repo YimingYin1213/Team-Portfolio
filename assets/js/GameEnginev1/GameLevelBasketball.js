@@ -9,7 +9,7 @@ class GameLevelBasketball {
     const height = gameEnv.innerHeight;
     const path = gameEnv.path;
     this.playerStart = { x: Math.round(width * 0.12), y: Math.round(height * 0.68) };
-    this.lebronStart = { x: Math.round(width * 0.72), y: Math.round(height * 0.55) };
+    this.chaserStart = { x: Math.round(width * 0.72), y: Math.round(height * 0.55) };
 
     this.caught = false;
     this.startTime = 0;
@@ -51,27 +51,26 @@ class GameLevelBasketball {
       keypress: { up: 87, left: 65, down: 83, right: 68 }
     };
 
-    // LeBron data: bron.png is a single-frame image (1080 x 1350)
-    const sprite_src_lebron = path + '/images/gamebuilder/sprites/bron.png';
-    const sprite_data_lebron = {
+    // Chaser data: kirby.png from index.json (rows:1, cols:13)
+    const sprite_src_chaser = path + '/images/gamebuilder/sprites/kirby.png';
+    const sprite_data_chaser = {
       id: 'LeBron',
       greeting: 'You reached LeBron.',
-      src: sprite_src_lebron,
-      // Lower scale factor => larger on-screen size
-      SCALE_FACTOR: 5,
-      ANIMATION_RATE: 120,
-      INIT_POSITION: { ...this.lebronStart },
-      pixels: { height: 1350, width: 1080 },
-      orientation: { rows: 1, columns: 1 },
-      down:      { row: 0, start: 0, columns: 1 },
-      left:      { row: 0, start: 0, columns: 1 },
-      right:     { row: 0, start: 0, columns: 1 },
-      up:        { row: 0, start: 0, columns: 1 },
-      downRight: { row: 0, start: 0, columns: 1 },
-      downLeft:  { row: 0, start: 0, columns: 1 },
-      upRight:   { row: 0, start: 0, columns: 1 },
-      upLeft:    { row: 0, start: 0, columns: 1 },
-      hitbox: { widthPercentage: 0.6, heightPercentage: 0.6 },
+      src: sprite_src_chaser,
+      SCALE_FACTOR: 7,
+      ANIMATION_RATE: 8,
+      INIT_POSITION: { ...this.chaserStart },
+      pixels: { height: 36, width: 569 },
+      orientation: { rows: 1, columns: 13 },
+      down:      { row: 0, start: 0, columns: 13 },
+      left:      { row: 0, start: 0, columns: 13 },
+      right:     { row: 0, start: 0, columns: 13 },
+      up:        { row: 0, start: 0, columns: 13 },
+      downRight: { row: 0, start: 0, columns: 13 },
+      downLeft:  { row: 0, start: 0, columns: 13 },
+      upRight:   { row: 0, start: 0, columns: 13 },
+      upLeft:    { row: 0, start: 0, columns: 13 },
+      hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
       dialogues: ['LeBron is in the gym.'],
       reaction: function () {
         if (this.dialogueSystem) this.showReactionDialogue();
@@ -84,7 +83,7 @@ class GameLevelBasketball {
     this.classes = [
       { class: GameEnvBackground, data: image_data_court },
       { class: Player, data: sprite_data_player },
-      { class: Npc, data: sprite_data_lebron }
+      { class: Npc, data: sprite_data_chaser }
     ];
   }
 
@@ -117,6 +116,10 @@ class GameLevelBasketball {
     lebron.position.x += (dx / dist) * speed;
     lebron.position.y += (dy / dist) * speed;
 
+    // Keep chaser inside the playable area
+    lebron.position.x = Math.max(0, Math.min(lebron.position.x, this.gameEnv.innerWidth - (lebron.width || 0)));
+    lebron.position.y = Math.max(0, Math.min(lebron.position.y, this.gameEnv.innerHeight - (lebron.height || 0)));
+
     if (Math.abs(dx) > Math.abs(dy)) {
       lebron.direction = dx >= 0 ? 'right' : 'left';
     } else {
@@ -139,9 +142,9 @@ class GameLevelBasketball {
     const width = obj.width || 0;
     const height = obj.height || 0;
     const pos = obj.position || { x: 0, y: 0 };
-    const hb = obj.hitbox || {};
-    const widthReduction = width * (hb.widthPercentage || 0);
-    const heightReduction = height * (hb.heightPercentage || 0);
+    // Stable collision area independent of sprite metadata
+    const widthReduction = width * 0.2;
+    const heightReduction = height * 0.2;
 
     return {
       left: pos.x + widthReduction,
@@ -163,10 +166,8 @@ class GameLevelBasketball {
   }
 
   createHud() {
-    const container = this.gameEnv.gameContainer;
+    const container = this.gameEnv.container || this.gameEnv.gameContainer;
     if (!container) return;
-
-    container.style.position = 'relative';
 
     const oldTimer = container.querySelector('#basketball-time-hud');
     if (oldTimer) oldTimer.remove();
@@ -238,8 +239,8 @@ class GameLevelBasketball {
     }
 
     if (lebron) {
-      lebron.position.x = this.lebronStart.x;
-      lebron.position.y = this.lebronStart.y;
+      lebron.position.x = this.chaserStart.x;
+      lebron.position.y = this.chaserStart.y;
       lebron.velocity.x = 0;
       lebron.velocity.y = 0;
       lebron.direction = 'left';
