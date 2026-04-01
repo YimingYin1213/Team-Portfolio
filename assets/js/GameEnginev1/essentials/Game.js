@@ -42,15 +42,19 @@ class Game {
                 return response.json();
             })
             .then(data => {
-                if (!data) return;
+                if (!data) return null;
                 this.uid = data.uid;
 
                 const javaURL = this.javaURI + '/rpg_answer/person/' + this.uid;
                 return fetch(javaURL, this.fetchOptions);
             })
             .then(response => {
-                if (!response || !response.ok) {
-                    throw new Error(`Spring server response: ${response?.status}`);
+                if (!response) {
+                    return null;
+                }
+                if (!response.ok) {
+                    console.error(`Spring server response: ${response.status}`);
+                    return null;
                 }
                 return response.json();
             })

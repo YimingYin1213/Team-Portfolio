@@ -87,7 +87,7 @@ class GameLevelAquaticGameLevel {
 
         this.sharkGameOverShown = false;
 
-        const showSharkGameOver = () => {
+        this.showSharkGameOver = () => {
             if (this.sharkGameOverShown) return;
             this.sharkGameOverShown = true;
 
@@ -678,7 +678,7 @@ class GameLevelAquaticGameLevel {
 
                 shark.isCollision(player);
                 if (shark.collisionData?.hit) {
-                    showSharkGameOver();
+                    this.showSharkGameOver();
                 }
             };
         }
