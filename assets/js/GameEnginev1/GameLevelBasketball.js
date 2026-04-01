@@ -2,6 +2,9 @@ import GameEnvBackground from './essentials/GameEnvBackground.js';
 import Player from './essentials/Player.js';
 import Npc from './essentials/Npc.js';
 import Coin from './Coin.js';
+import Barrier from './essentials/Barrier.js';
+import Leaderboard from '../GameEnginev1.1/essentials/Leaderboard.js';
+import DialogueSystem from './DialogueSystem.js';
 
 class GameLevelBasketball {
   constructor(gameEnv) {
@@ -21,13 +24,17 @@ class GameLevelBasketball {
     this.bestCoins = this.loadBestCoins();
     this.timeHud = null;
     this.messageHud = null;
+    this.leaderboard = null;
+    this.introDialogue = null;
+    this.preGameLocked = true;
+    this.scoreSubmittedThisRound = false;
     this.handleRestartKey = this.handleRestartKey.bind(this);
 
-    const image_src_court = path + '/images/gamebuilder/bg/BballCourt.png';
+    const image_src_court = path + '/images/gamebuilder/bg/BaskCourt.png';
     const image_data_court = {
       id: 'BasketballCourt',
       src: image_src_court,
-      pixels: { height: 580, width: 900 }
+      pixels: { height: 720, width: 1478 }
     };
 
     // Player data (Astronaut sheet from index.json: 4 rows x 4 cols)
@@ -105,23 +112,73 @@ class GameLevelBasketball {
       value: 1
     };
 
+    // Bench / Gatorade blocking zones (tuned for BaskCourt background)
+    // Use relative units (0-1) so they scale with screen size.
+    const barrier_bench_top = {
+      id: 'barrier_bench_top',
+      x: 0.07,
+      y: 0.07,
+      width: 0.86,
+      height: 0.10,
+      visible: false,
+      hitbox: { widthPercentage: 0, heightPercentage: 0 }
+    };
+
+    const barrier_bench_bottom = {
+      id: 'barrier_bench_bottom',
+      x: 0.07,
+      y: 0.83,
+      width: 0.86,
+      height: 0.10,
+      visible: false,
+      hitbox: { widthPercentage: 0, heightPercentage: 0 }
+    };
+
+    const barrier_gatorade_left = {
+      id: 'barrier_gatorade_left',
+      x: 0.03,
+      y: 0.38,
+      width: 0.05,
+      height: 0.22,
+      visible: false,
+      hitbox: { widthPercentage: 0, heightPercentage: 0 }
+    };
+
+    const barrier_gatorade_right = {
+      id: 'barrier_gatorade_right',
+      x: 0.92,
+      y: 0.38,
+      width: 0.05,
+      height: 0.22,
+      visible: false,
+      hitbox: { widthPercentage: 0, heightPercentage: 0 }
+    };
+
     this.classes = [
       { class: GameEnvBackground, data: image_data_court },
       { class: Player, data: sprite_data_player },
       { class: Npc, data: sprite_data_chaser },
       { class: Coin, data: coin_1 },
       { class: Coin, data: coin_2 },
-      { class: Coin, data: coin_3 }
+      { class: Coin, data: coin_3 },
+      { class: Barrier, data: barrier_bench_top },
+      { class: Barrier, data: barrier_bench_bottom },
+      { class: Barrier, data: barrier_gatorade_left },
+      { class: Barrier, data: barrier_gatorade_right }
     ];
   }
 
   initialize() {
     if (!this.gameEnv.stats) this.gameEnv.stats = {};
     this.gameEnv.stats.coinsCollected = 0;
-    this.startTime = performance.now();
+    this.updateCoinSpawnBounds();
+    this.applyCoinSpawnRules();
+    this.startTime = 0;
     this.currentTime = 0;
     this.createHud();
     this.updateHud();
+    this.initLeaderboard();
+    this.showIntroDialogue();
     document.addEventListener('keydown', this.handleRestartKey);
   }
 
@@ -129,6 +186,7 @@ class GameLevelBasketball {
     const player = this.findById('BasketballPlayer');
     const lebron = this.findById('LeBron');
     if (!player || !lebron) return;
+    if (this.preGameLocked) return;
 
     if (!this.caught) {
       this.currentTime = (performance.now() - this.startTime) / 1000;
@@ -147,7 +205,8 @@ class GameLevelBasketball {
     const dist = Math.hypot(dx, dy);
     if (dist < 1) return;
 
-    const speed = 1.7;
+    // Faster but fair speed curve: tracks astronaut without instant catches.
+    const speed = Math.min(2.1 + this.currentTime * 0.03, 2.8);
     lebron.position.x += (dx / dist) * speed;
     lebron.position.y += (dy / dist) * speed;
 
@@ -168,6 +227,7 @@ class GameLevelBasketball {
       this.bestCoins = Math.max(this.bestCoins, this.getCoinsCollected());
       this.saveBestTime();
       this.saveBestCoins();
+      this.submitRoundScore();
       this.showCaughtMessage();
       this.updateHud();
     }
@@ -269,6 +329,30 @@ class GameLevelBasketball {
     this.messageHud.style.display = 'block';
   }
 
+  initLeaderboard() {
+    if (this.leaderboard) return;
+    this.leaderboard = new Leaderboard(this.gameEnv.gameControl, {
+      gameName: 'Basketball',
+      initiallyHidden: false
+    });
+    const container = document.getElementById('leaderboard-container');
+    if (container) {
+      container.style.left = 'auto';
+      container.style.right = '20px';
+      container.style.top = '80px';
+    }
+  }
+
+  submitRoundScore() {
+    if (!this.leaderboard || this.scoreSubmittedThisRound) return;
+    const score = Math.round((this.currentTime * 10) + (this.getCoinsCollected() * 50));
+    const username = (this.gameEnv?.game?.uid && String(this.gameEnv.game.uid)) || 'Player';
+    this.scoreSubmittedThisRound = true;
+
+    this.leaderboard.submitScore(username, score, 'Basketball')
+      .catch((err) => console.warn('Leaderboard score submit failed:', err));
+  }
+
   handleRestartKey(event) {
     if (event.key.toLowerCase() !== 'r' || !this.caught) return;
     this.resetRound();
@@ -303,12 +387,81 @@ class GameLevelBasketball {
 
     this.caught = false;
     this.caughtAt = 0;
+    this.scoreSubmittedThisRound = false;
+    this.updateCoinSpawnBounds();
+    this.applyCoinSpawnRules();
     this.startTime = performance.now();
     this.currentTime = 0;
     if (!this.gameEnv.stats) this.gameEnv.stats = {};
     this.gameEnv.stats.coinsCollected = 0;
     if (this.messageHud) this.messageHud.style.display = 'none';
     this.updateHud();
+  }
+
+  showIntroDialogue() {
+    this.introDialogue = new DialogueSystem({
+      dialogues: ['Foreign explorer? Try to survive as long as you can by keeping the Ball safe!'],
+      id: 'basketball_boss_intro'
+    });
+
+    this.introDialogue.showDialogue(
+      'Foreign explorer? Try to survive as long as you can by keeping the Ball safe!',
+      'Boss Level'
+    );
+    if (this.introDialogue.closeBtn) {
+      this.introDialogue.closeBtn.style.display = 'none';
+    }
+
+    this.introDialogue.addButtons([
+      {
+        text: 'Start',
+        primary: true,
+        action: () => {
+          this.preGameLocked = false;
+          this.startTime = performance.now();
+          this.currentTime = 0;
+          this.updateHud();
+          this.introDialogue.closeDialogue();
+        }
+      }
+    ]);
+  }
+
+  updateCoinSpawnBounds() {
+    if (!this.gameEnv.stats) this.gameEnv.stats = {};
+    // Spawn strictly inside bench/gatorade barrier box:
+    // x between side gatorade barriers, y between top/bottom bench barriers.
+    this.gameEnv.stats.coinSpawnBounds = {
+      xMin: this.gameEnv.innerWidth * 0.10,
+      xMax: this.gameEnv.innerWidth * 0.88,
+      yMin: this.gameEnv.innerHeight * 0.19,
+      yMax: this.gameEnv.innerHeight * 0.80
+    };
+  }
+
+  applyCoinSpawnRules() {
+    const bounds = this.gameEnv?.stats?.coinSpawnBounds;
+    if (!bounds) return;
+    const coins = this.gameEnv.gameObjects.filter((obj) => String(obj?.spriteData?.id || '').startsWith('coin_'));
+
+    coins.forEach((coin) => {
+      // Keep original function once for fallback/safety.
+      if (!coin._originalRandomizePosition && typeof coin.randomizePosition === 'function') {
+        coin._originalRandomizePosition = coin.randomizePosition.bind(coin);
+      }
+
+      coin.randomizePosition = () => {
+        const xMin = bounds.xMin;
+        const xMax = bounds.xMax;
+        const yMin = bounds.yMin;
+        const yMax = bounds.yMax;
+        coin.position.x = xMin + Math.random() * Math.max(1, xMax - xMin);
+        coin.position.y = yMin + Math.random() * Math.max(1, yMax - yMin);
+      };
+
+      // Reposition immediately so current run also obeys bounds.
+      coin.randomizePosition();
+    });
   }
 
   getCoinsCollected() {
@@ -347,8 +500,16 @@ class GameLevelBasketball {
     document.removeEventListener('keydown', this.handleRestartKey);
     if (this.timeHud) this.timeHud.remove();
     if (this.messageHud) this.messageHud.remove();
+    if (this.leaderboard && typeof this.leaderboard.destroy === 'function') {
+      this.leaderboard.destroy();
+    }
+    if (this.introDialogue && typeof this.introDialogue.closeDialogue === 'function') {
+      this.introDialogue.closeDialogue();
+    }
     this.timeHud = null;
     this.messageHud = null;
+    this.leaderboard = null;
+    this.introDialogue = null;
   }
 }
 
