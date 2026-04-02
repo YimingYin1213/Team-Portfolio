@@ -80,7 +80,7 @@ class GameLevelAquaticGameLevel {
 
                 if (q2.pendingSlimeCompletion) {
                     this.dialogueSystem.showDialogue(
-                        "You've saved the ocean, you may go onto the lands now!",
+                        "You've saved the ocean, you may go onto the lands now! seems like kirby is missing.",
                         'Slime',
                         null
                     );
@@ -229,20 +229,20 @@ class GameLevelAquaticGameLevel {
             id: 'Kirby',
             greeting: 'Poyo! Ask me anything about ocean cleanup and sea life.',
             src: path + '/images/gamebuilder/sprites/kirby.png',
-            SCALE_FACTOR: 4,
-            ANIMATION_RATE: 7,
-            INIT_POSITION: { x: 240, y: 210 },
+            SCALE_FACTOR: 10,
+            ANIMATION_RATE: 6,
+            INIT_POSITION: { x: 180, y: 140 },
             pixels: { height: 36, width: 569 },
-            orientation: { rows: 1, columns: 16 },
-            down: { row: 0, start: 0, columns: 16 },
-            right: { row: 0, start: 0, columns: 16 },
-            left: { row: 0, start: 0, columns: 16 },
-            up: { row: 0, start: 0, columns: 16 },
-            upRight: { row: 0, start: 0, columns: 16 },
-            downRight: { row: 0, start: 0, columns: 16 },
-            upLeft: { row: 0, start: 0, columns: 16 },
-            downLeft: { row: 0, start: 0, columns: 16 },
-            hitbox: { widthPercentage: 0.2, heightPercentage: 0.3 },
+            orientation: { rows: 1, columns: 13 },
+            down: { row: 0, start: 0, columns: 13 },
+            right: { row: 0, start: 0, columns: 13 },
+            left: { row: 0, start: 0, columns: 13 },
+            up: { row: 0, start: 0, columns: 13 },
+            upRight: { row: 0, start: 0, columns: 13 },
+            downRight: { row: 0, start: 0, columns: 13 },
+            upLeft: { row: 0, start: 0, columns: 13 },
+            downLeft: { row: 0, start: 0, columns: 13 },
+            hitbox: { widthPercentage: 0.34, heightPercentage: 0.42 },
             expertise: 'ocean',
             chatHistory: [],
             dialogues: [
@@ -1097,11 +1097,27 @@ class GameLevelAquaticGameLevel {
         const trashSprites = createDetailedTrashSprites();
 
         const setWorldNpcVisibility = (visible) => {
-            const ids = ['Mermaid', 'Random Slime', 'Kirby', 'Shark'];
+            const ids = ['Mermaid', 'Random Slime', 'Shark'];
+            if (!questState.secondQuest.completed) {
+                ids.push('Kirby');
+            }
             (this.gameEnv?.gameObjects || []).forEach((obj) => {
                 if (!obj?.spriteData?.id || !ids.includes(obj.spriteData.id) || !obj.canvas) return;
                 obj.canvas.style.display = visible ? 'block' : 'none';
             });
+        };
+
+        const hideKirbyAfterQuestTwo = () => {
+            const kirby = this.gameEnv?.gameObjects?.find(
+                (obj) => obj?.spriteData?.id === 'Kirby'
+            );
+            if (!kirby) return;
+
+            if (kirby.canvas) kirby.canvas.style.display = 'none';
+            kirby.position.x = -10000;
+            kirby.position.y = -10000;
+            kirby.interact = function() {};
+            kirby.reaction = function() {};
         };
 
         const spawnSurfaceTrash = () => {
@@ -1250,6 +1266,7 @@ class GameLevelAquaticGameLevel {
             q2.returning = false;
             q2.completed = true;
             q2.pendingSlimeCompletion = true;
+            hideKirbyAfterQuestTwo();
             this.playerLock = false;
 
             if (overlay) {

@@ -21,6 +21,47 @@ import { pythonURI, fetchOptions } from '../../api/config.js';
 
 class AiNpc {
     /**
+     * Build a useful local response from NPC knowledge when backend is unavailable.
+     * @param {Object} spriteData - The NPC sprite data
+     * @param {string} userMessage - User message
+     * @returns {string} Local fallback response
+     */
+    static generateLocalResponse(spriteData, userMessage) {
+        const expertise = spriteData?.expertise || 'this topic';
+        const knowledge = spriteData?.knowledgeBase?.[expertise] || [];
+        const prompt = (userMessage || '').toLowerCase();
+
+        if (!Array.isArray(knowledge) || knowledge.length === 0) {
+            return `I can help with ${expertise}, but I need a clearer question.`;
+        }
+
+        // Basic keyword overlap scoring between user prompt and available Q/A entries.
+        const keywords = prompt
+            .replace(/[^a-z0-9\s]/g, ' ')
+            .split(/\s+/)
+            .filter(word => word.length > 2);
+
+        let bestTopic = null;
+        let bestScore = -1;
+
+        knowledge.forEach(topic => {
+            const haystack = `${topic.question || ''} ${topic.answer || ''}`.toLowerCase();
+            const score = keywords.reduce((sum, word) => sum + (haystack.includes(word) ? 1 : 0), 0);
+            if (score > bestScore) {
+                bestScore = score;
+                bestTopic = topic;
+            }
+        });
+
+        if (!bestTopic || bestScore <= 0) {
+            const randomTopic = knowledge[Math.floor(Math.random() * knowledge.length)];
+            return randomTopic?.answer || `Try asking me about ${expertise}.`;
+        }
+
+        return bestTopic.answer || `I know about ${expertise}, ask me another angle.`;
+    }
+
+    /**
      * Main entry point - Shows full AI interaction dialog for an NPC
      * Creates DialogueSystem with NPC's dialogues and uses cycling behavior
      * @param {Object} npcInstance - The NPC instance (with this.spriteData, this.gameControl)
@@ -207,13 +248,19 @@ class AiNpc {
                 })
             });
 
+            if (!response.ok) {
+                const localResponse = AiNpc.generateLocalResponse(spriteData, userMessage);
+                spriteData.chatHistory.push({ role: 'ai', message: localResponse });
+                AiNpc.showResponse(localResponse, responseArea);
+                return;
+            }
+
             const data = await response.json();
 
             if (data.status === 'error') {
-                AiNpc.showResponse(
-                    data.message || "I'm having trouble thinking right now.",
-                    responseArea
-                );
+                const localResponse = AiNpc.generateLocalResponse(spriteData, userMessage);
+                spriteData.chatHistory.push({ role: 'ai', message: localResponse });
+                AiNpc.showResponse(localResponse, responseArea);
                 return;
             }
 
@@ -223,10 +270,9 @@ class AiNpc {
 
         } catch (err) {
             console.error('Frontend error:', err);
-            AiNpc.showResponse(
-                "I'm having trouble reaching my brain right now.",
-                responseArea
-            );
+            const localResponse = AiNpc.generateLocalResponse(spriteData, userMessage);
+            spriteData.chatHistory.push({ role: 'ai', message: localResponse });
+            AiNpc.showResponse(localResponse, responseArea);
         }
     }
 

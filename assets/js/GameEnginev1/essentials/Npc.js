@@ -109,17 +109,42 @@ class Npc extends Character {
             return;
         }
         
-        // Add null checks here too
+        // Use real-time collision checks instead of stale collisionEvents history.
         const players = this.gameEnv.gameObjects.filter(
-            obj => obj && obj.state && obj.state.collisionEvents && obj.state.collisionEvents.includes(this.spriteData.id)
+            obj => obj && obj.spriteData && obj.spriteData.id === 'playerData' && obj.canvas
         );
+        const collidingPlayers = players.filter(playerObj => {
+            this.isCollision(playerObj);
+            return this.collisionData?.hit;
+        });
         const hasInteract = this.interact !== undefined;
 
         // Only trigger interaction if:
         // 1. Player is in collision with this NPC
         // 2. NPC has an interact function
         // 3. Not already interacting
-        if (players.length > 0 && hasInteract && !this.isInteracting) {
+        if (collidingPlayers.length > 0 && hasInteract && !this.isInteracting) {
+            const playerObj = collidingPlayers[0];
+            const thisCenterX = this.position.x + (this.width / 2);
+            const thisCenterY = this.position.y + (this.height / 2);
+            const thisDistance = Math.hypot(thisCenterX - playerObj.position.x, thisCenterY - playerObj.position.y);
+
+            // If multiple NPCs overlap the player, only the closest one should handle interaction.
+            const overlappingNpcs = this.gameEnv.gameObjects.filter(obj => {
+                if (!obj || obj === this || !obj.interact || !obj.canvas || !obj.position) return false;
+                obj.isCollision(playerObj);
+                return obj.collisionData?.hit;
+            });
+
+            const hasCloserNpc = overlappingNpcs.some(obj => {
+                const centerX = obj.position.x + (obj.width / 2);
+                const centerY = obj.position.y + (obj.height / 2);
+                const distance = Math.hypot(centerX - playerObj.position.x, centerY - playerObj.position.y);
+                return distance < thisDistance;
+            });
+
+            if (hasCloserNpc) return;
+
             this.isInteracting = true;
             
             // Store a reference to this NPC's interact function
