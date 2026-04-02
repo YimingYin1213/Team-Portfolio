@@ -30,6 +30,15 @@ class GameLevelBasketball {
     this.preGameLocked = true;
     this.scoreSubmittedThisRound = false;
     this.handleRestartKey = this.handleRestartKey.bind(this);
+    this.handleShootKey = this.handleShootKey.bind(this);
+    this.projectiles = [];
+    this.projectileSpeed = 9;
+    this.projectileRadius = 10;
+    this.projectileLifeMs = 2200;
+    this.shootCooldownMs = 5000;
+    this.lastShotAt = -Infinity;
+    this.lebronStunUntil = 0;
+    this.lebronStunDurationMs = 3000;
 
     const image_src_court = path + '/images/gamebuilder/bg/BaskCourt.png';
     const image_data_court = {
@@ -182,23 +191,32 @@ class GameLevelBasketball {
     this.initLeaderboard();
     this.showIntroDialogue();
     document.addEventListener('keydown', this.handleRestartKey);
+    document.addEventListener('keydown', this.handleShootKey);
   }
 
   update() {
     const player = this.findById('BasketballPlayer');
     const lebron = this.findById('LeBron');
     if (!player || !lebron) return;
+    const now = performance.now();
+    this.updateProjectiles(now, lebron);
     if (this.preGameLocked) return;
 
     if (!this.caught) {
-      this.currentTime = (performance.now() - this.startTime) / 1000;
+      this.currentTime = (now - this.startTime) / 1000;
       this.updateHud();
     }
 
     if (this.caught) {
-      if (performance.now() - this.caughtAt >= this.roundResetDelayMs) {
+      if (now - this.caughtAt >= this.roundResetDelayMs) {
         this.resetRound();
       }
+      return;
+    }
+
+    if (now < this.lebronStunUntil) {
+      lebron.velocity.x = 0;
+      lebron.velocity.y = 0;
       return;
     }
 
@@ -224,7 +242,7 @@ class GameLevelBasketball {
 
     if (this.isHitboxCollision(player, lebron)) {
       this.caught = true;
-      this.caughtAt = performance.now();
+      this.caughtAt = now;
       this.bestTime = Math.max(this.bestTime, this.currentTime);
       this.bestCoins = Math.max(this.bestCoins, this.getCoinsCollected());
       this.saveBestTime();
@@ -233,6 +251,144 @@ class GameLevelBasketball {
       this.showCaughtMessage();
       this.updateHud();
     }
+  }
+
+  handleShootKey(event) {
+    if (event.key.toLowerCase() !== 'e' || event.repeat) return;
+    if (this.preGameLocked || this.caught) return;
+    const now = performance.now();
+    if (now - this.lastShotAt < this.shootCooldownMs) return;
+
+    const player = this.findById('BasketballPlayer');
+    if (!player) return;
+
+    this.lastShotAt = now;
+    this.spawnProjectileFromPlayer(player, now);
+  }
+
+  spawnProjectileFromPlayer(player, now) {
+    const container = this.gameEnv.container || this.gameEnv.gameContainer;
+    if (!container) return;
+
+    const directionVector = this.getFacingDirectionVector(player);
+    const projectile = {
+      x: player.position.x + (player.width || 0) / 2,
+      y: player.position.y + (player.height || 0) / 2,
+      vx: directionVector.x * this.projectileSpeed,
+      vy: directionVector.y * this.projectileSpeed,
+      radius: this.projectileRadius,
+      bornAt: now,
+      canvas: document.createElement('canvas')
+    };
+
+    projectile.canvas.width = 64;
+    projectile.canvas.height = 64;
+    const ctx = projectile.canvas.getContext('2d');
+    if (ctx) this.drawProjectileSprite(ctx, projectile.canvas.width, projectile.canvas.height);
+
+    Object.assign(projectile.canvas.style, {
+      position: 'absolute',
+      width: `${projectile.radius * 2}px`,
+      height: `${projectile.radius * 2}px`,
+      left: `${projectile.x - projectile.radius}px`,
+      top: `${(this.gameEnv.top || 0) + projectile.y - projectile.radius}px`,
+      zIndex: '1002',
+      pointerEvents: 'none',
+      imageRendering: 'pixelated'
+    });
+
+    container.appendChild(projectile.canvas);
+    this.projectiles.push(projectile);
+  }
+
+  getFacingDirectionVector(player) {
+    const direction = String(player?.direction || 'down');
+    const vectors = {
+      up: { x: 0, y: -1 },
+      down: { x: 0, y: 1 },
+      left: { x: -1, y: 0 },
+      right: { x: 1, y: 0 },
+      upLeft: { x: -Math.SQRT1_2, y: -Math.SQRT1_2 },
+      downLeft: { x: -Math.SQRT1_2, y: Math.SQRT1_2 },
+      upRight: { x: Math.SQRT1_2, y: -Math.SQRT1_2 },
+      downRight: { x: Math.SQRT1_2, y: Math.SQRT1_2 }
+    };
+    return vectors[direction] || vectors.down;
+  }
+
+  drawProjectileSprite(ctx, width, height) {
+    const cx = width / 2;
+    const cy = height / 2;
+    const r = Math.min(width, height) * 0.42;
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = '#f68b1f';
+    ctx.fill();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#8a3d00';
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(cx - r, cy);
+    ctx.quadraticCurveTo(cx, cy - 8, cx + r, cy);
+    ctx.strokeStyle = '#8a3d00';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - r);
+    ctx.quadraticCurveTo(cx - 8, cy, cx, cy + r);
+    ctx.stroke();
+  }
+
+  updateProjectiles(now, lebron) {
+    for (let i = this.projectiles.length - 1; i >= 0; i -= 1) {
+      const projectile = this.projectiles[i];
+      projectile.x += projectile.vx;
+      projectile.y += projectile.vy;
+
+      if (this.isProjectileOutOfBounds(projectile) || now - projectile.bornAt > this.projectileLifeMs) {
+        this.removeProjectileAt(i);
+        continue;
+      }
+
+      projectile.canvas.style.left = `${projectile.x - projectile.radius}px`;
+      projectile.canvas.style.top = `${(this.gameEnv.top || 0) + projectile.y - projectile.radius}px`;
+
+      if (lebron && this.isCircleHittingObject(projectile, lebron)) {
+        this.lebronStunUntil = Math.max(this.lebronStunUntil, now + this.lebronStunDurationMs);
+        lebron.velocity.x = 0;
+        lebron.velocity.y = 0;
+        this.removeProjectileAt(i);
+      }
+    }
+  }
+
+  isProjectileOutOfBounds(projectile) {
+    const margin = projectile.radius * 2;
+    return (
+      projectile.x < -margin ||
+      projectile.y < -margin ||
+      projectile.x > this.gameEnv.innerWidth + margin ||
+      projectile.y > this.gameEnv.innerHeight + margin
+    );
+  }
+
+  isCircleHittingObject(projectile, obj) {
+    const rect = this.getHitboxRect(obj);
+    const nearestX = Math.max(rect.left, Math.min(projectile.x, rect.right));
+    const nearestY = Math.max(rect.top, Math.min(projectile.y, rect.bottom));
+    const dx = projectile.x - nearestX;
+    const dy = projectile.y - nearestY;
+    return (dx * dx + dy * dy) <= (projectile.radius * projectile.radius);
+  }
+
+  removeProjectileAt(index) {
+    const projectile = this.projectiles[index];
+    if (projectile?.canvas) projectile.canvas.remove();
+    this.projectiles.splice(index, 1);
   }
 
   findById(id) {
@@ -439,6 +595,7 @@ class GameLevelBasketball {
     this.caught = false;
     this.caughtAt = 0;
     this.scoreSubmittedThisRound = false;
+    this.lebronStunUntil = 0;
     this.updateCoinSpawnBounds();
     this.applyCoinSpawnRules();
     this.startTime = performance.now();
@@ -446,6 +603,7 @@ class GameLevelBasketball {
     if (!this.gameEnv.stats) this.gameEnv.stats = {};
     this.gameEnv.stats.coinsCollected = 0;
     if (this.messageHud) this.messageHud.style.display = 'none';
+    this.clearProjectiles();
     this.updateHud();
   }
 
@@ -549,9 +707,11 @@ class GameLevelBasketball {
 
   destroy() {
     document.removeEventListener('keydown', this.handleRestartKey);
+    document.removeEventListener('keydown', this.handleShootKey);
     if (this.timeHud) this.timeHud.remove();
     if (this.messageHud) this.messageHud.remove();
     if (this.bottomNav) this.bottomNav.remove();
+    this.clearProjectiles();
     if (this.leaderboard && typeof this.leaderboard.destroy === 'function') {
       this.leaderboard.destroy();
     }
@@ -563,6 +723,11 @@ class GameLevelBasketball {
     this.bottomNav = null;
     this.leaderboard = null;
     this.introDialogue = null;
+  }
+
+  clearProjectiles() {
+    this.projectiles.forEach((projectile) => projectile?.canvas?.remove());
+    this.projectiles = [];
   }
 }
 
