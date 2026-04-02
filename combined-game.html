@@ -135,8 +135,8 @@ permalink: /games/combined.html
     </div>
     <div class="level-transition" id="levelTransition" aria-live="polite" aria-hidden="true">
       <div class="level-transition-card" role="status">
-        <h2 class="level-transition-title" id="levelTransitionTitle">Next Challenge</h2>
-        <p class="level-transition-text" id="levelTransitionText">Leaving Seek. Entering Basketball...</p>
+        <h2 class="level-transition-title" id="levelTransitionTitle">Game Level Completed</h2>
+        <p class="level-transition-text" id="levelTransitionText">Loading Basketball...</p>
       </div>
     </div>
     <div class="level-menu" aria-label="Game level menu">
@@ -155,15 +155,12 @@ permalink: /games/combined.html
         const textEl = document.getElementById('levelTransitionText');
         if (!overlay) return;
 
-        if (titleEl) titleEl.textContent = 'Seek Complete';
-        if (textEl) textEl.textContent = 'Court doors opening... Prepare for Basketball.';
+        if (titleEl) titleEl.textContent = 'Game Level Completed';
+        if (textEl) textEl.textContent = 'Loading Basketball...';
 
         overlay.classList.add('visible');
         overlay.setAttribute('aria-hidden', 'false');
-        await delay(650);
-
-        if (titleEl) titleEl.textContent = 'Entering Basketball';
-        if (textEl) textEl.textContent = 'Aim for speed and accuracy. Good luck!';
+        await delay(900);
       }
 
       async function hideTransitionOverlay() {
