@@ -76,6 +76,44 @@ permalink: /games/combined.html
         border-color: rgba(200, 214, 255, 0.9);
         box-shadow: 0 0 16px rgba(123, 150, 255, 0.55);
       }
+      .level-transition {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at center, rgba(25, 47, 120, 0.35) 0%, rgba(4, 8, 26, 0.9) 65%, rgba(0, 0, 0, 0.97) 100%);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 360ms ease;
+        z-index: 40;
+      }
+      .level-transition.visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .level-transition-card {
+        width: min(560px, calc(100vw - 48px));
+        padding: 28px 30px;
+        border-radius: 18px;
+        border: 1px solid rgba(146, 180, 255, 0.35);
+        background: linear-gradient(160deg, rgba(13, 23, 56, 0.95), rgba(7, 12, 30, 0.95));
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.52);
+        text-align: center;
+      }
+      .level-transition-title {
+        margin: 0 0 10px;
+        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        letter-spacing: 0.6px;
+        font-weight: 700;
+        color: #dbe6ff;
+      }
+      .level-transition-text {
+        margin: 0;
+        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        color: #adc2ff;
+        line-height: 1.5;
+      }
       @media (max-width: 640px) {
         .level-menu {
           padding: 10px 12px 14px;
@@ -95,6 +133,12 @@ permalink: /games/combined.html
     <div class="game-shell">
       <div id="gameContainer"></div>
     </div>
+    <div class="level-transition" id="levelTransition" aria-live="polite" aria-hidden="true">
+      <div class="level-transition-card" role="status">
+        <h2 class="level-transition-title" id="levelTransitionTitle">Next Challenge</h2>
+        <p class="level-transition-text" id="levelTransitionText">Leaving Seek. Entering Basketball...</p>
+      </div>
+    </div>
     <div class="level-menu" aria-label="Game level menu">
       <div class="menu-inner" id="levelMenu"></div>
     </div>
@@ -102,6 +146,33 @@ permalink: /games/combined.html
     <script type="module">
       const path = '{{ site.baseurl }}' || '';
       const baseUrl = window.location.origin + path;
+
+      const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+      async function playSeekToBasketballTransition() {
+        const overlay = document.getElementById('levelTransition');
+        const titleEl = document.getElementById('levelTransitionTitle');
+        const textEl = document.getElementById('levelTransitionText');
+        if (!overlay) return;
+
+        if (titleEl) titleEl.textContent = 'Seek Complete';
+        if (textEl) textEl.textContent = 'Court doors opening... Prepare for Basketball.';
+
+        overlay.classList.add('visible');
+        overlay.setAttribute('aria-hidden', 'false');
+        await delay(650);
+
+        if (titleEl) titleEl.textContent = 'Entering Basketball';
+        if (textEl) textEl.textContent = 'Aim for speed and accuracy. Good luck!';
+      }
+
+      async function hideTransitionOverlay() {
+        const overlay = document.getElementById('levelTransition');
+        if (!overlay) return;
+        await delay(800);
+        overlay.classList.remove('visible');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
 
       async function boot() {
         const [
@@ -141,6 +212,28 @@ permalink: /games/combined.html
 
         const gameInstance = Game.main ? Game.main(environment) : Game(environment);
         window.__combinedGame = gameInstance;
+
+        const gameControl = gameInstance?.gameControl;
+        if (gameControl && typeof gameControl.switchToLevel === 'function') {
+          const originalSwitchToLevel = gameControl.switchToLevel.bind(gameControl);
+          let transitionRunning = false;
+
+          gameControl.switchToLevel = async (index, ...args) => {
+            const currentIndex = gameControl.currentLevelIndex ?? 0;
+            const isSeekToBasketball = currentIndex === 1 && index === 2;
+
+            if (!isSeekToBasketball || transitionRunning) {
+              return originalSwitchToLevel(index, ...args);
+            }
+
+            transitionRunning = true;
+            await playSeekToBasketballTransition();
+            const result = originalSwitchToLevel(index, ...args);
+            await hideTransitionOverlay();
+            transitionRunning = false;
+            return result;
+          };
+        }
 
         const menu = document.getElementById('levelMenu');
         if (menu && Array.isArray(environment.gameLevelClasses)) {
