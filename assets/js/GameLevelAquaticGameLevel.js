@@ -15,10 +15,12 @@ import Player from './GameEnginev1/essentials/Player.js';
 import Npc from './GameEnginev1/essentials/Npc.js';
 import Barrier from './GameEnginev1/essentials/Barrier.js';
 import Collectible from './GameEnginev1/essentials/Collectible.js';
+import AiNpc from './GameEnginev1.1/essentials/AiNpc.js';
 
 class GameLevelAquaticGameLevel {
     constructor(gameEnv) {
         this.gameEnv = gameEnv;
+        const levelContext = this;
         const path = gameEnv.path;
         const width = gameEnv.innerWidth;
         const height = gameEnv.innerHeight;
@@ -220,6 +222,73 @@ class GameLevelAquaticGameLevel {
                         action: () => this.dialogueSystem.closeDialogue()
                     }
                 ]);
+            }
+        };
+
+        const kirbyNpc = {
+            id: 'Kirby',
+            greeting: 'Poyo! Ask me anything about ocean cleanup and sea life.',
+            src: path + '/images/gamebuilder/sprites/kirby.png',
+            SCALE_FACTOR: 4,
+            ANIMATION_RATE: 7,
+            INIT_POSITION: { x: 240, y: 210 },
+            pixels: { height: 36, width: 569 },
+            orientation: { rows: 1, columns: 16 },
+            down: { row: 0, start: 0, columns: 16 },
+            right: { row: 0, start: 0, columns: 16 },
+            left: { row: 0, start: 0, columns: 16 },
+            up: { row: 0, start: 0, columns: 16 },
+            upRight: { row: 0, start: 0, columns: 16 },
+            downRight: { row: 0, start: 0, columns: 16 },
+            upLeft: { row: 0, start: 0, columns: 16 },
+            downLeft: { row: 0, start: 0, columns: 16 },
+            hitbox: { widthPercentage: 0.2, heightPercentage: 0.3 },
+            expertise: 'ocean',
+            chatHistory: [],
+            dialogues: [
+                'Poyo! Need a hint for your aquatic mission?',
+                'I can answer questions about sea life and pollution.',
+                'Ask me how to protect the ocean!'
+            ],
+            knowledgeBase: {
+                ocean: [
+                    {
+                        question: 'Why are plastics dangerous for marine life?',
+                        answer: 'Plastics can entangle animals or be mistaken for food, which can cause injury, starvation, and toxic exposure.'
+                    },
+                    {
+                        question: 'What can people do to reduce ocean trash?',
+                        answer: 'Use reusables, sort waste correctly, avoid littering, and join local beach or river cleanups.'
+                    },
+                    {
+                        question: 'Why are coral reefs important?',
+                        answer: 'Coral reefs support biodiversity, protect coastlines from waves, and provide habitat for many fish species.'
+                    },
+                    {
+                        question: 'What are microplastics?',
+                        answer: 'Microplastics are tiny plastic fragments that enter water and food chains, affecting wildlife and ecosystems.'
+                    }
+                ]
+            },
+            reaction: function() {},
+            interact: function() {
+                if (levelContext.gameMode === 'challenge') return;
+                if (levelContext.playerLock) return;
+                const q2 = levelContext.questState?.secondQuest;
+                if (q2?.inSurface || q2?.returning) return;
+
+                try {
+                    AiNpc.showInteraction(this);
+                } catch (err) {
+                    console.error('Kirby AI interaction failed:', err);
+                    if (this.dialogueSystem?.showDialogue) {
+                        this.dialogueSystem.showDialogue(
+                            'Kirby is having trouble answering right now. Please try again.',
+                            'Kirby',
+                            null
+                        );
+                    }
+                }
             }
         };
 
@@ -1028,7 +1097,7 @@ class GameLevelAquaticGameLevel {
         const trashSprites = createDetailedTrashSprites();
 
         const setWorldNpcVisibility = (visible) => {
-            const ids = ['Mermaid', 'Random Slime', 'Shark'];
+            const ids = ['Mermaid', 'Random Slime', 'Kirby', 'Shark'];
             (this.gameEnv?.gameObjects || []).forEach((obj) => {
                 if (!obj?.spriteData?.id || !ids.includes(obj.spriteData.id) || !obj.canvas) return;
                 obj.canvas.style.display = visible ? 'block' : 'none';
@@ -1372,7 +1441,8 @@ class GameLevelAquaticGameLevel {
             const minNpcDist = 140;
             const npcPositions = [
                 mermaidNpc.INIT_POSITION,
-                slimeNpc.INIT_POSITION
+                slimeNpc.INIT_POSITION,
+                kirbyNpc.INIT_POSITION
             ];
 
             const maxX = Math.max(padding + 1, width - padding);
@@ -1665,7 +1735,7 @@ class GameLevelAquaticGameLevel {
             downRight: { row: 0, start: 0, columns: 1, mirror: true },
             upLeft: { row: 0, start: 0, columns: 1 },
             downLeft: { row: 0, start: 0, columns: 1 },
-            hitbox: { widthPercentage: 0.12, heightPercentage: 0.15 },
+            hitbox: { widthPercentage: 0.2, heightPercentage: 0.28 },
             reaction: function() {}
         };
 
@@ -1693,6 +1763,7 @@ class GameLevelAquaticGameLevel {
             { class: Player, data: playerData },
             { class: Npc, data: mermaidNpc },
             { class: Npc, data: slimeNpc },
+            { class: Npc, data: kirbyNpc },
             { class: Npc, data: sharkNpc },
             { class: Barrier, data: dbarrier_1 },
             { class: Barrier, data: dbarrier_2 },
@@ -1759,8 +1830,11 @@ class GameLevelAquaticGameLevel {
             const slimeNpc = this.gameEnv?.gameObjects?.find(
                 obj => obj?.spriteData?.id === 'Random Slime'
             );
+            const kirbyNpc = this.gameEnv?.gameObjects?.find(
+                obj => obj?.spriteData?.id === 'Kirby'
+            );
 
-            [mermaidNpc, slimeNpc].forEach((npc) => {
+            [mermaidNpc, slimeNpc, kirbyNpc].forEach((npc) => {
                 if (!npc) return;
                 if (npc.canvas) npc.canvas.style.display = 'none';
                 npc.position.x = -10000;
@@ -1936,6 +2010,8 @@ class GameLevelAquaticGameLevel {
         if (waveComplete) waveComplete.remove();
         const transition = document.getElementById('aquatic-transition-overlay');
         if (transition) transition.remove();
+        document.querySelectorAll('.ai-npc-modal').forEach((modal) => modal.remove());
+        document.querySelectorAll('.ai-npc-container').forEach((container) => container.remove());
         this.clearSurfaceTrash?.();
         this.clearChallengeStarfish?.();
     }

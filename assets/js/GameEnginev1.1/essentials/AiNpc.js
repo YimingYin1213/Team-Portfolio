@@ -26,8 +26,15 @@ class AiNpc {
      * @param {Object} npcInstance - The NPC instance (with this.spriteData, this.gameControl)
      */
     static showInteraction(npcInstance) {
+        if (!npcInstance || !npcInstance.spriteData) return;
+
         const npc = npcInstance;
         const data = npc.spriteData;
+        if (!Array.isArray(data.chatHistory)) data.chatHistory = [];
+        if (!Array.isArray(data.dialogues) || data.dialogues.length === 0) {
+            data.dialogues = [data.greeting || 'Hello!'];
+        }
+        if (!data.expertise) data.expertise = 'general';
 
         // Close any existing dialogue
         if (npc.dialogueSystem?.isDialogueOpen()) {
@@ -43,7 +50,14 @@ class AiNpc {
         }
 
         // Use DialogueSystem's cycling showRandomDialogue method
-        npc.dialogueSystem.showRandomDialogue(data.id, data.src, data);
+        if (typeof npc.dialogueSystem.showRandomDialogue === 'function') {
+            npc.dialogueSystem.showRandomDialogue(data.id, data.src, data);
+        } else if (typeof npc.dialogueSystem.showDialogue === 'function') {
+            const firstDialogue = data.dialogues[0] || data.greeting || 'Hello!';
+            npc.dialogueSystem.showDialogue(firstDialogue, data.id, data.src, data);
+        } else {
+            return;
+        }
 
         // Create and attach AI chat UI
         const ui = AiNpc.createChatUI(data);
@@ -134,14 +148,17 @@ class AiNpc {
      * @param {HTMLElement} container - The UI container to attach
      */
     static attachToDialogue(dialogueSystem, container) {
-        const dialogueBox = document.getElementById('custom-dialogue-box-' + dialogueSystem.safeId);
+        if (!dialogueSystem || !container) return;
+
+        const dialogueId = dialogueSystem.safeId || dialogueSystem.id;
+        const dialogueBox = document.getElementById('custom-dialogue-box-' + dialogueId);
         if (dialogueBox) {
             // Remove any existing AI NPC containers first
             const existingContainers = dialogueBox.querySelectorAll('.ai-npc-container');
             existingContainers.forEach(existing => existing.remove());
             
             // Find the close button using its specific ID
-            const closeBtn = document.getElementById('dialogue-close-btn-' + dialogueSystem.safeId);
+            const closeBtn = document.getElementById('dialogue-close-btn-' + dialogueId) || dialogueSystem.closeBtn;
             if (closeBtn && closeBtn.parentNode === dialogueBox) {
                 dialogueBox.insertBefore(container, closeBtn);
             } else {
@@ -157,6 +174,7 @@ class AiNpc {
      * @param {HTMLElement} responseArea - Response display element
      */
     static async sendPromptToBackend(spriteData, userMessage, responseArea) {
+        if (!Array.isArray(spriteData.chatHistory)) spriteData.chatHistory = [];
         spriteData.chatHistory.push({ role: 'user', message: userMessage });
 
         responseArea.textContent = 'Thinking...';
@@ -246,6 +264,8 @@ class AiNpc {
      * @param {Object} spriteData - The NPC sprite data
      */
     static showChatHistory(spriteData) {
+        if (!Array.isArray(spriteData.chatHistory)) spriteData.chatHistory = [];
+
         const modal = document.createElement('div');
         modal.className = 'ai-npc-modal';
 
@@ -253,6 +273,13 @@ class AiNpc {
         title.textContent = 'Chat History';
         title.className = 'ai-npc-modal-title';
         modal.appendChild(title);
+
+        if (spriteData.chatHistory.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'ai-message';
+            empty.textContent = 'No chat history yet.';
+            modal.appendChild(empty);
+        }
 
         spriteData.chatHistory.forEach(msg => {
             const div = document.createElement('div');
