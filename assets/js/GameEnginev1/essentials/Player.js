@@ -79,54 +79,39 @@ class Player extends Character {
         this.velocity.x = 0;
         this.velocity.y = 0;
 
-        this.moved = false;
+        const horizontal = (this.pressedKeys[this.keypress.right] ? 1 : 0) - (this.pressedKeys[this.keypress.left] ? 1 : 0);
+        const vertical = (this.pressedKeys[this.keypress.down] ? 1 : 0) - (this.pressedKeys[this.keypress.up] ? 1 : 0);
+        const hasHorizontal = horizontal !== 0;
+        const hasVertical = vertical !== 0;
+        const diagonalScale = (hasHorizontal && hasVertical) ? Math.SQRT1_2 : 1;
 
-        if (this.pressedKeys[this.keypress.right] || this.pressedKeys[this.keypress.left]) {
-            this.moved = true;
-
-            if (this.pressedKeys[this.keypress.right]) {
-                this.velocity.x += this.xVelocity;
-            }
-
-            else if (this.pressedKeys[this.keypress.left]) {
-                this.velocity.x -= this.xVelocity;
-            }
-        }
-
-        if (this.pressedKeys[this.keypress.up] || this.pressedKeys[this.keypress.down]) {
-            this.moved = true;
-
-            if (this.pressedKeys[this.keypress.up]) {
-                this.velocity.y -= this.yVelocity;
-            }
-
-            else if (this.pressedKeys[this.keypress.down]) {
-                this.velocity.y += this.yVelocity;
-            }
-        }
+        this.velocity.x = horizontal * this.xVelocity * diagonalScale;
+        this.velocity.y = vertical * this.yVelocity * diagonalScale;
+        this.moved = hasHorizontal || hasVertical;
     }
 
-    updateDirection() {       
-        // Single-key movement
-        if (this.pressedKeys[this.keypress.up]) {
-            this.direction = "up";
-        } else if (this.pressedKeys[this.keypress.down]) {
-            this.direction = "down";
-        } else if (this.pressedKeys[this.keypress.right]) {
-            this.direction = "right";
-        } else if (this.pressedKeys[this.keypress.left]) {
-            this.direction = "left";
-        }
+    updateDirection() {
+        const horizontal = (this.pressedKeys[this.keypress.right] ? 1 : 0) - (this.pressedKeys[this.keypress.left] ? 1 : 0);
+        const vertical = (this.pressedKeys[this.keypress.down] ? 1 : 0) - (this.pressedKeys[this.keypress.up] ? 1 : 0);
 
-        // Multi-key movement
-        if (this.pressedKeys[this.keypress.left] && this.pressedKeys[this.keypress.up]) {
+        if (horizontal === 0 && vertical === 0) return;
+
+        if (horizontal < 0 && vertical < 0) {
             this.direction = "upLeft";
-        } else if (this.pressedKeys[this.keypress.left] && this.pressedKeys[this.keypress.down]) {
+        } else if (horizontal < 0 && vertical > 0) {
             this.direction = "downLeft";
-        } else if (this.pressedKeys[this.keypress.right] && this.pressedKeys[this.keypress.up]) {
+        } else if (horizontal > 0 && vertical < 0) {
             this.direction = "upRight";
-        } else if (this.pressedKeys[this.keypress.right] && this.pressedKeys[this.keypress.down]) {
+        } else if (horizontal > 0 && vertical > 0) {
             this.direction = "downRight";
+        } else if (vertical < 0) {
+            this.direction = "up";
+        } else if (vertical > 0) {
+            this.direction = "down";
+        } else if (horizontal > 0) {
+            this.direction = "right";
+        } else if (horizontal < 0) {
+            this.direction = "left";
         }
     }
 

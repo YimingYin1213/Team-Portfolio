@@ -24,6 +24,7 @@ class GameLevelBasketball {
     this.bestCoins = this.loadBestCoins();
     this.timeHud = null;
     this.messageHud = null;
+    this.bottomNav = null;
     this.leaderboard = null;
     this.introDialogue = null;
     this.preGameLocked = true;
@@ -176,6 +177,7 @@ class GameLevelBasketball {
     this.startTime = 0;
     this.currentTime = 0;
     this.createHud();
+    this.createBottomNav();
     this.updateHud();
     this.initLeaderboard();
     this.showIntroDialogue();
@@ -314,6 +316,55 @@ class GameLevelBasketball {
       textAlign: 'center'
     });
     container.appendChild(this.messageHud);
+  }
+
+  createBottomNav() {
+    const oldNav = document.getElementById('basketball-bottom-nav');
+    if (oldNav) oldNav.remove();
+
+    const basePath = (this.gameEnv?.path || '').replace(/\/$/, '');
+    const aquaticUrl = `${basePath}/games/aquatic.html`;
+    const seekUrl = `${basePath}/gamify/seek.html`;
+
+    this.bottomNav = document.createElement('div');
+    this.bottomNav.id = 'basketball-bottom-nav';
+    Object.assign(this.bottomNav.style, {
+      position: 'fixed',
+      left: '0',
+      right: '0',
+      bottom: '10px',
+      zIndex: '20001',
+      display: 'flex',
+      justifyContent: 'center',
+      gap: '10px',
+      pointerEvents: 'auto'
+    });
+
+    const createNavButton = (label, url) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = label;
+      Object.assign(button.style, {
+        background: 'rgba(255,255,255,0.12)',
+        color: '#fff',
+        border: '1px solid rgba(255,255,255,0.35)',
+        borderRadius: '8px',
+        padding: '8px 14px',
+        fontFamily: 'monospace',
+        fontSize: '13px',
+        fontWeight: '700',
+        cursor: 'pointer',
+        backdropFilter: 'blur(2px)'
+      });
+      button.addEventListener('click', () => {
+        window.location.href = url;
+      });
+      return button;
+    };
+
+    this.bottomNav.appendChild(createNavButton('Go to Aquatic', aquaticUrl));
+    this.bottomNav.appendChild(createNavButton('Go to Seek', seekUrl));
+    document.body.appendChild(this.bottomNav);
   }
 
   updateHud() {
@@ -500,6 +551,7 @@ class GameLevelBasketball {
     document.removeEventListener('keydown', this.handleRestartKey);
     if (this.timeHud) this.timeHud.remove();
     if (this.messageHud) this.messageHud.remove();
+    if (this.bottomNav) this.bottomNav.remove();
     if (this.leaderboard && typeof this.leaderboard.destroy === 'function') {
       this.leaderboard.destroy();
     }
@@ -508,6 +560,7 @@ class GameLevelBasketball {
     }
     this.timeHud = null;
     this.messageHud = null;
+    this.bottomNav = null;
     this.leaderboard = null;
     this.introDialogue = null;
   }
