@@ -292,6 +292,7 @@ class GameLevelAquaticGameLevel {
             }
         };
 
+        // Story mode quest state machine used by Mermaid and Slime dialogue gates.
         const questState = {
             firstQuest: {
                 accepted: false,
@@ -313,9 +314,11 @@ class GameLevelAquaticGameLevel {
             }
         };
 
+        // Mode is selected through URL query string: ?mode=challenge.
         const modeParam = new URLSearchParams(window.location.search).get('mode');
         this.gameMode = modeParam === 'challenge' ? 'challenge' : 'story';
 
+        // Challenge mode session + persistent leaderboard state.
         const challengeState = {
             wave: 1,
             waveTarget: 14,
@@ -336,6 +339,7 @@ class GameLevelAquaticGameLevel {
             obj => obj?.spriteData?.id === 'playerData'
         );
 
+        // Prevent duplicate action rows when a dialogue updates in place.
         const clearDialogueActionButtons = (dialogueSystem) => {
             if (!dialogueSystem?.dialogueBox) return;
 
@@ -902,6 +906,7 @@ class GameLevelAquaticGameLevel {
             document.body.appendChild(bar);
         };
 
+        // Start the next challenge wave by respawning a full starfish set.
         const startChallengeWave = () => {
             if (this.gameMode !== 'challenge') return;
             clearChallengeStarfish();
@@ -919,6 +924,7 @@ class GameLevelAquaticGameLevel {
             backgroundObject.image.src = src;
         };
 
+        // Shared cinematic overlay for scene changes.
         const transitionOverlay = (label) => {
             const existing = document.getElementById('aquatic-transition-overlay');
             if (existing) existing.remove();
@@ -957,6 +963,7 @@ class GameLevelAquaticGameLevel {
             return overlay;
         };
 
+        // Locks input while moving the player vertically for transition scenes.
         const animatePlayerSwim = (targetY) => {
             const player = getPlayer();
             if (!player) return Promise.resolve();
@@ -1096,6 +1103,7 @@ class GameLevelAquaticGameLevel {
 
         const trashSprites = createDetailedTrashSprites();
 
+        // Hide NPC layer during surface quest scene and restore afterward.
         const setWorldNpcVisibility = (visible) => {
             const ids = ['Mermaid', 'Random Slime', 'Shark'];
             if (!questState.secondQuest.completed) {
@@ -1107,6 +1115,7 @@ class GameLevelAquaticGameLevel {
             });
         };
 
+        // Narrative beat: Kirby disappears permanently after quest #2 completion.
         const hideKirbyAfterQuestTwo = () => {
             const kirby = this.gameEnv?.gameObjects?.find(
                 (obj) => obj?.spriteData?.id === 'Kirby'
@@ -1120,6 +1129,7 @@ class GameLevelAquaticGameLevel {
             kirby.reaction = function() {};
         };
 
+        // Build quest #2 cleanup targets with lightweight floating animation.
         const spawnSurfaceTrash = () => {
             if (questState.secondQuest.inSurface === false) return;
 
@@ -1212,6 +1222,7 @@ class GameLevelAquaticGameLevel {
             this.surfaceTrashIds = [];
         };
 
+        // Story transition: underwater world -> surface cleanup scene.
         const transitionToSurface = async () => {
             const q2 = questState.secondQuest;
             if (q2.inSurface || q2.returning || q2.completed) return;
@@ -1240,6 +1251,7 @@ class GameLevelAquaticGameLevel {
             updateQuestHud();
         };
 
+        // Story transition: return underwater and unlock Slime final turn-in.
         const transitionBackUnderwater = async () => {
             const q2 = questState.secondQuest;
             if (!q2.inSurface || q2.returning || q2.completed) return;
@@ -1789,6 +1801,7 @@ class GameLevelAquaticGameLevel {
     }
 
     initialize() {
+        // Runtime wiring: mount HUD/menu, apply locks, gate NPCs, and attach shark AI.
         this.ensureTopMenuBar?.();
 
         if (this.gameMode === 'challenge') {
@@ -2011,6 +2024,7 @@ class GameLevelAquaticGameLevel {
     }
 
     destroy() {
+        // Remove level-owned overlays and temporary spawned objects.
         const topMenu = document.getElementById('aquatic-top-menubar');
         if (topMenu) topMenu.remove();
         const topMenuNotice = document.getElementById('aquatic-top-menu-notice');
