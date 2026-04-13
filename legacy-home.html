@@ -1,0 +1,298 @@
+---
+layout: null
+permalink: /legacy-home
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Legacy Home portal for switching between space and aquatic Team Space themes">
+    <title>Legacy Home</title>
+    <style>
+        :root {
+            --space-1: #050a18;
+            --space-2: #101c3b;
+            --space-3: #1f2f68;
+            --aqua-1: #021a27;
+            --aqua-2: #06475c;
+            --aqua-3: #0a6b7d;
+            --text: #edf8ff;
+            --muted: rgba(237, 248, 255, 0.74);
+            --panel: rgba(4, 10, 22, 0.56);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            min-height: 100%;
+            font-family: "Trebuchet MS", "Avenir Next", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 18% 12%, rgba(255,255,255,0.12), transparent 16%),
+                radial-gradient(circle at 84% 10%, rgba(122,243,255,0.14), transparent 18%),
+                linear-gradient(135deg, #040816 0%, #071a31 30%, #063b4c 72%, #021a27 100%);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.9) 0 1px, transparent 2px),
+                radial-gradient(circle at 72% 26%, rgba(255,255,255,0.65) 0 2px, transparent 3px),
+                radial-gradient(circle at 54% 78%, rgba(122,243,255,0.5) 0 3px, transparent 4px),
+                radial-gradient(circle at 84% 62%, rgba(255,255,255,0.6) 0 2px, transparent 3px),
+                radial-gradient(circle at 32% 68%, rgba(122,243,255,0.42) 0 4px, transparent 5px);
+            background-size: 320px 320px;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .shell {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            padding: 28px;
+            display: grid;
+            gap: 28px;
+            align-content: center;
+        }
+
+        .hero {
+            width: min(1080px, 100%);
+            margin: 0 auto;
+            padding: 28px;
+            border-radius: 28px;
+            background: rgba(4, 13, 28, 0.66);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 24px 90px rgba(0, 0, 0, 0.34);
+            backdrop-filter: blur(16px);
+            text-align: center;
+        }
+
+        .eyebrow {
+            display: inline-block;
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.16);
+            color: #bfefff;
+            font-size: 0.76rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 16px 0 12px;
+            font-size: clamp(2.4rem, 6vw, 4.6rem);
+            line-height: 0.96;
+        }
+
+        .gradient {
+            background: linear-gradient(90deg, #ffffff 0%, #90d0ff 42%, #7af3ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            width: min(720px, 100%);
+            margin: 0 auto;
+            color: var(--muted);
+            font-size: 1.02rem;
+            line-height: 1.65;
+        }
+
+        .grid {
+            width: min(1080px, 100%);
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 24px;
+        }
+
+        .portal-card {
+            position: relative;
+            min-height: 440px;
+            padding: 28px;
+            border-radius: 32px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+            display: grid;
+            align-content: space-between;
+            gap: 22px;
+        }
+
+        .portal-card.space {
+            background:
+                radial-gradient(circle at 24% 18%, rgba(173, 206, 255, 0.26), transparent 24%),
+                radial-gradient(circle at 78% 28%, rgba(142, 125, 255, 0.24), transparent 24%),
+                linear-gradient(180deg, var(--space-3) 0%, var(--space-2) 42%, var(--space-1) 100%);
+        }
+
+        .portal-card.aquatic {
+            background:
+                radial-gradient(circle at 22% 16%, rgba(122,243,255,0.22), transparent 24%),
+                radial-gradient(circle at 76% 18%, rgba(105,255,209,0.16), transparent 24%),
+                linear-gradient(180deg, var(--aqua-3) 0%, var(--aqua-2) 44%, var(--aqua-1) 100%);
+        }
+
+        .portal-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .portal-card.space::before {
+            background:
+                radial-gradient(circle at 14% 24%, rgba(255,255,255,0.92) 0 1px, transparent 2px),
+                radial-gradient(circle at 84% 16%, rgba(255,255,255,0.8) 0 2px, transparent 3px),
+                radial-gradient(circle at 58% 58%, rgba(107,231,255,0.52) 0 4px, transparent 5px),
+                radial-gradient(circle at 76% 74%, rgba(255,255,255,0.64) 0 1px, transparent 2px),
+                radial-gradient(circle at 28% 76%, rgba(142,125,255,0.48) 0 5px, transparent 6px);
+        }
+
+        .portal-card.aquatic::before {
+            background:
+                radial-gradient(circle at 14% 24%, rgba(255,255,255,0.76) 0 6px, transparent 7px),
+                radial-gradient(circle at 84% 18%, rgba(122,243,255,0.64) 0 8px, transparent 9px),
+                radial-gradient(circle at 58% 58%, rgba(255,255,255,0.58) 0 4px, transparent 5px),
+                radial-gradient(circle at 76% 74%, rgba(105,255,209,0.34) 0 7px, transparent 8px),
+                linear-gradient(180deg, transparent, rgba(241, 218, 168, 0.18));
+        }
+
+        .card-top,
+        .card-bottom {
+            position: relative;
+            z-index: 1;
+        }
+
+        .mode-tag {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.14);
+        }
+
+        .portal-card h2 {
+            margin: 16px 0 10px;
+            font-size: 2rem;
+        }
+
+        .portal-card p {
+            margin: 0;
+            line-height: 1.6;
+            color: rgba(237,248,255,0.84);
+        }
+
+        .feature-list {
+            margin: 18px 0 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 10px;
+            color: rgba(237,248,255,0.88);
+        }
+
+        .feature-list li {
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 52px;
+            padding: 14px 20px;
+            border-radius: 18px;
+            text-decoration: none;
+            font-weight: 700;
+            color: #03121f;
+            background: linear-gradient(90deg, #9ed8ff, #ffffff);
+            box-shadow: 0 16px 32px rgba(0,0,0,0.2);
+        }
+
+        .portal-card.aquatic .cta {
+            background: linear-gradient(90deg, #7af3ff, #69ffd1);
+            color: #032430;
+        }
+
+        .back-link {
+            width: min(1080px, 100%);
+            margin: 0 auto;
+            color: rgba(237,248,255,0.76);
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 860px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .shell {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <section class="hero">
+            <div class="eyebrow">Legacy Home</div>
+            <h1>Choose Your <span class="gradient">Portal Current</span></h1>
+            <p class="subtitle">Legacy Home is the crossover gate between the original space-era Team Space experience and the newer aquatic world. Teleport into whichever visual language you want, then jump back here any time.</p>
+        </section>
+
+        <section class="grid" aria-label="Theme portals">
+            <article class="portal-card space">
+                <div class="card-top">
+                    <div class="mode-tag">Original Theme</div>
+                    <h2>Space Portal</h2>
+                    <p>Return to the older galaxy framing with constellations, jump routes, and orbit-style navigation.</p>
+                    <ul class="feature-list">
+                        <li>Starfield backdrop and nebula styling</li>
+                        <li>Legacy portal language and cosmic navigation</li>
+                        <li>Direct access to games, builder, and return routes</li>
+                    </ul>
+                </div>
+                <div class="card-bottom">
+                    <a class="cta" href="{{ site.baseurl }}/legacy-space-portal">Enter Space Portal</a>
+                </div>
+            </article>
+
+            <article class="portal-card aquatic">
+                <div class="card-top">
+                    <div class="mode-tag">Current Theme</div>
+                    <h2>Aquatic Portal</h2>
+                    <p>Drop into the reef-forward Team Space flow with bubble fields, jellyfish guides, and the live underwater hub.</p>
+                    <ul class="feature-list">
+                        <li>Aquatic landing and reef portal shell</li>
+                        <li>Live underwater Team Space embed</li>
+                        <li>Quick jump into the current themed experience</li>
+                    </ul>
+                </div>
+                <div class="card-bottom">
+                    <a class="cta" href="{{ site.baseurl }}/team-space-portal">Enter Aquatic Portal</a>
+                </div>
+            </article>
+        </section>
+
+        <a class="back-link" href="{{ site.baseurl }}/">Return to the landing page</a>
+    </main>
+</body>
+</html>

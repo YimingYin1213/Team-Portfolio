@@ -1,0 +1,313 @@
+---
+layout: null
+permalink: /legacy-space-portal
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Legacy space-themed Team Space portal">
+    <title>Legacy Space Portal</title>
+    <style>
+        :root {
+            --bg-1: #040814;
+            --bg-2: #09162c;
+            --bg-3: #16295a;
+            --accent: #6be7ff;
+            --accent-2: #8e7dff;
+            --text: #eefaff;
+            --muted: #9eb8d8;
+            --panel: rgba(9, 15, 32, 0.78);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            min-height: 100%;
+            font-family: "Trebuchet MS", "Avenir Next", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 18% 14%, rgba(107,231,255,0.12), transparent 22%),
+                radial-gradient(circle at 84% 12%, rgba(142,125,255,0.14), transparent 24%),
+                linear-gradient(180deg, var(--bg-3) 0%, var(--bg-2) 38%, var(--bg-1) 100%);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 12% 20%, rgba(255,255,255,0.95) 0 1px, transparent 2px),
+                radial-gradient(circle at 72% 18%, rgba(255,255,255,0.7) 0 2px, transparent 3px),
+                radial-gradient(circle at 48% 54%, rgba(107,231,255,0.62) 0 3px, transparent 4px),
+                radial-gradient(circle at 82% 76%, rgba(255,255,255,0.52) 0 1px, transparent 2px),
+                radial-gradient(circle at 28% 72%, rgba(142,125,255,0.54) 0 5px, transparent 6px);
+            background-size: 320px 320px;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .shell {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            padding: 28px;
+            display: grid;
+            gap: 24px;
+            align-content: start;
+        }
+
+        .topbar {
+            width: min(1120px, 100%);
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 20px;
+            border-radius: 24px;
+            background: rgba(8, 15, 32, 0.68);
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(14px);
+        }
+
+        .topbar strong {
+            display: block;
+            font-size: 0.84rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: #c5f3ff;
+        }
+
+        .topbar span {
+            color: var(--muted);
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .action-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            padding: 10px 16px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 700;
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .action-link.primary {
+            color: #05101f;
+            background: linear-gradient(90deg, #6be7ff, #9a84ff);
+        }
+
+        .action-link.secondary {
+            color: var(--text);
+            background: rgba(255,255,255,0.06);
+        }
+
+        .hero {
+            width: min(1120px, 100%);
+            margin: 0 auto;
+            padding: 34px;
+            border-radius: 32px;
+            background: linear-gradient(180deg, rgba(11, 18, 38, 0.76), rgba(5, 11, 26, 0.9));
+            border: 1px solid rgba(107,231,255,0.18);
+            box-shadow: 0 24px 90px rgba(0,0,0,0.34);
+        }
+
+        h1 {
+            margin: 0 0 12px;
+            font-size: clamp(2.5rem, 6vw, 4.8rem);
+            line-height: 0.96;
+        }
+
+        .gradient {
+            background: linear-gradient(90deg, #ffffff, #7bdcff 44%, #9e8bff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            width: min(720px, 100%);
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .grid {
+            width: min(1120px, 100%);
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 22px;
+        }
+
+        .panel {
+            padding: 24px;
+            border-radius: 28px;
+            background: var(--panel);
+            border: 1px solid rgba(107,231,255,0.14);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+        }
+
+        .panel h2 {
+            margin: 0 0 16px;
+            font-size: 1.25rem;
+        }
+
+        .jump-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .jump {
+            display: block;
+            text-decoration: none;
+            color: var(--text);
+            padding: 16px;
+            border-radius: 20px;
+            background:
+                radial-gradient(circle at top right, rgba(107,231,255,0.12), transparent 32%),
+                rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            min-height: 128px;
+        }
+
+        .jump strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .jump span {
+            display: block;
+            color: var(--muted);
+            line-height: 1.55;
+            font-size: 0.94rem;
+        }
+
+        .orbit-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 12px;
+        }
+
+        .orbit-list li {
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--muted);
+        }
+
+        .orbit-list strong {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--text);
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .jump-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <header class="topbar">
+            <div>
+                <strong>Legacy Space Portal</strong>
+                <span>The original cosmic route is still online.</span>
+            </div>
+            <div class="actions">
+                <a class="action-link primary" href="{{ site.baseurl }}/legacy-home">Legacy Home</a>
+                <a class="action-link secondary" href="{{ site.baseurl }}/team-space-portal">Switch to Aquatic</a>
+            </div>
+        </header>
+
+        <section class="hero">
+            <h1>Return to the <span class="gradient">Galaxy Route</span></h1>
+            <p>This legacy portal keeps the original space-style framing alive. Use it as a launch deck for the same game work, builder tools, and navigation targets, then jump back to Legacy Home whenever you want to switch themes.</p>
+        </section>
+
+        <section class="grid">
+            <article class="panel">
+                <h2>Launch Destinations</h2>
+                <div class="jump-grid">
+                    <a class="jump" href="{{ site.baseurl }}/team-space-portal/gamebuilder">
+                        <strong>Game Builder</strong>
+                        <span>Open the builder workspace and export new levels from the legacy launch deck.</span>
+                    </a>
+                    <a class="jump" href="{{ site.baseurl }}/games/aquatic.html">
+                        <strong>Aquatic Game</strong>
+                        <span>Jump straight into the reef challenge from the older cosmic shell.</span>
+                    </a>
+                    <a class="jump" href="{{ site.baseurl }}/gamify/seek.html">
+                        <strong>Find Kirby</strong>
+                        <span>Open the seek level and continue the original mini-game route.</span>
+                    </a>
+                    <a class="jump" href="{{ site.baseurl }}/games/basketball.html">
+                        <strong>Basketball</strong>
+                        <span>Launch the court level from the legacy starfield path.</span>
+                    </a>
+                    <a class="jump" href="{{ site.baseurl }}/games/combined.html">
+                        <strong>Combined Run</strong>
+                        <span>Chain Aquatic, Seek, and Basketball in a single session.</span>
+                    </a>
+                    <a class="jump" href="{{ site.baseurl }}/team-space">
+                        <strong>Current Team Space</strong>
+                        <span>Open the current hub directly if you want the full page without the aquatic shell.</span>
+                    </a>
+                </div>
+            </article>
+
+            <aside class="panel">
+                <h2>Orbit Notes</h2>
+                <ul class="orbit-list">
+                    <li>
+                        <strong>Legacy Theme</strong>
+                        This page preserves the original space mood while keeping current content destinations reachable.
+                    </li>
+                    <li>
+                        <strong>Theme Teleport</strong>
+                        Legacy Home is the crossover gate between the space route and the aquatic route.
+                    </li>
+                    <li>
+                        <strong>Builder Access</strong>
+                        The builder link points at the repaired portal builder path so level export still works.
+                    </li>
+                    <li>
+                        <strong>Aquatic Shortcut</strong>
+                        Use the top-right switch to move back into the current underwater portal instantly.
+                    </li>
+                </ul>
+            </aside>
+        </section>
+    </main>
+</body>
+</html>

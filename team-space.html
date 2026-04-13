@@ -10,8 +10,8 @@ layout: null
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <meta name="author" content="Team Space">
-    <meta name="description" content="Team Space CSSE Portfolio Hub - Interactive galaxy navigation">
-    <title>Team Space (CSSE) - Portfolio Hub</title>
+    <meta name="description" content="Team Space CSSE Portfolio Hub - Interactive underwater navigation">
+    <title>Team Space (CSSE) - Underwater Portfolio Hub</title>
     <style>
         * {
             margin: 0 !important;
@@ -25,17 +25,48 @@ layout: null
             width: 100% !important;
             height: 100% !important;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0d1b2a 100%) !important;
-            color: #e0e0ff !important;
+            background:
+                radial-gradient(circle at 50% 0%, rgba(132, 244, 255, 0.18), transparent 28%),
+                linear-gradient(180deg, #0b5a72 0%, #06485d 18%, #04374a 42%, #022837 68%, #011923 100%) !important;
+            color: #e7fbff !important;
             overflow-x: hidden !important;
         }
 
         body {
             min-height: 100vh !important;
             position: relative !important;
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg fill='none' stroke='%23ecfcff' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='7.5'/%3E%3Cpath d='M7 7 L17 17' opacity='.85'/%3E%3Cpath d='M7 12 H17' opacity='.75'/%3E%3Cpath d='M12 7 V17' opacity='.75'/%3E%3Cpath d='M9 5.5 C13 4.6 16.8 6.1 18.5 9.2' opacity='.65'/%3E%3Cpath d='M17.5 17.5 L27 27'/%3E%3Cpath d='M22.5 22.5 L25.5 29'/%3E%3C/svg%3E") 8 8, auto !important;
         }
 
-        /* Animated starfield background */
+        body::before,
+        body::after {
+            content: '' !important;
+            position: fixed !important;
+            inset: 0 !important;
+            pointer-events: none !important;
+        }
+
+        body::before {
+            background:
+                radial-gradient(circle at 20% 12%, rgba(255, 255, 255, 0.12), transparent 18%),
+                radial-gradient(circle at 72% 8%, rgba(173, 247, 255, 0.1), transparent 16%),
+                repeating-linear-gradient(115deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 70px) !important;
+            opacity: 0.55 !important;
+            z-index: 0 !important;
+        }
+
+        body::after {
+            inset: auto 0 0 0 !important;
+            height: 20vh !important;
+            background:
+                radial-gradient(circle at 10% 100%, rgba(14, 66, 58, 0.95) 0 18%, transparent 19%),
+                radial-gradient(circle at 23% 100%, rgba(8, 95, 86, 0.92) 0 15%, transparent 16%),
+                radial-gradient(circle at 83% 100%, rgba(16, 72, 62, 0.94) 0 21%, transparent 22%),
+                linear-gradient(180deg, rgba(228, 201, 149, 0), rgba(228, 201, 149, 0.12) 55%, rgba(228, 201, 149, 0.22)) !important;
+            z-index: 0 !important;
+        }
+
+        /* Animated bubble field background */
         .stars {
             position: fixed !important;
             top: 0 !important;
@@ -48,14 +79,17 @@ layout: null
 
         .star {
             position: absolute !important;
-            background: white !important;
+            background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.92), rgba(122,243,255,0.32) 70%, transparent 72%) !important;
             border-radius: 50% !important;
-            animation: twinkle 3s infinite !important;
+            border: 1px solid rgba(255,255,255,0.34) !important;
+            box-shadow: inset 0 0 6px rgba(255,255,255,0.18), 0 0 10px rgba(122,243,255,0.18) !important;
+            animation: bubbleRise 8s infinite ease-in !important;
         }
 
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
+        @keyframes bubbleRise {
+            0% { opacity: 0; transform: translateY(16px) scale(0.9); }
+            12% { opacity: 0.7; }
+            100% { opacity: 0; transform: translateY(-85px) scale(1.08); }
         }
 
         /* Main container */
@@ -81,27 +115,27 @@ layout: null
         .header h1 {
             font-size: 4rem !important;
             margin-bottom: 10px !important;
-            color: #64b5f6 !important;
+            color: #8ff6ff !important;
             letter-spacing: 3px !important;
-            text-shadow: 0 0 30px rgba(100, 181, 246, 0.6), 0 0 60px rgba(129, 212, 250, 0.4) !important;
+            text-shadow: 0 0 30px rgba(122, 243, 255, 0.42), 0 0 60px rgba(122, 243, 255, 0.22) !important;
         }
 
         .header p {
             font-size: 1.3rem !important;
-            color: #81d4fa !important;
+            color: #b8fbff !important;
             letter-spacing: 2px !important;
             font-style: italic !important;
-            text-shadow: 0 0 20px rgba(129, 212, 250, 0.4) !important;
+            text-shadow: 0 0 20px rgba(122, 243, 255, 0.28) !important;
         }
 
         .subtitle {
             font-size: 0.9rem !important;
-            color: #90caf9 !important;
+            color: #c6edf1 !important;
             margin-top: 15px !important;
             opacity: 0.8 !important;
         }
 
-        /* Galaxy clouds grid */
+        /* Bubble clusters grid */
         .galaxy-grid {
             display: grid !important;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
@@ -112,11 +146,11 @@ layout: null
             width: 100% !important;
         }
 
-        /* Galaxy cloud card */
+        /* Bubble cluster card */
         .galaxy-cloud {
             position: relative !important;
             height: 350px !important;
-            cursor: pointer !important;
+            cursor: inherit !important;
             perspective: 1000px !important;
             animation: float 6s ease-in-out infinite !important;
         }
@@ -143,75 +177,76 @@ layout: null
             transform: scale(1.05) rotateY(5deg) !important;
         }
 
-        /* Cloud background with glow effect */
+        /* Bubble background with glow effect */
         .cloud-background {
             position: absolute !important;
             width: 100% !important;
             height: 100% !important;
-            border-radius: 50% !important;
-            background: radial-gradient(circle at 30% 30%, rgba(100, 181, 246, 0.4), rgba(33, 150, 243, 0.2), transparent) !important;
-            border: 2px solid rgba(129, 212, 250, 0.5) !important;
+            border-radius: 44% 56% 52% 48% / 46% 42% 58% 54% !important;
+            background: radial-gradient(circle at 30% 28%, rgba(233, 253, 255, 0.38), rgba(122, 243, 255, 0.24) 34%, rgba(41, 163, 201, 0.14) 58%, transparent 82%) !important;
+            border: 2px solid rgba(196, 248, 255, 0.45) !important;
             box-shadow: 
-                0 0 30px rgba(100, 181, 246, 0.4),
-                inset 0 0 30px rgba(129, 212, 250, 0.2),
-                0 0 60px rgba(33, 150, 243, 0.3) !important;
-            filter: blur(1px) !important;
+                0 0 30px rgba(122, 243, 255, 0.22),
+                inset 0 0 40px rgba(228, 254, 255, 0.18),
+                0 0 60px rgba(15, 153, 195, 0.24) !important;
+            filter: blur(0.6px) !important;
         }
 
         .galaxy-cloud:nth-child(1) .cloud-background {
-            background: radial-gradient(circle at 30% 30%, rgba(100, 181, 246, 0.4), rgba(33, 150, 243, 0.2), transparent) !important;
-            box-shadow: 
-                0 0 30px rgba(100, 181, 246, 0.4),
-                inset 0 0 30px rgba(129, 212, 250, 0.2),
-                0 0 60px rgba(33, 150, 243, 0.3) !important;
+            background: radial-gradient(circle at 30% 30%, rgba(240, 255, 255, 0.42), rgba(117, 238, 255, 0.26), rgba(42, 135, 199, 0.14), transparent) !important;
+            box-shadow:
+                0 0 30px rgba(117, 238, 255, 0.24),
+                inset 0 0 30px rgba(228, 254, 255, 0.2),
+                0 0 60px rgba(42, 135, 199, 0.2) !important;
         }
 
         .galaxy-cloud:nth-child(2) .cloud-background {
-            background: radial-gradient(circle at 30% 30%, rgba(156, 39, 176, 0.4), rgba(103, 58, 183, 0.2), transparent) !important;
-            box-shadow: 
-                0 0 30px rgba(156, 39, 176, 0.4),
-                inset 0 0 30px rgba(171, 71, 188, 0.2),
-                0 0 60px rgba(103, 58, 183, 0.3) !important;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 244, 249, 0.42), rgba(255, 154, 212, 0.24), rgba(196, 98, 191, 0.14), transparent) !important;
+            box-shadow:
+                0 0 30px rgba(255, 154, 212, 0.22),
+                inset 0 0 30px rgba(255, 235, 246, 0.18),
+                0 0 60px rgba(196, 98, 191, 0.18) !important;
         }
 
         .galaxy-cloud:nth-child(3) .cloud-background {
-            background: radial-gradient(circle at 30% 30%, rgba(76, 175, 80, 0.4), rgba(56, 142, 60, 0.2), transparent) !important;
-            box-shadow: 
-                0 0 30px rgba(76, 175, 80, 0.4),
-                inset 0 0 30px rgba(102, 187, 106, 0.2),
-                0 0 60px rgba(56, 142, 60, 0.3) !important;
+            background: radial-gradient(circle at 30% 30%, rgba(244, 255, 245, 0.4), rgba(120, 240, 193, 0.22), rgba(28, 151, 118, 0.14), transparent) !important;
+            box-shadow:
+                0 0 30px rgba(120, 240, 193, 0.22),
+                inset 0 0 30px rgba(234, 255, 241, 0.18),
+                0 0 60px rgba(28, 151, 118, 0.18) !important;
         }
 
         .galaxy-cloud:nth-child(4) .cloud-background {
-            background: radial-gradient(circle at 30% 30%, rgba(255, 152, 0, 0.4), rgba(255, 111, 0, 0.2), transparent) !important;
-            box-shadow: 
-                0 0 30px rgba(255, 152, 0, 0.4),
-                inset 0 0 30px rgba(255, 167, 38, 0.2),
-                0 0 60px rgba(255, 111, 0, 0.3) !important;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 250, 238, 0.42), rgba(255, 201, 120, 0.22), rgba(234, 140, 55, 0.14), transparent) !important;
+            box-shadow:
+                0 0 30px rgba(255, 201, 120, 0.22),
+                inset 0 0 30px rgba(255, 248, 228, 0.18),
+                0 0 60px rgba(234, 140, 55, 0.18) !important;
         }
 
-        /* Animated particles inside cloud */
+        /* Animated particles inside bubble */
         .particles {
             position: absolute !important;
             width: 100% !important;
             height: 100% !important;
-            border-radius: 50% !important;
+            border-radius: 44% 56% 52% 48% / 46% 42% 58% 54% !important;
             overflow: hidden !important;
         }
 
         .particle {
             position: absolute !important;
-            width: 3px !important;
-            height: 3px !important;
-            background: rgba(255, 255, 255, 0.6) !important;
+            width: 6px !important;
+            height: 6px !important;
+            background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.92), rgba(122, 243, 255, 0.28) 72%, transparent 74%) !important;
             border-radius: 50% !important;
+            border: 1px solid rgba(255,255,255,0.26) !important;
             animation: drift 15s infinite linear !important;
         }
 
         @keyframes drift {
             0% {
                 opacity: 0;
-                transform: translate(0, 0);
+                transform: translate(0, 0) scale(0.85);
             }
             10% {
                 opacity: 1;
@@ -221,7 +256,7 @@ layout: null
             }
             100% {
                 opacity: 0;
-                transform: translate(var(--tx), var(--ty));
+                transform: translate(var(--tx), var(--ty)) scale(1.08);
             }
         }
 
@@ -240,7 +275,7 @@ layout: null
         .cloud-icon {
             font-size: 4rem !important;
             margin-bottom: 15px !important;
-            filter: drop-shadow(0 0 10px rgba(100, 181, 246, 0.6)) !important;
+            filter: drop-shadow(0 0 10px rgba(122, 243, 255, 0.42)) !important;
             animation: pulse 2s ease-in-out infinite !important;
         }
 
@@ -250,12 +285,12 @@ layout: null
             text-align: center !important;
             margin-bottom: 8px !important;
             color: #ffffff !important;
-            text-shadow: 0 0 20px rgba(100, 181, 246, 0.5) !important;
+            text-shadow: 0 0 18px rgba(122, 243, 255, 0.3) !important;
         }
 
         .cloud-description {
             font-size: 0.9rem !important;
-            color: #b0bec5 !important;
+            color: #d8edf0 !important;
             text-align: center !important;
             opacity: 0.8 !important;
         }
@@ -265,7 +300,7 @@ layout: null
             position: relative !important;
             text-align: center !important;
             font-size: 0.95rem !important;
-            color: #90caf9 !important;
+            color: #bfeef5 !important;
             opacity: 0.8 !important;
             margin-top: 40px !important;
             animation: fadeInUp 1s ease-out 0.5s backwards !important;
@@ -304,7 +339,7 @@ layout: null
             }
         }
 
-        /* Planet/Sub-item styles */
+        /* Jellyfish/Sub-item styles */
         .planets-grid {
             display: grid !important;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
@@ -316,7 +351,7 @@ layout: null
         .planet {
             position: relative !important;
             height: 300px !important;
-            cursor: pointer !important;
+            cursor: inherit !important;
             perspective: 1000px !important;
             animation: float 6s ease-in-out infinite !important;
         }
@@ -329,86 +364,95 @@ layout: null
             width: 100% !important;
             height: 100% !important;
             position: relative !important;
-            border-radius: 50% !important;
+            border-radius: 24px !important;
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
-            justify-content: center !important;
-            padding: 20px !important;
+            justify-content: flex-end !important;
+            padding: 20px 20px 10px !important;
             text-align: center !important;
             transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
             transform-style: preserve-3d !important;
-            overflow: hidden !important;
+            overflow: visible !important;
         }
 
-        /* Detailed planet surface */
+        /* Jellyfish bell */
         .planet-surface {
             position: absolute !important;
-            width: 100% !important;
-            height: 100% !important;
-            border-radius: 50% !important;
+            width: 74% !important;
+            height: 48% !important;
+            left: 13% !important;
+            top: 8% !important;
+            border-radius: 58% 58% 42% 42% / 74% 74% 28% 28% !important;
             z-index: 1 !important;
-            animation: rotatePlanet 20s linear infinite !important;
+            animation: jellyPulse 4.8s ease-in-out infinite !important;
         }
 
-        @keyframes rotatePlanet {
-            0% { transform: rotateZ(0deg); }
-            100% { transform: rotateZ(360deg); }
+        @keyframes jellyPulse {
+            0%, 100% { transform: translateY(0) scaleY(1); }
+            50% { transform: translateY(8px) scaleY(0.9); }
         }
 
-        /* Planet surface detail overlay */
+        /* Jellyfish highlight overlay */
         .planet-surface::after {
             content: '' !important;
             position: absolute !important;
             width: 100% !important;
             height: 100% !important;
-            border-radius: 50% !important;
+            border-radius: inherit !important;
             background: 
-                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.15), transparent 50%),
-                radial-gradient(circle at 70% 70%, rgba(0, 0, 0, 0.2), transparent 50%),
-                radial-gradient(circle at 50% 50%, transparent 70%, rgba(0, 0, 0, 0.1)) !important;
+                radial-gradient(circle at 26% 30%, rgba(255, 255, 255, 0.28), transparent 40%),
+                radial-gradient(circle at 75% 72%, rgba(0, 0, 0, 0.16), transparent 46%),
+                linear-gradient(180deg, rgba(255,255,255,0.06), transparent 70%) !important;
             z-index: 1 !important;
         }
 
-        /* Atmosphere glow effect */
+        /* Jellyfish halo */
         .planet-atmosphere {
             position: absolute !important;
-            width: 100% !important;
-            height: 100% !important;
-            border-radius: 50% !important;
+            width: 76% !important;
+            height: 50% !important;
+            left: 12% !important;
+            top: 7% !important;
+            border-radius: 58% 58% 42% 42% / 74% 74% 28% 28% !important;
             box-shadow: 
-                inset -20px -20px 60px rgba(0, 0, 0, 0.5),
-                inset 20px 20px 60px rgba(255, 255, 255, 0.15),
-                0 0 40px rgba(100, 181, 246, 0.6),
-                0 0 80px rgba(100, 181, 246, 0.3) !important;
+                inset -16px -16px 42px rgba(0, 0, 0, 0.22),
+                inset 20px 20px 44px rgba(255, 255, 255, 0.14),
+                0 0 40px rgba(122, 243, 255, 0.34),
+                0 0 70px rgba(122, 243, 255, 0.16) !important;
             z-index: 2 !important;
             animation: atmosphereGlow 3s ease-in-out infinite !important;
         }
 
         @keyframes atmosphereGlow {
-            0%, 100% { filter: drop-shadow(0 0 20px rgba(100, 181, 246, 0.4)); }
-            50% { filter: drop-shadow(0 0 30px rgba(100, 181, 246, 0.6)); }
+            0%, 100% { filter: drop-shadow(0 0 18px rgba(122, 243, 255, 0.24)); }
+            50% { filter: drop-shadow(0 0 28px rgba(122, 243, 255, 0.34)); }
         }
 
-        /* Planet rings */
+        /* Jellyfish tentacles */
         .planet-ring {
             position: absolute !important;
-            border-radius: 50% !important;
-            border: 3px solid rgba(255, 200, 100, 0.4) !important;
-            z-index: 0 !important;
-            top: 50% !important;
+            border-radius: 0 0 22px 22px !important;
+            border: none !important;
+            z-index: 1 !important;
+            top: 38% !important;
             left: 50% !important;
-            transform: translate(-50%, -50%) rotateX(75deg) !important;
-            animation: rotateRing 30s linear infinite !important;
-            box-shadow: 0 0 20px rgba(255, 200, 100, 0.3) !important;
+            transform: translateX(-50%) !important;
+            width: 110px !important;
+            height: 128px !important;
+            background:
+                repeating-linear-gradient(90deg,
+                    transparent 0 11px,
+                    rgba(193, 249, 255, 0.88) 11px 13px,
+                    transparent 13px 22px),
+                linear-gradient(180deg, rgba(193,249,255,0.3), transparent 78%) !important;
+            mask-image: linear-gradient(180deg, rgba(0,0,0,0.85), transparent) !important;
+            -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.85), transparent) !important;
+            filter: drop-shadow(0 0 10px rgba(122,243,255,0.24)) !important;
+            opacity: 0.78 !important;
         }
 
-        @keyframes rotateRing {
-            0% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(0deg); }
-            100% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(360deg); }
-        }
-
-        /* Planet content overlay */
+        /* Jellyfish content overlay */
         .planet-content {
             position: relative !important;
             z-index: 3 !important;
@@ -416,7 +460,13 @@ layout: null
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
-            height: 100% !important;
+            height: auto !important;
+            margin-top: 180px !important;
+            background: linear-gradient(180deg, rgba(4, 38, 51, 0.05), rgba(4, 38, 51, 0.42)) !important;
+            backdrop-filter: blur(6px) !important;
+            border: 1px solid rgba(175, 244, 255, 0.12) !important;
+            border-radius: 18px !important;
+            padding: 16px !important;
         }
 
         .planet-title {
@@ -425,42 +475,42 @@ layout: null
             color: #ffffff !important;
             margin-bottom: 10px !important;
             text-shadow: 
-                0 0 10px rgba(100, 181, 246, 0.8),
-                0 0 20px rgba(33, 150, 243, 0.6) !important;
+                0 0 10px rgba(122, 243, 255, 0.62),
+                0 0 20px rgba(14, 153, 195, 0.28) !important;
             z-index: 4 !important;
             position: relative !important;
         }
 
         .planet-description {
             font-size: 0.85rem !important;
-            color: #b0bec5 !important;
+            color: #dbf2f5 !important;
             opacity: 0.95 !important;
             z-index: 4 !important;
             position: relative !important;
         }
 
-        /* Planet type variations */
+        /* Jellyfish color variations */
         .planet-ice {
-            background: radial-gradient(circle at 30% 30%, #ffffff, #e3f2fd, #1565c0) !important;
+            background: radial-gradient(circle at 30% 30%, #ffffff, #d9fbff, #48bfdc) !important;
         }
 
         .planet-lava {
-            background: radial-gradient(circle at 30% 30%, #ffeb3b, #ff6f00, #1a0000) !important;
+            background: radial-gradient(circle at 30% 30%, #fff2de, #ffb16f, #de5f46) !important;
         }
 
         .planet-gas {
-            background: radial-gradient(circle at 35% 35%, #ff9800, #ff7043, #4a235a) !important;
+            background: radial-gradient(circle at 35% 35%, #fff4ff, #f7a0ef, #855fb9) !important;
         }
 
         .planet-ocean {
-            background: radial-gradient(circle at 35% 35%, #4dd0e1, #00bcd4, #0d47a1) !important;
+            background: radial-gradient(circle at 35% 35%, #e8ffff, #73e8ef, #178cb0) !important;
         }
 
         .planet-jungle {
-            background: radial-gradient(circle at 30% 30%, #66bb6a, #2e7d32, #1b5e20) !important;
+            background: radial-gradient(circle at 30% 30%, #effff4, #7ee1b0, #209a74) !important;
         }
 
-        /* Rocket styles */
+        /* Submarine styles */
         .rocket-container {
             position: fixed !important;
             left: calc(100% - 100px) !important;
@@ -475,71 +525,75 @@ layout: null
             position: relative !important;
             width: 60px !important;
             height: 80px !important;
-            cursor: grab !important;
+            cursor: inherit !important;
             animation: rocketFloat 3s ease-in-out infinite !important;
         }
 
         .rocket:active {
-            cursor: grabbing !important;
+            cursor: inherit !important;
         }
 
         .rocket-body {
             position: absolute !important;
-            width: 40px !important;
-            height: 50px !important;
-            background: linear-gradient(90deg, #ff6b9d 0%, #ff8a80 50%, #ff6b9d 100%) !important;
-            border-radius: 10px 10px 20px 20px !important;
-            left: 10px !important;
-            top: 10px !important;
-            box-shadow: 0 0 20px rgba(255, 107, 157, 0.6) !important;
+            width: 50px !important;
+            height: 32px !important;
+            background: linear-gradient(90deg, #ffd16b 0%, #ffb347 48%, #ffcf6a 100%) !important;
+            border-radius: 18px 20px 16px 16px !important;
+            left: 5px !important;
+            top: 22px !important;
+            box-shadow: 0 0 20px rgba(255, 209, 107, 0.38) !important;
         }
 
         .rocket-window {
             position: absolute !important;
-            width: 20px !important;
-            height: 20px !important;
-            background: radial-gradient(circle at 35% 35%, #ffffff, #64b5f6) !important;
+            width: 16px !important;
+            height: 16px !important;
+            background: radial-gradient(circle at 35% 35%, #ffffff, #7af3ff) !important;
             border-radius: 50% !important;
-            left: 20px !important;
-            top: 15px !important;
-            box-shadow: inset 0 0 10px rgba(100, 181, 246, 0.5) !important;
+            left: 22px !important;
+            top: 29px !important;
+            box-shadow: inset 0 0 10px rgba(122, 243, 255, 0.46) !important;
         }
 
         .rocket-fins {
             position: absolute !important;
-            bottom: 0px !important;
-            left: 10px !important;
+            bottom: 21px !important;
+            left: 46px !important;
         }
 
         .rocket-fin {
             position: absolute !important;
             width: 0 !important;
             height: 0 !important;
-            border-left: 8px solid transparent !important;
-            border-right: 8px solid transparent !important;
-            border-bottom: 15px solid #ff6b9d !important;
+            border-top: 8px solid transparent !important;
+            border-bottom: 8px solid transparent !important;
+            border-left: 14px solid #ffb347 !important;
         }
 
         .rocket-fin-left {
-            left: -5px !important;
-            transform: skewX(-10deg) !important;
+            left: -3px !important;
+            top: 2px !important;
+            transform: rotate(-18deg) !important;
         }
 
         .rocket-fin-right {
-            right: -5px !important;
-            transform: skewX(10deg) !important;
+            left: -2px !important;
+            top: 14px !important;
+            transform: rotate(18deg) !important;
         }
 
         .rocket-flame {
             position: absolute !important;
-            bottom: -20px !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            width: 20px !important;
-            height: 25px !important;
-            background: linear-gradient(180deg, #ffeb3b 0%, #ff9800 50%, transparent 100%) !important;
-            border-radius: 50% 50% 0 0 !important;
-            filter: blur(2px) !important;
+            bottom: 10px !important;
+            left: -2px !important;
+            width: 24px !important;
+            height: 44px !important;
+            background:
+                radial-gradient(circle at 50% 15%, rgba(255,255,255,0.9) 0 18%, transparent 19%),
+                radial-gradient(circle at 30% 42%, rgba(122,243,255,0.65) 0 16%, transparent 17%),
+                radial-gradient(circle at 70% 72%, rgba(255,255,255,0.52) 0 12%, transparent 13%) !important;
+            border-radius: 50% !important;
+            filter: blur(1px) !important;
             animation: flame 0.3s ease-in-out infinite !important;
         }
 
@@ -564,14 +618,14 @@ layout: null
             bottom: 100px !important;
             right: 0 !important;
             background: rgba(0, 0, 0, 0.8) !important;
-            color: #81d4fa !important;
+            color: #b8fbff !important;
             padding: 8px 12px !important;
             border-radius: 5px !important;
             white-space: nowrap !important;
             font-size: 0.85rem !important;
             opacity: 0 !important;
             transition: opacity 0.3s !important;
-            border: 1px solid rgba(129, 212, 250, 0.6) !important;
+            border: 1px solid rgba(122, 243, 255, 0.5) !important;
         }
 
         .rocket-container:hover .rocket-tooltip {
@@ -601,18 +655,18 @@ layout: null
         }
 
         .modal-content {
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0d1b2a 100%) !important;
+            background: linear-gradient(180deg, #06394d 0%, #032a39 56%, #021a24 100%) !important;
             margin: 5% auto !important;
             padding: 40px !important;
-            border: 2px solid rgba(129, 212, 250, 0.5) !important;
+            border: 2px solid rgba(122, 243, 255, 0.42) !important;
             border-radius: 20px !important;
             width: 90% !important;
             max-width: 800px !important;
             max-height: 80vh !important;
             overflow-y: auto !important;
             box-shadow: 
-                0 0 50px rgba(100, 181, 246, 0.4),
-                inset 0 0 30px rgba(129, 212, 250, 0.1) !important;
+                0 0 50px rgba(122, 243, 255, 0.22),
+                inset 0 0 30px rgba(122, 243, 255, 0.08) !important;
             animation: slideIn 0.4s ease !important;
         }
 
@@ -638,15 +692,15 @@ layout: null
 
         .modal-title {
             font-size: 2.2rem !important;
-            color: #64b5f6 !important;
-            text-shadow: 0 0 20px rgba(100, 181, 246, 0.5) !important;
+            color: #8ff6ff !important;
+            text-shadow: 0 0 20px rgba(122, 243, 255, 0.28) !important;
         }
 
         .close-btn {
             font-size: 2rem !important;
             font-weight: bold !important;
-            color: #81d4fa !important;
-            cursor: pointer !important;
+            color: #b8fbff !important;
+            cursor: inherit !important;
             background: none !important;
             border: none !important;
             transition: color 0.3s !important;
@@ -663,11 +717,11 @@ layout: null
         }
 
         .modal-body h3 {
-            color: #81d4fa !important;
+            color: #97f5ff !important;
             margin-top: 25px !important;
             margin-bottom: 15px !important;
             font-size: 1.4rem !important;
-            text-shadow: 0 0 10px rgba(129, 212, 250, 0.4) !important;
+            text-shadow: 0 0 10px rgba(122, 243, 255, 0.18) !important;
         }
 
         .modal-body h3:first-child {
@@ -727,6 +781,7 @@ layout: null
             text-decoration: none !important;
             color: inherit !important;
             display: block;
+            cursor: inherit !important;
         }
 
         /* View toggle controls */
@@ -738,35 +793,35 @@ layout: null
             display: flex !important;
             gap: 15px !important;
             z-index: 998 !important;
-            background: rgba(0, 0, 0, 0.6) !important;
+            background: rgba(2, 27, 36, 0.68) !important;
             padding: 12px 20px !important;
             border-radius: 30px !important;
-            border: 2px solid rgba(129, 212, 250, 0.5) !important;
+            border: 2px solid rgba(122, 243, 255, 0.34) !important;
             backdrop-filter: blur(10px) !important;
         }
 
         .view-btn {
-            background: linear-gradient(135deg, rgba(100, 181, 246, 0.3), rgba(33, 150, 243, 0.2)) !important;
-            border: 2px solid rgba(129, 212, 250, 0.4) !important;
-            color: #81d4fa !important;
+            background: linear-gradient(135deg, rgba(122, 243, 255, 0.18), rgba(17, 132, 165, 0.18)) !important;
+            border: 2px solid rgba(122, 243, 255, 0.28) !important;
+            color: #b8fbff !important;
             padding: 8px 18px !important;
             border-radius: 20px !important;
-            cursor: pointer !important;
+            cursor: inherit !important;
             font-size: 0.95rem !important;
             font-weight: 600 !important;
             transition: all 0.3s !important;
         }
 
         .view-btn:hover {
-            background: linear-gradient(135deg, rgba(100, 181, 246, 0.5), rgba(33, 150, 243, 0.4)) !important;
-            box-shadow: 0 0 15px rgba(129, 212, 250, 0.6) !important;
+            background: linear-gradient(135deg, rgba(122, 243, 255, 0.26), rgba(32, 183, 192, 0.28)) !important;
+            box-shadow: 0 0 15px rgba(122, 243, 255, 0.28) !important;
             transform: scale(1.05) !important;
         }
 
         .view-btn.active {
-            background: linear-gradient(135deg, rgba(100, 181, 246, 0.8), rgba(33, 150, 243, 0.6)) !important;
-            box-shadow: 0 0 25px rgba(129, 212, 250, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
-            border-color: rgba(129, 212, 250, 0.8) !important;
+            background: linear-gradient(135deg, rgba(122, 243, 255, 0.46), rgba(32, 183, 192, 0.36)) !important;
+            box-shadow: 0 0 25px rgba(122, 243, 255, 0.32), inset 0 0 10px rgba(255, 255, 255, 0.14) !important;
+            border-color: rgba(122, 243, 255, 0.52) !important;
         }
 
         /* Traveler view styles */
@@ -795,23 +850,23 @@ layout: null
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
-            cursor: pointer !important;
+            cursor: inherit !important;
         }
 
         .planet-traveler {
             position: absolute !important;
-            cursor: pointer !important;
+            cursor: inherit !important;
         }
 
         .hud-display {
             position: fixed !important;
             top: 20px !important;
             left: 20px !important;
-            background: rgba(0, 0, 0, 0.7) !important;
-            border: 2px solid rgba(129, 212, 250, 0.5) !important;
+            background: rgba(2, 25, 34, 0.74) !important;
+            border: 2px solid rgba(122, 243, 255, 0.34) !important;
             padding: 15px 25px !important;
             border-radius: 10px !important;
-            color: #81d4fa !important;
+            color: #b8fbff !important;
             z-index: 100 !important;
             font-family: 'Courier New', monospace !important;
             font-size: 0.9rem !important;
@@ -824,22 +879,22 @@ layout: null
 
         .hud-display p {
             margin: 5px 0 !important;
-            color: #81d4fa !important;
+            color: #b8fbff !important;
         }
 
         .hud-display .label {
-            color: #64b5f6 !important;
+            color: #8ff6ff !important;
             font-weight: bold !important;
         }
 
         .code-box {
             background: rgba(0, 0, 0, 0.65) !important;
-            border: 1px solid rgba(129, 212, 250, 0.35) !important;
+            border: 1px solid rgba(122, 243, 255, 0.28) !important;
             border-radius: 10px !important;
             padding: 12px 14px !important;
             overflow-x: auto !important;
             color: #e3f2fd !important;
-            box-shadow: 0 0 18px rgba(33, 150, 243, 0.15) !important;
+            box-shadow: 0 0 18px rgba(16, 156, 198, 0.12) !important;
         }
 
         .code-box code {
@@ -851,7 +906,7 @@ layout: null
     </style>
 </head>
 <body>
-    <!-- Starfield background -->
+    <!-- Bubble field background -->
     <div class="stars" id="starfield"></div>
 
     <!-- Main container -->
@@ -859,40 +914,40 @@ layout: null
         <!-- Header -->
         <div class="header">
             <h1>TEAM SPACE</h1>
-            <p>CSSE PORTFOLIO</p>
-            <div class="subtitle">Navigate through the galaxy of our projects and files</div>
+            <p>UNDERWATER PORTFOLIO</p>
+            <div class="subtitle">Navigate through reef bubbles, currents, and jellyfish to explore our projects and files</div>
         </div>
 
-        <!-- Galaxy clouds grid -->
+        <!-- Bubble clusters grid -->
         <div class="galaxy-grid" id="galaxyGrid">
-            <!-- Galaxy clouds will be populated here -->
+            <!-- Bubble clusters will be populated here -->
         </div>
 
         <!-- Instructions -->
         <div class="instructions">
-            <p>✨ Click on any galaxy to explore its contents ✨</p>
-            <div class="scroll-indicator">↓ Scroll to see more ↓</div>
+            <p>🫧 Click any bubble cluster to explore what it contains 🫧</p>
+            <div class="scroll-indicator">↓ Drift down to see more ↓</div>
         </div>
     </div>
 
     <!-- View Toggle Controls -->
     <div class="view-toggle" id="viewToggle">
         <button class="view-btn active" id="listViewBtn" onclick="switchToListView()">📋 View as List</button>
-        <button class="view-btn" id="travelerViewBtn" onclick="switchToTravelerView()">🚀 View as Traveler</button>
+        <button class="view-btn" id="travelerViewBtn" onclick="switchToTravelerView()">🤿 View as Dive</button>
     </div>
 
     <!-- Traveler View -->
     <div class="traveler-view" id="travelerView" style="display: none;">
         <div class="traveler-space" id="travelerSpace"></div>
         <div class="hud-display" id="hudDisplay">
-            <p><span class="label">SECTOR SCAN:</span> <span id="hudCoords">0.0, 0.0</span></p>
-            <p><span class="label">DISTANCE:</span> <span id="hudDistance">N/A</span></p>
+            <p><span class="label">REEF SCAN:</span> <span id="hudCoords">0.0, 0.0</span></p>
+            <p><span class="label">DRIFT:</span> <span id="hudDistance">N/A</span></p>
         </div>
     </div>
 
-    <!-- Controllable Rocket -->
+    <!-- Controllable Submarine -->
     <div class="rocket-container" id="rocketContainer">
-        <div class="rocket-tooltip">Use arrow keys or WASD to move the rocket!</div>
+        <div class="rocket-tooltip">Use arrow keys or WASD to pilot the submarine.</div>
         <div class="rocket" id="rocket">
             <div class="rocket-body">
                 <div class="rocket-window"></div>
@@ -910,12 +965,12 @@ layout: null
         console.log('Team Space page loaded successfully');
         console.log('Window dimensions:', window.innerWidth, 'x', window.innerHeight);
         
-        // Generate starfield
+        // Generate bubble field
         function generateStars() {
-            console.log('Generating stars...');
+            console.log('Generating bubbles...');
             const starfield = document.getElementById('starfield');
             if (!starfield) {
-                console.error('Starfield element not found!');
+                console.error('Bubble field element not found!');
                 return;
             }
             const starCount = 200;
@@ -938,10 +993,10 @@ layout: null
 
                 starfield.appendChild(star);
             }
-            console.log('Stars generated: ' + starCount);
+            console.log('Bubbles generated: ' + starCount);
         }
 
-        // Generate particles in galaxy clouds
+        // Generate particles in bubble clusters
         function generateParticles(container) {
             const particleCount = 20;
             const particlesDiv = container.querySelector('.particles');
@@ -968,12 +1023,12 @@ layout: null
             }
         }
 
-        // Sample galaxies (to be customized)
+        // Sample categories (to be customized)
         const galaxies = [
             {
                 title: 'Games',
-                description: 'Explore our interactive games and the engine we used to build them!',
-                icon: '🎮',
+            description: 'Swim through our interactive games and the engine we used to build them.',
+            icon: '🐠',
                 color: 'blue',
                 planets: [
                     {
@@ -1002,15 +1057,35 @@ layout: null
                             <h3>Game Library</h3>
                             <p>Browse existing games created with this engine:</p>
                             <ul style="text-align: left; display: inline-block;">
-                                <li><a href="${window.location.origin}${window.location.pathname}" style="color: #81d4fa; text-decoration: underline;">Arjun's Mini Game Level</a> - Find Kirby in the playground</li>
-                                <li><a href="${window.location.origin}${window.location.pathname}" style="color: #81d4fa; text-decoration: underline;">Lance's Mini Game Basketball</a> - Navigate the court to meet LeBron</li>
+                                <li><a href="{{ site.baseurl }}/games/aquatic.html" style="color: #81d4fa; text-decoration: underline;">Aquatic Game Level</a> - Explore the reef and complete the aquatic challenge</li>
+                                <li><a href="{{ site.baseurl }}/gamify/seek.html" style="color: #81d4fa; text-decoration: underline;">Find Kirby (Seek)</a> - Search the playground and find Kirby</li>
+                                <li><a href="{{ site.baseurl }}/games/basketball.html" style="color: #81d4fa; text-decoration: underline;">Basketball Game Level</a> - Navigate the court and meet LeBron</li>
+                                <li><a href="{{ site.baseurl }}/games/combined.html" style="color: #81d4fa; text-decoration: underline;">Combined Game Levels</a> - Run Aquatic, Seek, and Basketball in one session</li>
                             </ul>
 
                             <h3>Getting Started</h3>
-                            <p>Access the Game Builder at <a href="{{ site.baseurl }}/gamebuilder" style="color: #81d4fa; text-decoration: underline;">Game Builder</a> to create your own interactive game. Upload custom assets, configure game mechanics, and export your game in minutes!</p>
+                            <p>Access the Game Builder at <a href="{{ site.baseurl }}/team-space-portal/gamebuilder" style="color: #81d4fa; text-decoration: underline;">Game Builder</a> to create your own interactive game. Upload custom assets, configure game mechanics, and export your game in minutes!</p>
 
                             <h3>Technologies</h3>
                             <p>Built with JavaScript ES6+, featuring modular architecture for easy customization and extension. Supports responsive design for both desktop and mobile gaming experiences.</p>
+                        `
+                    },
+                    {
+                        title: 'Aquatic Game Level',
+                        description: 'Dive through the reef and complete the aquatic mission',
+                        content: `
+                            <h3>Aquatic Game Level</h3>
+                            <p>Play as a scuba diver, explore the reef, and complete the underwater mission.</p>
+                            <p><a href="{{ site.baseurl }}/games/aquatic.html" style="color: #81d4fa; text-decoration: underline;">Launch Aquatic Game</a></p>
+                        `
+                    },
+                    {
+                        title: 'Basketball Game Level',
+                        description: 'Navigate the court and reach LeBron',
+                        content: `
+                            <h3>Basketball Game Level</h3>
+                            <p>Work through the court obstacles and reach LeBron to finish the level.</p>
+                            <p><a href="{{ site.baseurl }}/games/basketball.html" style="color: #81d4fa; text-decoration: underline;">Launch Basketball Game</a></p>
                         `
                     },
                     {
@@ -1019,7 +1094,7 @@ layout: null
                         content: `
                             <h3>Find Kirby (Seek)</h3>
                             <p>Find Kirby hiding in the corner of the map.</p>
-                            <p><a href="{{ site.baseurl }}/gamify/seek" style="color: #81d4fa; text-decoration: underline;">Launch Seek Game</a></p>
+                            <p><a href="{{ site.baseurl }}/gamify/seek.html" style="color: #81d4fa; text-decoration: underline;">Launch Seek Game</a></p>
                         `
                     },
                     {
@@ -1028,15 +1103,15 @@ layout: null
                         content: `
                             <h3>Combined Game Levels</h3>
                             <p>Play the Aquatic level, find Kirby, then head to the basketball court — all in a single run.</p>
-                            <p><a href="{{ site.baseurl }}/games/combined" style="color: #81d4fa; text-decoration: underline;">Launch Combined Game Levels</a></p>
+                            <p><a href="{{ site.baseurl }}/games/combined.html" style="color: #81d4fa; text-decoration: underline;">Launch Combined Game Levels</a></p>
                         `
                     }
                 ]
             },
             {
                 title: 'Blogs',
-                description: 'Read our blogs to know about our development process and insights',
-                icon: '📝',
+                description: 'Read our blogs for development notes, reflections, and discoveries from the reef.',
+                icon: '🫧',
                 color: 'purple',
                 planets: [
                     {
@@ -1323,13 +1398,91 @@ export default GameLevelAquaticGameLevel;</code></pre>
                             <h3>Hardships</h3>
                             <p>While creating the game level, I priorly focused on manipulating the collision walls. They had quite big hitbox, sometimes when the player is unable to enter the crack of between the walls.</p>
                         `
+                    },
+                    {
+                        title: "Yiming's CSS1",
+                        description: 'CS111 concepts from the aquatic game',
+                        content: `
+                            <h3>Yiming's CSS1</h3>
+                            <p>This blog post explains how CS111 concepts like arrays, booleans, control structures, data types, and operators appear inside the Aquatic game level.</p>
+
+                            <h3>What It Covers</h3>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>Control structures such as iteration, conditionals, and nested conditions</li>
+                                <li>Data types including numbers, strings, arrays, booleans, and objects</li>
+                                <li>Operators like mathematical operations, string operations, and boolean expressions</li>
+                            </ul>
+
+                            <h3>Published Post</h3>
+                            <p>This content comes from the Aquatic arrays and booleans notebook and is published as a blog post in the portfolio.</p>
+                            <p><a href="{{ site.baseurl }}/blog/aquatic-arrays-booleans" style="color: #81d4fa; text-decoration: underline;">Open Yiming's CSS1</a></p>
+                        `
+                    },
+                    {
+                        title: "Lance's CSS1",
+                        description: 'Basketball evasion CS111 code review',
+                        content: `
+                            <h3>Lance's CSS1</h3>
+                            <p>This post breaks down a basketball evasion game using real CS111 concepts from the project code.</p>
+
+                            <h3>What It Covers</h3>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>Loops, conditionals, and nested logic in a live game</li>
+                                <li>Numbers, strings, booleans, arrays, and objects in one project</li>
+                                <li>Operators used for movement, collision detection, timing, and AI</li>
+                                <li>A published reflection connecting CS111 ideas to the basketball game</li>
+                            </ul>
+
+                            <h3>Published Post</h3>
+                            <p><strong>Title:</strong> CSSE-2 Personal Blog</p>
+                            <p><strong>Permalink:</strong> <code>/blog/lance-css1</code></p>
+                            <p><a href="{{ site.baseurl }}/blog/lance-css1" style="color: #81d4fa; text-decoration: underline;">Open Lance's CSS1</a></p>
+                        `
+                    },
+                    {
+                        title: "Arjun's Seek CSS1",
+                        description: 'Seek game CS111 review using real project code',
+                        content: `
+                            <h3>Arjun's Seek CSS1</h3>
+                            <p>This blog post explains how CS111 concepts like arrays, booleans, control structures, and operators appear in <strong>GameLevelSeek.js</strong>.</p>
+
+                            <h3>What It Covers</h3>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>Iteration and conditionals used in the Seek level</li>
+                                <li>Data types such as numbers, strings, arrays, booleans, and objects</li>
+                                <li>Operators used in level logic and player interactions</li>
+                                <li>A published CS111 review of the Seek game</li>
+                            </ul>
+
+                            <h3>Published Post</h3>
+                            <p><a href="{{ site.baseurl }}/blog/arjun-seek-arrays-booleans" style="color: #81d4fa; text-decoration: underline;">Open Arjun's Seek CSS1</a></p>
+                        `
+                    },
+                    {
+                        title: "Arjun's Game Blog V2",
+                        description: 'Game development progress for the custom seek level',
+                        content: `
+                            <h3>Arjun's Game Blog V2</h3>
+                            <p>This post tracks the development progress of the custom Seek level, including the background, player setup, hidden Kirby objective, and barrier layout.</p>
+
+                            <h3>Highlights</h3>
+                            <ul style="text-align: left; display: inline-block;">
+                                <li>How the playground map was assembled</li>
+                                <li>How the player and NPC interactions were configured</li>
+                                <li>How invisible barriers shaped the level flow</li>
+                                <li>Challenges and next steps for improving the seek game</li>
+                            </ul>
+
+                            <h3>Published Post</h3>
+                            <p><a href="{{ site.baseurl }}/blog/arjun-v2-seek-level" style="color: #81d4fa; text-decoration: underline;">Open Arjun's Game Blog V2</a></p>
+                        `
                     }
                 ]
             },
             {
                 title: 'Individual Contribution',
-                description: 'Discover individual team member work',
-                icon: '👤',
+                description: 'Meet each diver and see their individual work.',
+                icon: '🐙',
                 color: 'green',
                 planets: [
                     {
@@ -1340,20 +1493,20 @@ export default GameLevelAquaticGameLevel;</code></pre>
                             <p>Lead full-stack developer responsible for the entire Team Space portfolio website architecture and integration.</p>
 
                             <h3>Key Responsibilities</h3>
-                            <p><strong>Frontend Architecture:</strong> Designed and implemented the interactive space-themed UI with 4 galaxy categories using vanilla JavaScript, CSS3 animations, and 3D transforms.</p>
+                            <p><strong>Frontend Architecture:</strong> Designed and implemented the interactive underwater UI with 4 bubble-cluster categories using vanilla JavaScript, CSS3 animations, and layered visual effects.</p>
                             <p><strong>Backend Integration:</strong> Set up Jekyll static site generator with custom layouts and configuration for GitHub Pages deployment.</p>
-                            <p><strong>Interactive Features:</strong> Created the controllable rocket system with physics engine, view toggle system (list/traveler modes), and modal system for detailed information display.</p>
-                            <p><strong>Optimization:</strong> Implemented non-overlapping position algorithm for 3D space exploration, cache-busting techniques for GitHub Pages, and performance optimizations.</p>
+                            <p><strong>Interactive Features:</strong> Created the controllable submarine system with movement physics, view toggle system (list and dive modes), and modal system for detailed information display.</p>
+                            <p><strong>Optimization:</strong> Implemented non-overlapping position algorithms for exploration mode, cache-busting techniques for GitHub Pages, and performance optimizations.</p>
 
                             <h3>Technologies Used</h3>
                             <p>HTML5, CSS3, Vanilla JavaScript (ES6+), Jekyll, Git/GitHub, Python 3.14, Ruby, Responsive Design</p>
 
                             <h3>Key Features Developed</h3>
                             <ul style="text-align: left; display: inline-block;">
-                                <li>Starfield with 200 animated stars</li>
-                                <li>5 detailed planet types with unique textures</li>
-                                <li>Rocket physics and movement controls</li>
-                                <li>3D space navigation system</li>
+                                <li>Bubble field with 200 animated bubbles</li>
+                                <li>5 detailed jellyfish styles with unique textures</li>
+                                <li>Submarine movement controls</li>
+                                <li>Dive navigation system</li>
                                 <li>Modal information system</li>
                             </ul>
                         `
@@ -1412,18 +1565,18 @@ export default GameLevelAquaticGameLevel;</code></pre>
             },
             {
                 title: 'Trivia',
-                description: 'Unrelated topics/behind the scenes.',
-                icon: '🧠',
+                description: 'Loose shells, side notes, and behind-the-scenes discoveries.',
+                icon: '🐚',
                 color: 'orange'
             }
         ];
 
-        // Populate galaxy grid
+        // Populate bubble cluster grid
         function populateGalaxies() {
-            console.log('Populating galaxies...');
+            console.log('Populating bubble clusters...');
             const grid = document.getElementById('galaxyGrid');
             if (!grid) {
-                console.error('Galaxy grid element not found!');
+                console.error('Bubble cluster grid element not found!');
                 return;
             }
             
@@ -1449,58 +1602,58 @@ export default GameLevelAquaticGameLevel;</code></pre>
                 grid.appendChild(galaxyDiv);
                 generateParticles(galaxyDiv);
             });
-            console.log('Galaxies populated: ' + galaxies.length);
+            console.log('Bubble clusters populated: ' + galaxies.length);
         }
 
-        // Handle galaxy click
+        // Handle bubble cluster click
         function handleGalaxyClick(title, index) {
             console.log(`Navigating to: ${title} (Index: ${index})`);
             const galaxy = galaxies[index];
             
-            // If galaxy has planets, show them instead of alert
+            // If bubble cluster has jellyfish, show them instead of alert
             if (galaxy.planets && galaxy.planets.length > 0) {
                 showPlanets(galaxy);
             } else {
-                alert(`Welcome to ${title}!\n\nThis category page will be available soon.`);
+                alert(`Welcome to ${title}!\n\nThis bubble cluster opens soon.`);
             }
         }
 
-        // Show planets for a galaxy
+        // Show jellyfish for a bubble cluster
         function showPlanets(galaxy) {
             const container = document.getElementById('galaxyGrid');
             const currentGalaxies = document.querySelectorAll('.galaxy-cloud');
             
-            // Hide current galaxies
+            // Hide current bubble clusters
             currentGalaxies.forEach(g => g.style.display = 'none');
             
-            // Create planets container
+            // Create jellyfish container
             const planetsContainer = document.createElement('div');
             planetsContainer.id = 'planetsContainer';
             planetsContainer.innerHTML = `
                 <div style="width: 100%; text-align: center; margin-bottom: 40px;">
                     <button onclick="backToGalaxies()" style="
-                        background: linear-gradient(135deg, rgba(100, 181, 246, 0.3), rgba(33, 150, 243, 0.2));
-                        border: 2px solid rgba(129, 212, 250, 0.6);
-                        color: #81d4fa;
+                        background: linear-gradient(135deg, rgba(122, 243, 255, 0.18), rgba(17, 132, 165, 0.18));
+                        border: 2px solid rgba(122, 243, 255, 0.45);
+                        color: #b8fbff;
                         padding: 10px 25px;
                         font-size: 1rem;
                         border-radius: 25px;
-                        cursor: pointer;
+                        cursor: inherit;
                         transition: all 0.3s;
-                    " onmouseover="this.style.boxShadow='0 0 20px rgba(129, 212, 250, 0.6)'" onmouseout="this.style.boxShadow='none'">
-                        ← Back to Galaxies
+                    " onmouseover="this.style.boxShadow='0 0 20px rgba(122, 243, 255, 0.35)'" onmouseout="this.style.boxShadow='none'">
+                        ← Back to Bubble Clusters
                     </button>
                 </div>
-                <h2 style="text-align: center; color: #81d4fa; font-size: 2rem; margin-bottom: 40px; text-shadow: 0 0 20px rgba(129, 212, 250, 0.5);">${galaxy.title}</h2>
+                <h2 style="text-align: center; color: #b8fbff; font-size: 2rem; margin-bottom: 40px; text-shadow: 0 0 20px rgba(122, 243, 255, 0.24);">${galaxy.title}</h2>
                 <div class="planets-grid" id="planetsGrid"></div>
             `;
             
             container.appendChild(planetsContainer);
             
-            // Planet type colors
+            // Jellyfish type colors
             const planetTypes = ['ice', 'lava', 'gas', 'ocean', 'jungle'];
             
-            // Create planet elements
+            // Create jellyfish elements
             const planetsGrid = document.getElementById('planetsGrid');
             galaxy.planets.forEach((planet, index) => {
                 const planetDiv = document.createElement('div');
@@ -1511,7 +1664,7 @@ export default GameLevelAquaticGameLevel;</code></pre>
                     <div class="planet-inner">
                         <div class="planet-surface planet-${planetType}"></div>
                         <div class="planet-atmosphere"></div>
-                        <div class="planet-ring" style="width: 150px; height: 40px; border-width: 2px;"></div>
+                        <div class="planet-ring"></div>
                         <div class="planet-content">
                             <div class="planet-title">${planet.title}</div>
                             <div class="planet-description">${planet.description}</div>
@@ -1527,7 +1680,7 @@ export default GameLevelAquaticGameLevel;</code></pre>
             });
         }
 
-        // Back to galaxies view
+        // Back to bubble clusters view
         function backToGalaxies() {
             const planetsContainer = document.getElementById('planetsContainer');
             if (planetsContainer) {
@@ -1538,7 +1691,7 @@ export default GameLevelAquaticGameLevel;</code></pre>
             currentGalaxies.forEach(g => g.style.display = 'block');
         }
 
-        // Open planet modal
+        // Open jellyfish modal
         function openPlanetModal(planet) {
             // Remove existing modal if any
             const existingModal = document.getElementById('planetModal');
@@ -1580,7 +1733,7 @@ export default GameLevelAquaticGameLevel;</code></pre>
             }
         }
 
-        // Rocket control system
+        // Submarine control system
         const rocketState = {
             x: window.innerWidth - 100,
             y: window.innerHeight - 150,
@@ -1592,7 +1745,7 @@ export default GameLevelAquaticGameLevel;</code></pre>
 
         const keys = {};
 
-        // Handle rocket movement
+        // Handle submarine movement
         function updateRocketPosition() {
             const rocket = document.getElementById('rocket');
             if (!rocket) return;
@@ -1615,7 +1768,7 @@ export default GameLevelAquaticGameLevel;</code></pre>
             rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 70));
             rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 110));
 
-            // Update rocket container position
+            // Update submarine container position
             const rocketContainer = document.getElementById('rocketContainer');
             if (rocketContainer) {
                 rocketContainer.style.left = rocketState.x + 'px';
@@ -1625,7 +1778,7 @@ export default GameLevelAquaticGameLevel;</code></pre>
             requestAnimationFrame(updateRocketPosition);
         }
 
-        // Mouse dragging for rocket
+        // Mouse dragging for submarine
         let isDraggingRocket = false;
         let dragOffsetX = 0;
         let dragOffsetY = 0;
@@ -1638,7 +1791,7 @@ export default GameLevelAquaticGameLevel;</code></pre>
             keys[e.key.toLowerCase()] = false;
         });
 
-        // Rocket dragging
+        // Submarine dragging
         document.addEventListener('mousedown', (e) => {
             const rocketContainer = document.getElementById('rocketContainer');
             if (rocketContainer && rocketContainer.contains(e.target)) {
@@ -1700,7 +1853,7 @@ export default GameLevelAquaticGameLevel;</code></pre>
             travelerSpace.innerHTML = '';
             travelerGalaxies = [];
 
-            // Generate random non-overlapping positions for galaxies
+            // Generate random non-overlapping positions for bubble clusters
             const positions = generateNonOverlappingPositions(galaxies.length, 250, 200, 1900, 1900);
 
             galaxies.forEach((galaxy, index) => {
@@ -1713,33 +1866,35 @@ export default GameLevelAquaticGameLevel;</code></pre>
                 galaxyDiv.style.height = '200px';
                 
                 galaxyDiv.innerHTML = `
-                    <div class="cloud-inner" style="width: 100%; height: 100%; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <div class="cloud-background" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 1;"></div>
-                        <div class="cloud-atmosphere" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 2;"></div>
+                    <div class="cloud-inner" style="width: 100%; height: 100%; position: relative; border-radius: 44% 56% 52% 48% / 46% 42% 58% 54%; display: flex; align-items: center; justify-content: center;">
+                        <div class="cloud-background" style="position: absolute; width: 100%; height: 100%; z-index: 1;"></div>
+                        <div class="cloud-atmosphere" style="position: absolute; width: 100%; height: 100%; border-radius: 44% 56% 52% 48% / 46% 42% 58% 54%; z-index: 2;"></div>
                         <div class="cloud-content" style="position: relative; z-index: 3; text-align: center;">
-                            <div class="cloud-icon" style="font-size: 3rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(100, 181, 246, 0.6));">${galaxy.icon}</div>
-                            <div class="cloud-title" style="font-size: 1.2rem; font-weight: 700; color: #ffffff; text-shadow: 0 0 10px rgba(100, 181, 246, 0.5);">${galaxy.title}</div>
+                            <div class="cloud-icon" style="font-size: 3rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(122, 243, 255, 0.36));">${galaxy.icon}</div>
+                            <div class="cloud-title" style="font-size: 1.2rem; font-weight: 700; color: #ffffff; text-shadow: 0 0 10px rgba(122, 243, 255, 0.28);">${galaxy.title}</div>
                         </div>
                     </div>
                 `;
 
-                // Set galaxy-specific colors
+                // Set bubble-cluster-specific colors
                 const cloudBackground = galaxyDiv.querySelector('.cloud-background');
                 const cloudAtmosphere = galaxyDiv.querySelector('.cloud-atmosphere');
                 
                 if (galaxy.color === 'blue') {
-                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(100, 181, 246, 0.4), rgba(33, 150, 243, 0.2), transparent)';
-                    cloudBackground.style.boxShadow = '0 0 30px rgba(100, 181, 246, 0.4), inset 0 0 30px rgba(129, 212, 250, 0.2), 0 0 60px rgba(33, 150, 243, 0.3)';
+                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(240,255,255,0.42), rgba(117,238,255,0.26), rgba(42,135,199,0.14), transparent)';
+                    cloudBackground.style.boxShadow = '0 0 30px rgba(117,238,255,0.24), inset 0 0 30px rgba(228,254,255,0.2), 0 0 60px rgba(42,135,199,0.2)';
                 } else if (galaxy.color === 'purple') {
-                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(156, 39, 176, 0.4), rgba(103, 58, 183, 0.2), transparent)';
-                    cloudBackground.style.boxShadow = '0 0 30px rgba(156, 39, 176, 0.4), inset 0 0 30px rgba(171, 71, 188, 0.2), 0 0 60px rgba(103, 58, 183, 0.3)';
+                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(255,244,249,0.42), rgba(255,154,212,0.24), rgba(196,98,191,0.14), transparent)';
+                    cloudBackground.style.boxShadow = '0 0 30px rgba(255,154,212,0.22), inset 0 0 30px rgba(255,235,246,0.18), 0 0 60px rgba(196,98,191,0.18)';
                 } else if (galaxy.color === 'green') {
-                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(76, 175, 80, 0.4), rgba(56, 142, 60, 0.2), transparent)';
-                    cloudBackground.style.boxShadow = '0 0 30px rgba(76, 175, 80, 0.4), inset 0 0 30px rgba(102, 187, 106, 0.2), 0 0 60px rgba(56, 142, 60, 0.3)';
+                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(244,255,245,0.4), rgba(120,240,193,0.22), rgba(28,151,118,0.14), transparent)';
+                    cloudBackground.style.boxShadow = '0 0 30px rgba(120,240,193,0.22), inset 0 0 30px rgba(234,255,241,0.18), 0 0 60px rgba(28,151,118,0.18)';
                 } else if (galaxy.color === 'orange') {
-                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(255, 152, 0, 0.4), rgba(255, 111, 0, 0.2), transparent)';
-                    cloudBackground.style.boxShadow = '0 0 30px rgba(255, 152, 0, 0.4), inset 0 0 30px rgba(255, 167, 38, 0.2), 0 0 60px rgba(255, 111, 0, 0.3)';
+                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(255,250,238,0.42), rgba(255,201,120,0.22), rgba(234,140,55,0.14), transparent)';
+                    cloudBackground.style.boxShadow = '0 0 30px rgba(255,201,120,0.22), inset 0 0 30px rgba(255,248,228,0.18), 0 0 60px rgba(234,140,55,0.18)';
                 }
+
+                cloudAtmosphere.style.boxShadow = 'inset 0 0 22px rgba(255,255,255,0.12), 0 0 30px rgba(255,255,255,0.08)';
 
                 galaxyDiv.addEventListener('click', () => {
                     handleGalaxyClick(galaxy.title, index);
@@ -1747,7 +1902,7 @@ export default GameLevelAquaticGameLevel;</code></pre>
 
                 travelerSpace.appendChild(galaxyDiv);
                 
-                // Add planets if they exist
+                // Add jellyfish if they exist
                 if (galaxy.planets && galaxy.planets.length > 0) {
                     const planetPositions = generateNonOverlappingPositions(galaxy.planets.length, 120, 100, pos.x + 300, pos.y + 300);
                     const planetTypes = ['ice', 'lava', 'gas', 'ocean', 'jungle'];
@@ -1764,11 +1919,12 @@ export default GameLevelAquaticGameLevel;</code></pre>
                         const planetType = planetTypes[pIndex % planetTypes.length];
                         
                         planetDiv.innerHTML = `
-                            <div class="planet-inner" style="width: 100%; height: 100%; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                <div class="planet-surface planet-${planetType}" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 1;"></div>
-                                <div class="planet-atmosphere" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 2;"></div>
-                                <div class="planet-content" style="position: relative; z-index: 3; text-align: center;">
-                                    <div class="planet-title" style="font-size: 0.9rem; font-weight: 700; color: #ffffff; text-shadow: 0 0 10px rgba(100, 181, 246, 0.8);">${planet.title}</div>
+                            <div class="planet-inner" style="width: 100%; height: 100%; position: relative; border-radius: 24px; display: flex; align-items: flex-end; justify-content: center; overflow: visible;">
+                                <div class="planet-surface planet-${planetType}" style="position: absolute; width: 74%; height: 48%; left: 13%; top: 8%; z-index: 1;"></div>
+                                <div class="planet-atmosphere" style="position: absolute; width: 76%; height: 50%; left: 12%; top: 7%; z-index: 2;"></div>
+                                <div class="planet-ring" style="width: 54px; height: 68px; top: 34%;"></div>
+                                <div class="planet-content" style="position: relative; z-index: 3; text-align: center; margin-top: 52px; padding: 8px 10px;">
+                                    <div class="planet-title" style="font-size: 0.9rem; font-weight: 700; color: #ffffff; text-shadow: 0 0 10px rgba(122, 243, 255, 0.42);">${planet.title}</div>
                                 </div>
                             </div>
                         `;
@@ -1846,7 +2002,7 @@ export default GameLevelAquaticGameLevel;</code></pre>
         // Prevent caching on GitHub Pages
         window.addEventListener('load', function() {
             // Force body background to be visible
-            document.body.style.cssText = 'background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0d1b2a 100%) !important; color: #e0e0ff !important; overflow-x: hidden !important;';
+            document.body.style.cssText = 'background: radial-gradient(circle at 50% 0%, rgba(132, 244, 255, 0.18), transparent 28%), linear-gradient(180deg, #0b5a72 0%, #06485d 18%, #04374a 42%, #022837 68%, #011923 100%) !important; color: #e7fbff !important; overflow-x: hidden !important;';
         });
     </script>
 </body>

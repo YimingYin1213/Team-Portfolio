@@ -10,2515 +10,424 @@ layout: null
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <meta name="author" content="Team Space">
-    <meta name="description" content="Team Space CSSE Portfolio Hub - Interactive galaxy navigation">
-    <title>Team Space (CSSE) - Portfolio Hub</title>
-    <!-- CodeMirror (only loaded where needed) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+    <meta name="description" content="Team Space CSSE Portfolio Hub - Aquatic portal view">
+    <title>Team Space (CSSE) - Aquatic Portal</title>
     <style>
+        :root {
+            --sea-top: #0d6075;
+            --sea-mid: #064658;
+            --sea-deep: #021a24;
+            --glow: #85f5ff;
+            --foam: #eefcff;
+            --reef: #11473f;
+            --sand: #e7c994;
+            --panel: rgba(4, 33, 44, 0.72);
+            --text: #e7fbff;
+            --muted: #b9e9ef;
+        }
+
         * {
-            margin: 0 !important;
-            padding: 0 !important;
-            box-sizing: border-box !important;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0d1b2a 100%) !important;
-            color: #e0e0ff !important;
-            overflow-x: hidden !important;
-        }
-
-        body {
-            min-height: 100vh !important;
-            position: relative !important;
-        }
-
-        /* Animated starfield background */
-        .stars {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            z-index: 1 !important;
-            pointer-events: none !important;
-        }
-
-        /* Portal button */
-        .portal-button {
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 10px !important;
-            padding: 12px 18px !important;
-            border-radius: 999px !important;
-            border: 1px solid rgba(129, 212, 250, 0.8) !important;
-            color: #e9f6ff !important;
-            text-decoration: none !important;
-            font-weight: 700 !important;
-            letter-spacing: 0.2px !important;
-            background: radial-gradient(circle at 30% 30%, rgba(129, 212, 250, 0.35), rgba(24, 32, 66, 0.8)) !important;
-            box-shadow: 0 0 24px rgba(129, 212, 250, 0.3) !important;
-            transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-        }
-
-        .portal-button:hover {
-            transform: translateY(-2px) scale(1.01) !important;
-            box-shadow: 0 0 30px rgba(129, 212, 250, 0.45) !important;
-        }
-
-        .portal-button .spark {
-            display: inline-block !important;
-            width: 8px !important;
-            height: 8px !important;
-            border-radius: 50% !important;
-            background: #81d4fa !important;
-            box-shadow: 0 0 10px rgba(129, 212, 250, 0.9) !important;
-        }
-
-        .star {
-            position: absolute !important;
-            background: white !important;
-            border-radius: 50% !important;
-            animation: twinkle 3s infinite !important;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-
-        /* Main container */
-        .container {
-            position: relative !important;
-            z-index: 10 !important;
-            width: 100% !important;
-            min-height: 100vh !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            justify-content: center !important;
-            padding: 40px 20px !important;
-        }
-
-        /* Header */
-        .header {
-            text-align: center !important;
-            margin-bottom: 60px !important;
-            animation: fadeInDown 1s ease-out !important;
-        }
-
-        .header h1 {
-            font-size: 4rem !important;
-            margin-bottom: 10px !important;
-            color: #64b5f6 !important;
-            letter-spacing: 3px !important;
-            text-shadow: 0 0 30px rgba(100, 181, 246, 0.6), 0 0 60px rgba(129, 212, 250, 0.4) !important;
-        }
-
-        .header p {
-            font-size: 1.3rem !important;
-            color: #81d4fa !important;
-            letter-spacing: 2px !important;
-            font-style: italic !important;
-            text-shadow: 0 0 20px rgba(129, 212, 250, 0.4) !important;
-        }
-
-        .subtitle {
-            font-size: 0.9rem !important;
-            color: #90caf9 !important;
-            margin-top: 15px !important;
-            opacity: 0.8 !important;
-        }
-
-        /* Galaxy clouds grid */
-        .galaxy-grid {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
-            gap: 40px !important;
-            max-width: 1400px !important;
-            margin: 60px auto !important;
-            padding: 0 20px !important;
-            width: 100% !important;
-        }
-
-        /* Galaxy cloud card */
-        .galaxy-cloud {
-            position: relative !important;
-            height: 350px !important;
-            cursor: pointer !important;
-            perspective: 1000px !important;
-            animation: float 6s ease-in-out infinite !important;
-        }
-
-        .galaxy-cloud:nth-child(1) { animation-delay: 0s !important; }
-        .galaxy-cloud:nth-child(2) { animation-delay: 1s !important; }
-        .galaxy-cloud:nth-child(3) { animation-delay: 2s !important; }
-        .galaxy-cloud:nth-child(4) { animation-delay: 1.5s !important; }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-
-        .cloud-inner {
-            width: 100% !important;
-            height: 100% !important;
-            position: relative !important;
-            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
-            transform-style: preserve-3d !important;
-        }
-
-        .galaxy-cloud:hover .cloud-inner {
-            transform: scale(1.05) rotateY(5deg) !important;
-        }
-
-        /* Cloud background with glow effect */
-        .cloud-background {
-            position: absolute !important;
-            width: 100% !important;
-            height: 100% !important;
-            border-radius: 50% !important;
-            background: radial-gradient(circle at 30% 30%, rgba(100, 181, 246, 0.4), rgba(33, 150, 243, 0.2), transparent) !important;
-            border: 2px solid rgba(129, 212, 250, 0.5) !important;
-            box-shadow: 
-                0 0 30px rgba(100, 181, 246, 0.4),
-                inset 0 0 30px rgba(129, 212, 250, 0.2),
-                0 0 60px rgba(33, 150, 243, 0.3) !important;
-            filter: blur(1px) !important;
-        }
-
-        .galaxy-cloud:nth-child(1) .cloud-background {
-            background: radial-gradient(circle at 30% 30%, rgba(100, 181, 246, 0.4), rgba(33, 150, 243, 0.2), transparent) !important;
-            box-shadow: 
-                0 0 30px rgba(100, 181, 246, 0.4),
-                inset 0 0 30px rgba(129, 212, 250, 0.2),
-                0 0 60px rgba(33, 150, 243, 0.3) !important;
-        }
-
-        .galaxy-cloud:nth-child(2) .cloud-background {
-            background: radial-gradient(circle at 30% 30%, rgba(156, 39, 176, 0.4), rgba(103, 58, 183, 0.2), transparent) !important;
-            box-shadow: 
-                0 0 30px rgba(156, 39, 176, 0.4),
-                inset 0 0 30px rgba(171, 71, 188, 0.2),
-                0 0 60px rgba(103, 58, 183, 0.3) !important;
-        }
-
-        .galaxy-cloud:nth-child(3) .cloud-background {
-            background: radial-gradient(circle at 30% 30%, rgba(76, 175, 80, 0.4), rgba(56, 142, 60, 0.2), transparent) !important;
-            box-shadow: 
-                0 0 30px rgba(76, 175, 80, 0.4),
-                inset 0 0 30px rgba(102, 187, 106, 0.2),
-                0 0 60px rgba(56, 142, 60, 0.3) !important;
-        }
-
-        .galaxy-cloud:nth-child(4) .cloud-background {
-            background: radial-gradient(circle at 30% 30%, rgba(255, 152, 0, 0.4), rgba(255, 111, 0, 0.2), transparent) !important;
-            box-shadow: 
-                0 0 30px rgba(255, 152, 0, 0.4),
-                inset 0 0 30px rgba(255, 167, 38, 0.2),
-                0 0 60px rgba(255, 111, 0, 0.3) !important;
-        }
-
-        /* Animated particles inside cloud */
-        .particles {
-            position: absolute !important;
-            width: 100% !important;
-            height: 100% !important;
-            border-radius: 50% !important;
-            overflow: hidden !important;
-        }
-
-        .particle {
-            position: absolute !important;
-            width: 3px !important;
-            height: 3px !important;
-            background: rgba(255, 255, 255, 0.6) !important;
-            border-radius: 50% !important;
-            animation: drift 15s infinite linear !important;
-        }
-
-        @keyframes drift {
-            0% {
-                opacity: 0;
-                transform: translate(0, 0);
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-                transform: translate(var(--tx), var(--ty));
-            }
-        }
-
-        /* Cloud content */
-        .cloud-content {
-            position: absolute !important;
-            width: 100% !important;
-            height: 100% !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            justify-content: center !important;
-            z-index: 5 !important;
-        }
-
-        .cloud-icon {
-            font-size: 4rem !important;
-            margin-bottom: 15px !important;
-            filter: drop-shadow(0 0 10px rgba(100, 181, 246, 0.6)) !important;
-            animation: pulse 2s ease-in-out infinite !important;
-        }
-
-        .cloud-title {
-            font-size: 1.8rem !important;
-            font-weight: 700 !important;
-            text-align: center !important;
-            margin-bottom: 8px !important;
-            color: #ffffff !important;
-            text-shadow: 0 0 20px rgba(100, 181, 246, 0.5) !important;
-        }
-
-        .cloud-description {
-            font-size: 0.9rem !important;
-            color: #b0bec5 !important;
-            text-align: center !important;
-            opacity: 0.8 !important;
-        }
-
-        /* Instructions */
-        .instructions {
-            position: relative !important;
-            text-align: center !important;
-            font-size: 0.95rem !important;
-            color: #90caf9 !important;
-            opacity: 0.8 !important;
-            margin-top: 40px !important;
-            animation: fadeInUp 1s ease-out 0.5s backwards !important;
-        }
-
-        .scroll-indicator {
-            display: inline-block !important;
-            margin-top: 10px !important;
-            animation: bounce 2s infinite !important;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Planet/Sub-item styles */
-        .planets-grid {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
-            gap: 50px !important;
-            margin-top: 40px !important;
-            padding: 20px !important;
-        }
-
-        .planet {
-            position: relative !important;
-            height: 300px !important;
-            cursor: pointer !important;
-            perspective: 1000px !important;
-            animation: float 6s ease-in-out infinite !important;
-        }
-
-        .planet:hover .planet-inner {
-            transform: scale(1.08) rotateY(-5deg) !important;
-        }
-
-        .planet-inner {
-            width: 100% !important;
-            height: 100% !important;
-            position: relative !important;
-            border-radius: 50% !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            justify-content: center !important;
-            padding: 20px !important;
-            text-align: center !important;
-            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
-            transform-style: preserve-3d !important;
-            overflow: hidden !important;
-        }
-
-        /* Detailed planet surface */
-        .planet-surface {
-            position: absolute !important;
-            width: 100% !important;
-            height: 100% !important;
-            border-radius: 50% !important;
-            z-index: 1 !important;
-            animation: rotatePlanet 20s linear infinite !important;
-        }
-
-        @keyframes rotatePlanet {
-            0% { transform: rotateZ(0deg); }
-            100% { transform: rotateZ(360deg); }
-        }
-
-        /* Planet surface detail overlay */
-        .planet-surface::after {
-            content: '' !important;
-            position: absolute !important;
-            width: 100% !important;
-            height: 100% !important;
-            border-radius: 50% !important;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.15), transparent 50%),
-                radial-gradient(circle at 70% 70%, rgba(0, 0, 0, 0.2), transparent 50%),
-                radial-gradient(circle at 50% 50%, transparent 70%, rgba(0, 0, 0, 0.1)) !important;
-            z-index: 1 !important;
-        }
-
-        /* Atmosphere glow effect */
-        .planet-atmosphere {
-            position: absolute !important;
-            width: 100% !important;
-            height: 100% !important;
-            border-radius: 50% !important;
-            box-shadow: 
-                inset -20px -20px 60px rgba(0, 0, 0, 0.5),
-                inset 20px 20px 60px rgba(255, 255, 255, 0.15),
-                0 0 40px rgba(100, 181, 246, 0.6),
-                0 0 80px rgba(100, 181, 246, 0.3) !important;
-            z-index: 2 !important;
-            animation: atmosphereGlow 3s ease-in-out infinite !important;
-        }
-
-        @keyframes atmosphereGlow {
-            0%, 100% { filter: drop-shadow(0 0 20px rgba(100, 181, 246, 0.4)); }
-            50% { filter: drop-shadow(0 0 30px rgba(100, 181, 246, 0.6)); }
-        }
-
-        /* Planet rings */
-        .planet-ring {
-            position: absolute !important;
-            border-radius: 50% !important;
-            border: 3px solid rgba(255, 200, 100, 0.4) !important;
-            z-index: 0 !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) rotateX(75deg) !important;
-            animation: rotateRing 30s linear infinite !important;
-            box-shadow: 0 0 20px rgba(255, 200, 100, 0.3) !important;
-        }
-
-        @keyframes rotateRing {
-            0% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(0deg); }
-            100% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(360deg); }
-        }
-
-        /* Planet content overlay */
-        .planet-content {
-            position: relative !important;
-            z-index: 3 !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            justify-content: center !important;
-            height: 100% !important;
-        }
-
-        .planet-title {
-            font-size: 1.6rem !important;
-            font-weight: 700 !important;
-            color: #ffffff !important;
-            margin-bottom: 10px !important;
-            text-shadow: 
-                0 0 10px rgba(100, 181, 246, 0.8),
-                0 0 20px rgba(33, 150, 243, 0.6) !important;
-            z-index: 4 !important;
-            position: relative !important;
-        }
-
-        .planet-description {
-            font-size: 0.85rem !important;
-            color: #b0bec5 !important;
-            opacity: 0.95 !important;
-            z-index: 4 !important;
-            position: relative !important;
-        }
-
-        /* Planet type variations */
-        .planet-ice {
-            background: radial-gradient(circle at 30% 30%, #ffffff, #e3f2fd, #1565c0) !important;
-        }
-
-        .planet-lava {
-            background: radial-gradient(circle at 30% 30%, #ffeb3b, #ff6f00, #1a0000) !important;
-        }
-
-        .planet-gas {
-            background: radial-gradient(circle at 35% 35%, #ff9800, #ff7043, #4a235a) !important;
-        }
-
-        .planet-ocean {
-            background: radial-gradient(circle at 35% 35%, #4dd0e1, #00bcd4, #0d47a1) !important;
-        }
-
-        .planet-jungle {
-            background: radial-gradient(circle at 30% 30%, #66bb6a, #2e7d32, #1b5e20) !important;
-        }
-
-        /* Rocket styles */
-        .rocket-container {
-            position: fixed !important;
-            left: calc(100% - 132px) !important;
-            top: calc(100% - 180px) !important;
-            z-index: 999 !important;
-            user-select: none !important;
-            width: 108px !important;
-            height: 138px !important;
-            pointer-events: none !important;
-            transition: transform 0.18s ease, filter 0.18s ease !important;
-        }
-
-        .rocket-container.traveler-active {
-            filter: drop-shadow(0 0 18px rgba(129, 212, 250, 0.9)) !important;
-        }
-
-        .rocket-container.docked {
-            transform: scale(1.06) !important;
-            filter: drop-shadow(0 0 28px rgba(255, 235, 59, 0.9)) !important;
-        }
-
-        .rocket {
-            position: relative !important;
-            width: 108px !important;
-            height: 138px !important;
-            animation: rocketFloat 3s ease-in-out infinite !important;
-            transform-origin: 50% 58% !important;
-        }
-
-        .rocket-body {
-            position: absolute !important;
-            width: 60px !important;
-            height: 88px !important;
-            background: linear-gradient(180deg, #fff4fd 0%, #ffbfdb 25%, #ff78b0 58%, #f14d93 100%) !important;
-            border-radius: 34px 34px 26px 26px !important;
-            left: 24px !important;
-            top: 14px !important;
-            border: 2px solid rgba(255, 255, 255, 0.55) !important;
-            box-shadow: 0 0 26px rgba(255, 107, 157, 0.5), inset 0 0 18px rgba(255, 255, 255, 0.55) !important;
-        }
-
-        .rocket-nose {
-            position: absolute !important;
-            top: -20px !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            width: 0 !important;
-            height: 0 !important;
-            border-left: 20px solid transparent !important;
-            border-right: 20px solid transparent !important;
-            border-bottom: 32px solid #ffe7f5 !important;
-            filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.5)) !important;
-        }
-
-        .rocket-window {
-            position: absolute !important;
-            width: 26px !important;
-            height: 26px !important;
-            background: radial-gradient(circle at 35% 35%, #ffffff, #64b5f6) !important;
-            border-radius: 50% !important;
-            left: 41px !important;
-            top: 26px !important;
-            border: 3px solid rgba(255, 255, 255, 0.75) !important;
-            box-shadow: inset 0 0 12px rgba(100, 181, 246, 0.55), 0 0 14px rgba(100, 181, 246, 0.5) !important;
-        }
-
-        .rocket-stripe {
-            position: absolute !important;
-            left: 8px !important;
-            right: 8px !important;
-            height: 7px !important;
-            background: rgba(255, 255, 255, 0.55) !important;
-            border-radius: 999px !important;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3) !important;
-        }
-
-        .rocket-stripe-top {
-            top: 58px !important;
-        }
-
-        .rocket-stripe-bottom {
-            top: 70px !important;
-            opacity: 0.75 !important;
-        }
-
-        .rocket-fins {
-            position: absolute !important;
-            bottom: 14px !important;
-            left: 24px !important;
-            width: 60px !important;
-            height: 34px !important;
-        }
-
-        .rocket-wing-core {
-            position: absolute !important;
-            left: 16px !important;
-            bottom: 2px !important;
-            width: 28px !important;
-            height: 16px !important;
-            border-radius: 0 0 16px 16px !important;
-            background: linear-gradient(180deg, #ffd9ec, #ff78b0) !important;
-            box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.4) !important;
-        }
-
-        .rocket-fin {
-            position: absolute !important;
-            width: 22px !important;
-            height: 28px !important;
-            background: linear-gradient(180deg, #ff96c4, #ff4b97) !important;
-            clip-path: polygon(50% 0%, 100% 100%, 0% 100%) !important;
-            filter: drop-shadow(0 0 10px rgba(255, 107, 157, 0.45)) !important;
-        }
-
-        .rocket-fin-left {
-            left: -8px !important;
-            transform: rotate(-14deg) !important;
-        }
-
-        .rocket-fin-right {
-            right: -8px !important;
-            transform: rotate(14deg) !important;
-        }
-
-        .rocket-engine {
-            position: absolute !important;
-            bottom: 8px !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            width: 26px !important;
-            height: 16px !important;
-            background: linear-gradient(180deg, #b0bec5, #546e7a) !important;
-            border-radius: 0 0 12px 12px !important;
-            border: 1px solid rgba(255, 255, 255, 0.35) !important;
-        }
-
-        .rocket-flame {
-            position: absolute !important;
-            bottom: -40px !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            width: 30px !important;
-            height: 42px !important;
-            background: linear-gradient(180deg, #fff176 0%, #ff9800 45%, #ff5722 75%, transparent 100%) !important;
-            border-radius: 50% 50% 30% 30% !important;
-            filter: blur(2px) drop-shadow(0 0 12px rgba(255, 152, 0, 0.7)) !important;
-            animation: flame 0.3s ease-in-out infinite !important;
-        }
-
-        @keyframes rocketFloat {
-            0%, 100% { transform: translateY(0px) rotate(-12deg); }
-            50% { transform: translateY(-16px) rotate(-12deg); }
-        }
-
-        @keyframes flame {
-            0%, 100% { 
-                opacity: 0.7;
-                height: 25px;
-            }
-            50% { 
-                opacity: 1;
-                height: 35px;
-            }
-        }
-
-        .rocket-tooltip {
-            position: absolute !important;
-            bottom: 154px !important;
-            right: -8px !important;
-            background: rgba(7, 16, 35, 0.88) !important;
-            color: #81d4fa !important;
-            padding: 10px 14px !important;
-            border-radius: 10px !important;
-            white-space: nowrap !important;
-            font-size: 0.85rem !important;
-            opacity: 0 !important;
-            transition: opacity 0.3s !important;
-            border: 1px solid rgba(129, 212, 250, 0.6) !important;
-            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25) !important;
-        }
-
-        .rocket-container:hover .rocket-tooltip {
-            opacity: 1 !important;
-        }
-
-        /* Modal styles */
-        .modal {
-            display: none !important;
-            position: fixed !important;
-            z-index: 1000 !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            background-color: rgba(0, 0, 0, 0.8) !important;
-            animation: fadeIn 0.3s ease !important;
-        }
-
-        .modal.active {
-            display: block !important;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal-content {
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0d1b2a 100%) !important;
-            margin: 5% auto !important;
-            padding: 40px !important;
-            border: 2px solid rgba(129, 212, 250, 0.5) !important;
-            border-radius: 20px !important;
-            width: 90% !important;
-            max-width: 800px !important;
-            max-height: 80vh !important;
-            overflow-y: auto !important;
-            box-shadow: 
-                0 0 50px rgba(100, 181, 246, 0.4),
-                inset 0 0 30px rgba(129, 212, 250, 0.1) !important;
-            animation: slideIn 0.4s ease !important;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-header {
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            margin-bottom: 30px !important;
-            border-bottom: 2px solid rgba(129, 212, 250, 0.3) !important;
-            padding-bottom: 20px !important;
-        }
-
-        .modal-title {
-            font-size: 2.2rem !important;
-            color: #64b5f6 !important;
-            text-shadow: 0 0 20px rgba(100, 181, 246, 0.5) !important;
-        }
-
-        .close-btn {
-            font-size: 2rem !important;
-            font-weight: bold !important;
-            color: #81d4fa !important;
-            cursor: pointer !important;
-            background: none !important;
-            border: none !important;
-            transition: color 0.3s !important;
-        }
-
-        .close-btn:hover {
-            color: #ff6b9d !important;
-        }
-
-        .modal-body {
-            color: #e0e0ff !important;
-            line-height: 1.8 !important;
-            font-size: 1.05rem !important;
-        }
-
-        .modal-body h3 {
-            color: #81d4fa !important;
-            margin-top: 25px !important;
-            margin-bottom: 15px !important;
-            font-size: 1.4rem !important;
-            text-shadow: 0 0 10px rgba(129, 212, 250, 0.4) !important;
-        }
-
-        .modal-body h3:first-child {
-            margin-top: 0 !important;
-        }
-
-        .modal-body p {
-            margin-bottom: 15px !important;
-        }
-
-        .game-embed {
-            width: 100% !important;
-            display: grid !important;
-            grid-template-columns: 1fr !important;
-            gap: 16px !important;
-        }
-
-        .game-embed iframe {
-            width: 100% !important;
-            height: 420px !important;
-            border-radius: 16px !important;
-            overflow: hidden !important;
-            border: 1px solid rgba(129, 212, 250, 0.4) !important;
-            box-shadow: inset 0 0 18px rgba(129, 212, 250, 0.1) !important;
-            background: #050814 !important;
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .planets-grid {
-                grid-template-columns: 1fr !important;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: "Trebuchet MS", "Avenir Next", sans-serif;
+            background:
+                radial-gradient(circle at 50% 0%, rgba(133, 245, 255, 0.2), transparent 28%),
+                linear-gradient(180deg, var(--sea-top) 0%, var(--sea-mid) 24%, #033647 55%, var(--sea-deep) 100%);
+            color: var(--text);
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cg fill='none' stroke='%23ecfcff' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='7.5'/%3E%3Cpath d='M7 7 L17 17' opacity='.85'/%3E%3Cpath d='M7 12 H17' opacity='.75'/%3E%3Cpath d='M12 7 V17' opacity='.75'/%3E%3Cpath d='M9 5.5 C13 4.6 16.8 6.1 18.5 9.2' opacity='.65'/%3E%3Cpath d='M17.5 17.5 L27 27'/%3E%3Cpath d='M22.5 22.5 L25.5 29'/%3E%3C/svg%3E") 8 8, auto;
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            left: 0;
+            right: 0;
+            pointer-events: none;
+        }
+
+        body::before {
+            top: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 22% 10%, rgba(255,255,255,0.12), transparent 16%),
+                radial-gradient(circle at 78% 8%, rgba(173,247,255,0.1), transparent 14%),
+                repeating-linear-gradient(110deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 78px);
+            opacity: 0.52;
+            z-index: 0;
+        }
+
+        body::after {
+            bottom: 0;
+            height: 18vh;
+            background:
+                radial-gradient(circle at 12% 100%, rgba(14, 73, 63, 0.95) 0 18%, transparent 19%),
+                radial-gradient(circle at 28% 100%, rgba(10, 96, 84, 0.92) 0 14%, transparent 15%),
+                radial-gradient(circle at 84% 100%, rgba(18, 76, 66, 0.95) 0 20%, transparent 21%),
+                linear-gradient(180deg, rgba(231, 201, 148, 0), rgba(231, 201, 148, 0.13) 56%, rgba(231, 201, 148, 0.24));
+            z-index: 0;
+        }
+
+        .bubble-field {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.9), rgba(133,245,255,0.28) 72%, transparent 74%);
+            border: 1px solid rgba(255,255,255,0.28);
+            box-shadow: inset 0 0 8px rgba(255,255,255,0.18), 0 0 12px rgba(133,245,255,0.14);
+            animation: rise linear infinite;
+        }
+
+        @keyframes rise {
+            0% { transform: translateY(20px) scale(0.88); opacity: 0; }
+            12% { opacity: 0.75; }
+            100% { transform: translateY(-120px) scale(1.06); opacity: 0; }
+        }
+
+        .portal-shell {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-rows: auto 1fr;
+        }
+
+        .portal-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 16px 20px;
+            background: linear-gradient(180deg, rgba(4, 33, 44, 0.82), rgba(4, 33, 44, 0.58));
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(133, 245, 255, 0.22);
+        }
+
+        .portal-title {
+            display: grid;
+            gap: 4px;
+        }
+
+        .portal-title strong {
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--foam);
+            font-size: 0.82rem;
+        }
+
+        .portal-title span {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .portal-link {
+            color: var(--sea-deep);
+            background: linear-gradient(90deg, var(--glow), #79ffd6);
+            text-decoration: none;
+            padding: 12px 16px;
+            border-radius: 999px;
+            font-weight: 700;
+            box-shadow: 0 12px 24px rgba(133, 245, 255, 0.18);
+        }
+
+        .portal-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .frame-wrap {
+            position: relative;
+            padding: 18px;
+        }
+
+        .frame-wrap::before {
+            content: "";
+            position: absolute;
+            inset: 18px;
+            border-radius: 28px;
+            border: 1px solid rgba(133, 245, 255, 0.18);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04), 0 18px 50px rgba(0,0,0,0.22);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        iframe {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            min-height: calc(100vh - 92px - 36px);
+            border: none;
+            border-radius: 28px;
+            background: transparent;
+        }
+
+        .swim-loader {
+            position: absolute;
+            inset: 18px;
+            border-radius: 28px;
+            background: linear-gradient(180deg, rgba(3, 25, 33, 0.2), rgba(3, 25, 33, 0.76));
+            display: grid;
+            place-items: center;
+            z-index: 3;
+            transition: opacity 500ms ease, visibility 500ms ease;
+        }
+
+        .swim-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .swim-stage {
+            position: relative;
+            width: min(78vw, 820px);
+            height: 220px;
+        }
+
+        .loader-copy {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 12px;
+            text-align: center;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            color: var(--foam);
+        }
+
+        .swimmer {
+            position: absolute;
+            width: 116px;
+            height: 170px;
+            animation: swimAcross linear infinite;
+            filter: drop-shadow(0 0 20px rgba(133, 245, 255, 0.24));
+        }
+
+        .swimmer.one {
+            top: 16px;
+            left: -130px;
+            animation-duration: 4.6s;
+        }
+
+        .swimmer.two {
+            top: 58px;
+            left: -180px;
+            transform: scale(0.82);
+            animation-duration: 5.8s;
+            animation-delay: -1.8s;
+        }
+
+        .swimmer.three {
+            top: 8px;
+            left: -240px;
+            transform: scale(1.08);
+            animation-duration: 6.6s;
+            animation-delay: -3.2s;
+        }
+
+        @keyframes swimAcross {
+            0% { transform: translateX(0) translateY(24px) rotate(-5deg); }
+            25% { transform: translateX(26vw) translateY(-6px) rotate(2deg); }
+            50% { transform: translateX(52vw) translateY(20px) rotate(-2deg); }
+            75% { transform: translateX(74vw) translateY(-14px) rotate(4deg); }
+            100% { transform: translateX(96vw) translateY(12px) rotate(-3deg); }
+        }
+
+        .jelly {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .jelly-bell {
+            position: absolute;
+            left: 14px;
+            right: 14px;
+            top: 10px;
+            height: 78px;
+            border-radius: 58% 58% 42% 42% / 74% 74% 28% 28%;
+            background: linear-gradient(180deg, rgba(233,255,255,0.96), rgba(140,241,255,0.74) 45%, rgba(92,184,214,0.42) 100%);
+            border: 2px solid rgba(255,255,255,0.42);
+            box-shadow: inset 0 10px 20px rgba(255,255,255,0.2);
+            overflow: hidden;
+            animation: pulseBell 1.8s ease-in-out infinite;
+        }
+
+        .jelly-bell::after {
+            content: "";
+            position: absolute;
+            left: 20%;
+            top: 16%;
+            width: 60%;
+            height: 28%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.56), transparent 70%);
+        }
+
+        .jelly-core {
+            position: absolute;
+            left: 50%;
+            top: 44px;
+            width: 30px;
+            height: 30px;
+            margin-left: -15px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, #ffffff, #a9fbff 52%, #20748c 100%);
+            border: 2px solid rgba(255,255,255,0.56);
+            box-shadow: 0 0 12px rgba(133,245,255,0.5);
+        }
+
+        .jelly-tentacles {
+            position: absolute;
+            left: 24px;
+            right: 24px;
+            top: 86px;
+            bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .jelly-tentacles span {
+            width: 6px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(180deg, rgba(186,252,255,0.9), rgba(133,245,255,0.34) 54%, transparent 100%);
+            animation: sway 2.8s ease-in-out infinite;
+            transform-origin: top center;
+        }
+
+        .jelly-tentacles span:nth-child(2n) {
+            height: 88px;
+            animation-delay: -0.5s;
+        }
+
+        .jelly-tentacles span:nth-child(3n) {
+            width: 4px;
+            animation-delay: -1.1s;
+        }
+
+        @keyframes pulseBell {
+            0%, 100% { transform: translateY(0) scaleY(1); }
+            50% { transform: translateY(6px) scaleY(0.9); }
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: translateX(0) rotate(4deg); opacity: 0.75; }
+            50% { transform: translateX(6px) rotate(-7deg); opacity: 1; }
+        }
+
+        @media (max-width: 700px) {
+            .portal-bar {
+                flex-direction: column;
+                align-items: flex-start;
             }
 
-            .modal-content {
-                width: 95% !important;
-                padding: 20px !important;
+            .portal-actions {
+                width: 100%;
+                justify-content: flex-start;
             }
 
-            .modal-title {
-                font-size: 1.6rem !important;
-            }
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2.5rem !important;
+            .swim-stage {
+                height: 180px;
             }
 
-            .header p {
-                font-size: 1rem !important;
+            .swimmer {
+                width: 92px;
+                height: 136px;
             }
-
-            .galaxy-grid {
-                grid-template-columns: 1fr !important;
-                gap: 30px !important;
-            }
-
-            .galaxy-cloud {
-                height: 300px !important;
-            }
-
-            .cloud-title {
-                font-size: 1.5rem !important;
-            }
-
-            .cloud-icon {
-                font-size: 3rem !important;
-            }
-        }
-
-        /* Link styling */
-        a {
-            text-decoration: none !important;
-            color: inherit !important;
-            display: block;
-        }
-
-        /* View toggle controls */
-        .view-toggle {
-            position: fixed !important;
-            bottom: 30px !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            display: flex !important;
-            gap: 15px !important;
-            z-index: 998 !important;
-            background: rgba(0, 0, 0, 0.6) !important;
-            padding: 12px 20px !important;
-            border-radius: 30px !important;
-            border: 2px solid rgba(129, 212, 250, 0.5) !important;
-            backdrop-filter: blur(10px) !important;
-        }
-
-        .view-btn {
-            background: linear-gradient(135deg, rgba(100, 181, 246, 0.3), rgba(33, 150, 243, 0.2)) !important;
-            border: 2px solid rgba(129, 212, 250, 0.4) !important;
-            color: #81d4fa !important;
-            padding: 8px 18px !important;
-            border-radius: 20px !important;
-            cursor: pointer !important;
-            font-size: 0.95rem !important;
-            font-weight: 600 !important;
-            transition: all 0.3s !important;
-        }
-
-        .view-btn:hover {
-            background: linear-gradient(135deg, rgba(100, 181, 246, 0.5), rgba(33, 150, 243, 0.4)) !important;
-            box-shadow: 0 0 15px rgba(129, 212, 250, 0.6) !important;
-            transform: scale(1.05) !important;
-        }
-
-        .view-btn.active {
-            background: linear-gradient(135deg, rgba(100, 181, 246, 0.8), rgba(33, 150, 243, 0.6)) !important;
-            box-shadow: 0 0 25px rgba(129, 212, 250, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.2) !important;
-            border-color: rgba(129, 212, 250, 0.8) !important;
-        }
-
-        /* Traveler view styles */
-        .traveler-view {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            overflow: hidden !important;
-            perspective: 1000px !important;
-            z-index: 15 !important;
-            display: none !important;
-        }
-
-        .traveler-space {
-            position: absolute !important;
-            width: 100% !important;
-            height: 100% !important;
-            top: 0 !important;
-            left: 0 !important;
-        }
-
-        .galaxy-cloud-traveler {
-            position: absolute !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            cursor: pointer !important;
-        }
-
-        .planet-traveler {
-            position: absolute !important;
-            cursor: pointer !important;
-        }
-
-        .traveler-docked {
-            filter: drop-shadow(0 0 24px rgba(255, 235, 59, 0.95)) !important;
-            transform: scale(1.06) !important;
-        }
-
-        .traveler-back-btn {
-            position: fixed !important;
-            top: 22px !important;
-            right: 22px !important;
-            z-index: 120 !important;
-            display: none !important;
-            background: rgba(0, 0, 0, 0.75) !important;
-            border: 2px solid rgba(129, 212, 250, 0.55) !important;
-            color: #81d4fa !important;
-            padding: 10px 18px !important;
-            border-radius: 999px !important;
-            font-weight: 700 !important;
-            cursor: pointer !important;
-            box-shadow: 0 0 18px rgba(33, 150, 243, 0.2) !important;
-        }
-
-        .traveler-back-btn.active {
-            display: inline-flex !important;
-        }
-
-        .traveler-instruction {
-            position: fixed !important;
-            bottom: 95px !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            z-index: 120 !important;
-            padding: 10px 18px !important;
-            border-radius: 999px !important;
-            background: rgba(0, 0, 0, 0.74) !important;
-            border: 1px solid rgba(129, 212, 250, 0.45) !important;
-            color: #cfefff !important;
-            font-size: 0.9rem !important;
-            display: none !important;
-            white-space: nowrap !important;
-        }
-
-        .traveler-instruction.active {
-            display: block !important;
-        }
-
-        .hud-display {
-            position: fixed !important;
-            top: 20px !important;
-            left: 20px !important;
-            background: rgba(0, 0, 0, 0.7) !important;
-            border: 2px solid rgba(129, 212, 250, 0.5) !important;
-            padding: 15px 25px !important;
-            border-radius: 10px !important;
-            color: #81d4fa !important;
-            z-index: 100 !important;
-            font-family: 'Courier New', monospace !important;
-            font-size: 0.9rem !important;
-            display: none !important;
-        }
-
-        .hud-display.active {
-            display: block !important;
-        }
-
-        .hud-display p {
-            margin: 5px 0 !important;
-            color: #81d4fa !important;
-        }
-
-        .hud-display .label {
-            color: #64b5f6 !important;
-            font-weight: bold !important;
-        }
-
-        .code-box {
-            background: rgba(0, 0, 0, 0.65) !important;
-            border: 1px solid rgba(129, 212, 250, 0.35) !important;
-            border-radius: 10px !important;
-            padding: 12px 14px !important;
-            overflow-x: auto !important;
-            color: #e3f2fd !important;
-            box-shadow: 0 0 18px rgba(33, 150, 243, 0.15) !important;
-        }
-
-        .code-box code {
-            color: inherit !important;
-            font-family: "Courier New", monospace !important;
-            font-size: 0.85rem !important;
-            line-height: 1.4 !important;
         }
     </style>
 </head>
 <body>
-    <!-- Starfield background -->
-    <div class="stars" id="starfield"></div>
+    <div class="bubble-field" id="bubbleField" aria-hidden="true"></div>
 
-    <!-- Main container -->
-    <div class="container" id="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>TEAM SPACE</h1>
-            <p>CSSE PORTFOLIO</p>
-            <div class="subtitle">Navigate through the galaxy of our projects and files</div>
-        </div>
-
-        <!-- Galaxy clouds grid -->
-        <div class="galaxy-grid" id="galaxyGrid">
-            <!-- Galaxy clouds will be populated here -->
-        </div>
-
-        <!-- Instructions -->
-        <div class="instructions">
-            <p>✨ Click on any galaxy to explore its contents ✨</p>
-            <div class="scroll-indicator">↓ Scroll to see more ↓</div>
-        </div>
-    </div>
-
-    <!-- View Toggle Controls -->
-    <div class="view-toggle" id="viewToggle">
-        <button class="view-btn active" id="listViewBtn" onclick="switchToListView()">📋 View as List</button>
-        <button class="view-btn" id="travelerViewBtn" onclick="switchToTravelerView()">🚀 View as Traveler</button>
-    </div>
-
-    <!-- Traveler View -->
-    <div class="traveler-view" id="travelerView" style="display: none;">
-        <div class="traveler-space" id="travelerSpace"></div>
-        <div class="hud-display" id="hudDisplay">
-            <p><span class="label">SECTOR SCAN:</span> <span id="hudCoords">0.0, 0.0</span></p>
-            <p><span class="label">DISTANCE:</span> <span id="hudDistance">N/A</span></p>
-        </div>
-        <button class="traveler-back-btn" id="travelerBackBtn" onclick="backToTravelerGalaxies()">← Back to Galaxies</button>
-        <div class="traveler-instruction" id="travelerInstruction">Use WASD to fly. Dock with a glowing object and press Enter.</div>
-    </div>
-
-    <!-- Controllable Rocket -->
-    <div class="rocket-container" id="rocketContainer">
-        <div class="rocket-tooltip">List view: follow the cursor. Traveler view: use WASD or arrows.</div>
-        <div class="rocket" id="rocket">
-            <div class="rocket-body">
-                <div class="rocket-nose"></div>
-                <div class="rocket-window"></div>
-                <div class="rocket-stripe rocket-stripe-top"></div>
-                <div class="rocket-stripe rocket-stripe-bottom"></div>
+    <div class="portal-shell">
+        <header class="portal-bar">
+            <div class="portal-title">
+                <strong>Team Space Portal</strong>
+                <span>Underwater entry point with the live reef view loaded below.</span>
             </div>
-            <div class="rocket-fins">
-                <div class="rocket-wing-core"></div>
-                <div class="rocket-fin rocket-fin-left"></div>
-                <div class="rocket-fin rocket-fin-right"></div>
+            <div class="portal-actions">
+                <a class="portal-link" href="{{ site.baseurl }}/legacy-home">Legacy Home</a>
+                <a class="portal-link" href="{{ site.baseurl }}/team-space">Open Team Space Directly</a>
             </div>
-            <div class="rocket-engine"></div>
-            <div class="rocket-flame"></div>
-        </div>
+        </header>
+
+        <section class="frame-wrap">
+            <div class="swim-loader" id="swimLoader">
+                <div class="swim-stage" aria-hidden="true">
+                    <div class="swimmer one">
+                        <div class="jelly">
+                            <div class="jelly-bell"></div>
+                            <div class="jelly-core"></div>
+                            <div class="jelly-tentacles"><span></span><span></span><span></span><span></span><span></span></div>
+                        </div>
+                    </div>
+                    <div class="swimmer two">
+                        <div class="jelly">
+                            <div class="jelly-bell"></div>
+                            <div class="jelly-core"></div>
+                            <div class="jelly-tentacles"><span></span><span></span><span></span><span></span><span></span></div>
+                        </div>
+                    </div>
+                    <div class="swimmer three">
+                        <div class="jelly">
+                            <div class="jelly-bell"></div>
+                            <div class="jelly-core"></div>
+                            <div class="jelly-tentacles"><span></span><span></span><span></span><span></span><span></span></div>
+                        </div>
+                    </div>
+                    <div class="loader-copy">Jellyfish are guiding you into Team Space</div>
+                </div>
+            </div>
+
+            <iframe id="teamSpaceFrame" src="{{ site.baseurl }}/team-space" title="Team Space"></iframe>
+        </section>
     </div>
 
     <script>
-        // Debug - log that the page is loaded
-        console.log('Team Space page loaded successfully');
-        console.log('Window dimensions:', window.innerWidth, 'x', window.innerHeight);
-        
-        // Generate starfield
-        function generateStars() {
-            console.log('Generating stars...');
-            const starfield = document.getElementById('starfield');
-            if (!starfield) {
-                console.error('Starfield element not found!');
-                return;
-            }
-            const starCount = 200;
+        const bubbleField = document.getElementById('bubbleField');
+        const loader = document.getElementById('swimLoader');
+        const frame = document.getElementById('teamSpaceFrame');
 
-            for (let i = 0; i < starCount; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                
-                const size = Math.random() * 2.5 + 0.5;
-                const x = Math.random() * 100;
-                const y = Math.random() * 100;
-                const duration = Math.random() * 3 + 2;
-
-                star.style.width = size + 'px';
-                star.style.height = size + 'px';
-                star.style.left = x + '%';
-                star.style.top = y + '%';
-                star.style.animationDuration = duration + 's';
-                star.style.animationDelay = Math.random() * 3 + 's';
-
-                starfield.appendChild(star);
-            }
-            console.log('Stars generated: ' + starCount);
-        }
-
-        // Generate particles in galaxy clouds
-        function generateParticles(container) {
-            const particleCount = 20;
-            const particlesDiv = container.querySelector('.particles');
-
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-
-                const startX = Math.random() * 100;
-                const startY = Math.random() * 100;
-                const tx = (Math.random() - 0.5) * 200;
-                const ty = (Math.random() - 0.5) * 200;
-                const delay = Math.random() * 5;
-                const duration = Math.random() * 10 + 15;
-
-                particle.style.left = startX + '%';
-                particle.style.top = startY + '%';
-                particle.style.setProperty('--tx', tx + 'px');
-                particle.style.setProperty('--ty', ty + 'px');
-                particle.style.animationDelay = delay + 's';
-                particle.style.animationDuration = duration + 's';
-
-                particlesDiv.appendChild(particle);
+        function buildBubbles() {
+            const count = 48;
+            for (let index = 0; index < count; index += 1) {
+                const bubble = document.createElement('span');
+                bubble.className = 'bubble';
+                const size = 6 + Math.random() * 16;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${Math.random() * 100}%`;
+                bubble.style.top = `${15 + Math.random() * 85}%`;
+                bubble.style.animationDuration = `${5 + Math.random() * 8}s`;
+                bubble.style.animationDelay = `${Math.random() * 6}s`;
+                bubbleField.appendChild(bubble);
             }
         }
 
-        // Sample galaxies (to be customized)
-        const galaxies = [
-            {
-                title: 'Games',
-                description: 'Explore our interactive games and the engine we used to build them!',
-                icon: '🎮',
-                color: 'blue',
-                planets: [
-                    {
-                        title: 'Game Builder Engine',
-                        description: 'Interactive game creation platform with visual level editor',
-                        content: `
-                            <h3>Game Builder Engine Overview</h3>
-                            <p>A comprehensive game development platform that allows you to create interactive games with a visual level editor and no coding required. Perfect for rapid prototyping and game design.</p>
+        buildBubbles();
 
-                            <h3>Key Features</h3>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li><strong>Visual Level Editor:</strong> Drag-and-drop interface for game design</li>
-                                <li><strong>Sprite System:</strong> Configurable character animations and behavior</li>
-                                <li><strong>Background Assets:</strong> Extensive collection of game backgrounds</li>
-                                <li><strong>NPC Mechanics:</strong> Create interactive NPCs with dialogue systems</li>
-                                <li><strong>Collision Detection:</strong> Advanced hitbox and barrier systems</li>
-                                <li><strong>Player Control:</strong> WASD movement with customizable speed and physics</li>
-                            </ul>
-
-                            <h3>Core Components</h3>
-                            <p><strong>Player System:</strong> Configure sprite-based characters with STEP_FACTOR control for movement speed. Supports multiple animation states and seamless character control.</p>
-                            <p><strong>NPC System:</strong> Create interactive characters with idle animations, collision hitboxes, and dialogue triggers. Perfect for quest-givers and story elements.</p>
-                            <p><strong>Barrier System:</strong> Invisible collision walls that guide player movement and create engaging level design challenges.</p>
-                            <p><strong>Asset Management:</strong> Organize backgrounds and sprites in dedicated directories with automatic asset refreshing.</p>
-
-                            <h3>Game Library</h3>
-                            <p>Browse existing games created with this engine:</p>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li><a href="{{ site.baseurl }}/games/aquatic.html" style="color: #81d4fa; text-decoration: underline;">Aquatic Game Level</a> - Explore the deep sea</li>
-                                <li><a href="{{ site.baseurl }}/gamify/seek.html" style="color: #81d4fa; text-decoration: underline;">Find Kirby (Seek)</a> - Search the playground</li>
-                                <li><a href="{{ site.baseurl }}/gamify/basketball.html" style="color: #81d4fa; text-decoration: underline;">Basketball Game Level</a> - Navigate the court</li>
-                            </ul>
-
-                            <h3>Getting Started</h3>
-                            <p>Launch the portal to start building your own interactive game.</p>
-                            <p>
-                                <a class="portal-button" href="{{ site.baseurl }}/team-space-portal/gamebuilder">
-                                    <span class="spark"></span>
-                                    Enter GameBuilder Portal
-                                </a>
-                            </p>
-
-                            <h3>Play Now</h3>
-                            <div class="game-embed">
-                                <iframe src="{{ site.baseurl }}/games/aquatic.html" title="Aquatic Game Level"></iframe>
-                                <iframe src="{{ site.baseurl }}/gamify/seek.html?embed=1" title="Find Kirby (Seek)"></iframe>
-                                <iframe src="{{ site.baseurl }}/gamify/basketball.html" title="Basketball Game Level"></iframe>
-                            </div>
-
-                            <h3>Technologies</h3>
-                            <p>Built with JavaScript ES6+, featuring modular architecture for easy customization and extension. Supports responsive design for both desktop and mobile gaming experiences.</p>
-                        `
-                    },
-                    {
-                        title: 'Aquatic Game Level',
-                        description: 'Dive into the ocean adventure',
-                        link: '{{ site.baseurl }}/games/aquatic.html',
-                        content: `
-                            <h3>Aquatic Game Level</h3>
-                            <p>Explore the deep sea and interact with ocean creatures.</p>
-                            <p><a class="portal-button" href="{{ site.baseurl }}/games/aquatic.html"><span class="spark"></span>Teleport to Aquatic</a></p>
-                        `
-                    },
-                    {
-                        title: 'Basketball Game Level',
-                        description: 'Navigate the court and meet LeBron',
-                        link: '{{ site.baseurl }}/gamify/basketball.html',
-                        content: `
-                            <h3>Basketball Game Level</h3>
-                            <p>Challenge the court puzzle and reach LeBron.</p>
-                            <p><a class="portal-button" href="{{ site.baseurl }}/gamify/basketball.html"><span class="spark"></span>Teleport to Basketball</a></p>
-                        `
-                    },
-                    {
-                        title: 'Find Kirby (Seek)',
-                        description: 'Search the playground and find Kirby',
-                        link: '{{ site.baseurl }}/gamify/seek.html',
-                        content: `
-                            <h3>Find Kirby (Seek)</h3>
-                            <p>Find Kirby hiding in the corner of the map.</p>
-                            <p><a class="portal-button" href="{{ site.baseurl }}/gamify/seek.html"><span class="spark"></span>Teleport to Seek</a></p>
-                        `
-                    },
-                    {
-                        title: 'Combined Game Levels',
-                        description: 'Play Aquatic, Find Kirby, and Basketball in one run',
-                        link: '{{ site.baseurl }}/games/combined.html',
-                        content: `
-                            <h3>Combined Game Levels</h3>
-                            <p>Run through Aquatic, Find Kirby, and Basketball back-to-back.</p>
-                            <p><a class="portal-button" href="{{ site.baseurl }}/games/combined.html"><span class="spark"></span>Teleport to Combined</a></p>
-                        `
-                    }
-                ]
-            },
-            {
-                title: 'Blogs',
-                description: 'Read our blogs to know about our development process and insights',
-                icon: '📝',
-                color: 'purple',
-                planets: [
-                    {
-                        title: "Arjun's Mini Game Level",
-                        description: 'Find Kirby hiding in the corner',
-                        content: `
-                            <h3>Background</h3>
-                            <p><strong>Playground Environment:</strong> The background uses a custom playground image to create the game setting.</p>
-                            <p><strong>Configuration:</strong></p>
-                            <pre class="code-box"><code>const bgData = {
-name: "custom_bg",
-src: path + "/images/gamebuilder/bg/tagplayground.png",
-pixels: { height: 400, width: 560 }
-};</code></pre>
-                            <p><strong>Role:</strong></p>
-                            <p>✅ Provides the visual environment</p>
-                            <p>✅ Defines the playable space</p>
-                            <p>✅ Establishes theme (outdoor playground)</p>
-
-                            <h3>Player</h3>
-                            <p><strong>User-Controlled Character:</strong> The player controls a boy sprite that can move freely around the map using keyboard input.</p>
-                            <p><strong>Controls:</strong> W → Move up, A → Move left, S → Move down, D → Move right</p>
-                            <p><strong>Configuration:</strong></p>
-                            <pre class="code-box"><code>keypress: { up: 87, left: 65, down: 83, right: 68 }</code></pre>
-                            <p><strong>Movement Setup:</strong> INIT_POSITION: { x: 32, y: 300 }, SCALE_FACTOR: 5, STEP_FACTOR: 1000, ANIMATION_RATE: 50</p>
-                            <p><strong>Sprite Animation:</strong> Supports movement in 8 directions: Up, Down, Left, Right, Diagonals (upLeft, upRight, etc.)</p>
-                            <p><strong>Role:</strong></p>
-                            <p>✅ Main playable character</p>
-                            <p>✅ Explores the environment</p>
-                            <p>✅ Searches for the hidden NPC</p>
-
-                            <h3>NPC (Non-Playable Character)</h3>
-                            <p><strong>Hidden Character — Kirby:</strong> Kirby acts as the target the player must find.</p>
-                            <p><strong>Configuration:</strong></p>
-                            <pre class="code-box"><code>const npcData1 = {
-id: 'NPC',
-greeting: 'Oh you found me',
-INIT_POSITION: { x: 599, y: 88 },
-SCALE_FACTOR: 8
-};</code></pre>
-                            <p><strong>Interaction Behavior:</strong> When the player interacts with Kirby, dialogue appears, reaction is triggered, and the level ends after dialogue closes.</p>
-                            <p><strong>Reaction Function:</strong></p>
-                            <pre class="code-box"><code>reaction: function() {
-if (this.dialogueSystem) {
-this.showReactionDialogue();
-} else {
-console.log(this.greeting);
-}
-}</code></pre>
-                            <p><strong>Level Completion:</strong></p>
-                            <pre class="code-box"><code>onDialogueClose: function() {
-const gameControl = this.gameEnv?.gameControl;
-if (gameControl?.currentLevel) {
-gameControl.currentLevel.continue = false;
-}
-}</code></pre>
-                            <p><strong>Role:</strong></p>
-                            <p>Objective of the level</p>
-                            <p>Encourages exploration</p>
-                            <p>🏁 Triggers level completion</p>
-
-                            <h3>Barriers (Obstacles)</h3>
-                            <p>Invisible objects placed around the playground to restrict movement and shape the map.</p>
-                            <p><strong>Example:</strong></p>
-                            <pre class="code-box"><code>const dbarrier_1 = {
-x: 232, y: 218,
-width: 83, height: 78,
-visible: false
-};</code></pre>
-                            <p><strong>Count:</strong> There are 8 barriers total.</p>
-                            <p><strong>Characteristics:</strong> Invisible to the player, prevent walking through certain areas, imported from overlay collision map.</p>
-                            <p><strong>Collision Role:</strong></p>
-                            <p>✅ Create walls and blocked zones</p>
-                            <p>✅ Prevent leaving intended play area</p>
-                            <p>✅ Add challenge to navigation</p>
-
-                            <h3>Level Object Setup</h3>
-                            <p>All objects are registered into the game using:</p>
-                            <pre class="code-box"><code>this.classes = [
-{ class: GameEnvBackground, data: bgData },
-{ class: Player, data: playerData },
-{ class: Npc, data: npcData1 },
-{ class: Barrier, data: dbarrier_1 },
-...
-];</code></pre>
-                            <p>This tells the game engine which objects to spawn and manage.</p>
-
-                            <h3>Gameplay Summary</h3>
-                            <p>✔ Player spawns in playground</p>
-                            <p>✔ Moves using WASD</p>
-                            <p>✔ Explores while avoiding blocked areas</p>
-                            <p>✔ Searches for hidden Kirby</p>
-                            <p>✔ Interacts to trigger dialogue</p>
-                            <p>✔ Level ends after discovery</p>
-                        `
-                    },
-                    {
-                        title: "Lance's Mini Game Basketball",
-                        description: 'Navigate the court to reach LeBron James',
-                        content: `
-                            <h3>Game Concept</h3>
-                            <p>A basketball court mini game where the player navigates around barriers (trash can, benches, and hidden barriers) to reach LeBron James at the right side of the court and trigger dialogue.</p>
-
-                            <h3>Configured Objects</h3>
-                            <p><strong>Background:</strong> BasketballCourt/Court.png — sets the retro indoor court scene</p>
-                            <p><strong>Player:</strong> BasketballPlayer sprite — WASD-controlled, starts at left baseline</p>
-                            <p><strong>NPC:</strong> LeBron James — idle at right of court, triggers dialogue on interaction</p>
-                            <p><strong>Barriers:</strong> 4 invisible walls blocking paths around the court</p>
-
-                            <h3>Key Configuration Decisions</h3>
-                            <p><strong>STEP_FACTOR:</strong> 400 — faster movement than default</p>
-                            <p><strong>Speed on NPC:</strong> 0 — prevents LeBron from wandering</p>
-                            <p><strong>Columns on all NPC directions:</strong> 1 — freezes on single idle frame</p>
-                            <p><strong>Hitbox on NPC:</strong> 0.01 — allows player to walk close enough to interact</p>
-                        `
-                    },
-                    {
-                        title: "Lance's Basketball Game V2",
-                        description: 'Dribble evasion game against LeBron',
-                        content: `
-                            <h3>Game Concept</h3>
-                            <p>A basketball "evasion" game where the player must dribble around a basketball court while avoiding being caught by LeBron. The longer a player survives the higher their score.</p>
-
-                            <h3>Configured Game Objects and Roles</h3>
-                            <p><strong>Background:</strong> Custom basketball court canvas due to Game Builder errors. Court markings include the paint and three point arc.</p>
-                            <pre class="code-box"><code>const canvas = document.createElement('canvas');
-canvas.id = 'bball-evasion';
-canvas.width = W;
-canvas.height = H;
-
-document.body.appendChild(canvas);
-
-const ctx = canvas.getContext('2d');
-const drawCourt = () => {
-ctx.fillStyle = '#1a1a2a';
-ctx.fillRect(0, 0, W, H);
-
-const woodGrad = ctx.createLinearGradient(0, 0, W, 0);
-woodGrad.addColorStop(0,   '#b5651d');
-woodGrad.addColorStop(0.5, '#cd853f');
-woodGrad.addColorStop(1,   '#b5651d');
-
-ctx.fillStyle = woodGrad;
-ctx.fillRect(0, 0, W, H);
-};</code></pre>
-
-                            <p><strong>Player:</strong> Basketball Player 11 — user-controlled with WASD or arrow keys.</p>
-                            <pre class="code-box"><code>player = {
-x: W0.08,
-y: H0.50,
-dir:'right',
-frame:0,
-moving:false
-
-Movement
-};
-if (keys['w'] || keys['arrowup']) dy = -3.8;
-if (keys['s'] || keys['arrowdown']) dy = 3.8;
-if (keys['a'] || keys['arrowleft']) dx = -3.8;
-if (keys['d'] || keys['arrowright']) dx = 3.8;</code></pre>
-
-                            <h3>Collision</h3>
-                            <pre class="code-box"><code>if (!blocked(player.x + dx, player.y, PR)) player.x += dx;
-if (!blocked(player.x, player.y + dy, PR)) player.y += dy;</code></pre>
-                            <p><strong>Character Render:</strong></p>
-                            <pre class="code-box"><code>drawPerson(
-player.x, player.y,
-player.dir !== 'left',
-'#e53935', '#1565c0', '#d4845a',
-'11', '#e53935', PR
-);</code></pre>
-
-                            <h3>NPC</h3>
-                            <p><strong>LeBron:</strong> Chases the user constantly.</p>
-                            <pre class="code-box"><code>const spd = Math.min(1.6 + elapsed * 0.04, 4.2);
-
-const ddx = player.x - lebron.x;
-const ddy = player.y - lebron.y;
-
-const dist = Math.sqrt(ddxddx + ddyddy);
-
-const nx = ddx / dist;
-const ny = ddy / dist;
-
-const mx = nx * spd;
-const my = ny * spd;</code></pre>
-
-                            <h3>Barriers</h3>
-                            <p>Objects placed along the court to block movement and make navigation more difficult (walls, bench, gatorade coolers).</p>
-                            <pre class="code-box"><code>const obstacles = [
-
-{ x: W0.28, y: H0.30, w: W0.10, h: H0.06, type:'bench' },
-
-{ x: W0.55, y: H0.58, w: W0.10, h: H0.06, type:'bench' },
-
-{ x: W0.20, y: H0.64, w: W0.07, h: H0.18, type:'gator' },
-
-{ x: W0.46, y: H0.38, w: W0.06, h: H0.14, type:'cone' },
-
-{ x:0, y:0, w:4, h:H, type:'wall' }
-
-];</code></pre>
-
-                            <h3>Rendering</h3>
-                            <pre class="code-box"><code>const drawObstacles = () => {
-obstacles.forEach(o => {
-
-    if (o.type === 'bench') {
-        ctx.fillStyle = '#8d6e4a';
-        ctx.fillRect(o.x, o.y, o.w, o.h*0.38);
-    }
-
-    if (o.type === 'gator') {
-        ctx.fillStyle = '#2e7d32';
-        ctx.beginPath();
-        ctx.roundRect(o.x, o.y, o.w, o.h*0.80, 8);
-        ctx.fill();
-    }
-
-    if (o.type === 'cone') {
-        ctx.fillStyle = '#ff6f00';
-        ctx.fillRect(o.x, o.y + o.h*0.10, o.w, o.h*0.12);
-    }
-
-});
-};</code></pre>
-
-                            <h3>Collision Helper</h3>
-                            <pre class="code-box"><code>const circVsRect = (cx, cy, r, rx, ry, rw, rh) => {
-
-const nearX = Math.max(rx, Math.min(cx, rx+rw));
-const nearY = Math.max(ry, Math.min(cy, ry+rh));
-
-const dx = cx - nearX;
-const dy = cy - nearY;
-
-return dx*dx + dy*dy < r*r;
-};</code></pre>
-
-                            <h3>JavaScript Configuration File</h3>
-                            <p><code>assets/js/GameEnginev1/GameLevelBasketball.js</code></p>
-                        `
-                    },
-                    {
-                        title: "Yiming's Aquatic Game",
-                        description: 'Scuba diver seeks the floating slime',
-                        content: `
-                            <h3>Game Concept</h3>
-                            <p>The player will play as a scuba diver and seek for the floating slime under the sea.</p>
-
-                            <h3>How It Works</h3>
-                            <p>You need a Game Builder on your website to load custom assets. You also need to put the correct asset path so the background and sprites load properly.</p>
-
-                            <h3>Unique Assets</h3>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li>Added scuba diver spritesheet</li>
-                                <li>Added under sea background</li>
-                                <li>Collision walls to challenge the player</li>
-                            </ul>
-
-                            <h3>Game Level Configuration</h3>
-                            <pre class="code-box"><code>class GameLevelAquaticGameLevel {
-    constructor(gameEnv) {
-        const path = gameEnv.path;
-        const width = gameEnv.innerWidth;
-        const height = gameEnv.innerHeight;
-
-        const bgData = {
-            name: "custom_bg",
-            src: path + "/images/gamebuilder/bg/Aquatic.png",
-            pixels: { height: 1960, width: 2940 }
-        };
-
-        const playerData = {
-            id: 'playerData',
-            src: path + "/images/gamebuilder/sprites/scubadiver.png",
-            SCALE_FACTOR: 5,
-            STEP_FACTOR: 1000,
-            ANIMATION_RATE: 50,
-            INIT_POSITION: { x: 100, y: 300 },
-            pixels: { height: 948, width: 632 },
-            orientation: { rows: 4, columns: 3 },
-            down: { row: 0, start: 0, columns: 3 },
-            downRight: { row: 1, start: 0, columns: 3, rotate: Math.PI/16 },
-            downLeft: { row: 0, start: 0, columns: 3, rotate: -Math.PI/16 },
-            left: { row: 2, start: 0, columns: 3 },
-            right: { row: 1, start: 0, columns: 3 },
-            up: { row: 3, start: 0, columns: 3 },
-            upLeft: { row: 2, start: 0, columns: 3, rotate: Math.PI/16 },
-            upRight: { row: 3, start: 0, columns: 3, rotate: -Math.PI/16 },
-            hitbox: { widthPercentage: 0, heightPercentage: 0 },
-            keypress: { up: 87, left: 65, down: 83, right: 68 }
-            };
-
-        const npcData1 = {
-            id: 'Random Slime',
-            greeting: '^$%#^@&!^# (Slime Language) Did I see a human?',
-            src: path + "/images/gamebuilder/sprites/slime.png",
-            SCALE_FACTOR: 8,
-            ANIMATION_RATE: 50,
-            INIT_POSITION: { x: 800, y: 128 },
-            pixels: { height: 225, width: 225 },
-            orientation: { rows: 4, columns: 4 },
-            down: { row: 0, start: 0, columns: 3 },
-            right: { row: Math.min(1, 4 - 1), start: 0, columns: 3 },
-            left: { row: Math.min(2, 4 - 1), start: 0, columns: 3 },
-            up: { row: Math.min(3, 4 - 1), start: 0, columns: 3 },
-            upRight: { row: Math.min(3, 4 - 1), start: 0, columns: 3 },
-            downRight: { row: Math.min(1, 4 - 1), start: 0, columns: 3 },
-            upLeft: { row: Math.min(2, 4 - 1), start: 0, columns: 3 },
-            downLeft: { row: 0, start: 0, columns: 3 },
-            hitbox: { widthPercentage: 0.1, heightPercentage: 0.2 },
-            dialogues: ['^$%#^@&!^# (Slime Language) Did I see a human?'],
-            reaction: function() { if (this.dialogueSystem) { this.showReactionDialogue(); } else { console.log(this.greeting); } },
-            interact: function() {
-                if (this.dialogueSystem) {
-                    this.showReactionDialogue();
-                }
-            },
-            onDialogueClose: function() {
-                const gameControl = this.gameEnv?.gameControl;
-                if (gameControl?.currentLevel) {
-                    gameControl.currentLevel.continue = false;
-                }
-            }
-        };
-        const dbarrier_1 = {
-            id: 'dbarrier_1', x: 67, y: 86, width: 380, height: 40, visible: false,
-            hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
-            fromOverlay: true
-        };
-
-        const dbarrier_2 = {
-            id: 'dbarrier_2', x: 457, y: 356, width: 40, height: 187, visible: false,
-            hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
-            fromOverlay: true
-        };
-
-        const dbarrier_3 = {
-            id: 'dbarrier_3', x: 754, y: 340, width: 325, height: 40, visible: false,
-            hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
-            fromOverlay: true
-        };
-this.classes = [      { class: GameEnvBackground, data: bgData },
-      { class: Player, data: playerData },
-      { class: Npc, data: npcData1 },
-      { class: Barrier, data: dbarrier_1 },
-      { class: Barrier, data: dbarrier_2 },
-      { class: Barrier, data: dbarrier_3 }
-];
-
-        
-    }
-}
-
-export default GameLevelAquaticGameLevel;</code></pre>
-
-                            <h3>Hardships</h3>
-                            <p>While creating the game level, I priorly focused on manipulating the collision walls. They had quite big hitbox, sometimes when the player is unable to enter the crack of between the walls.</p>
-                        `
-                    },
-                    {
-                        title: "Yiming's CSS1",
-                        description: 'CSSE1 notes on arrays and booleans in the Aquatic game',
-                        link: '{{ site.baseurl }}/blog/aquatic-arrays-booleans',
-                        content: `
-                            <h3>Yiming's CSS1</h3>
-                            <p>This blog post explains how arrays, booleans, control structures, data types, and operators appear in the Aquatic game level.</p>
-
-                            <h3>What It Covers</h3>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li>Control structures such as iteration, conditionals, and nested conditions</li>
-                                <li>Data types including numbers, strings, arrays, booleans, and objects</li>
-                                <li>Operators like mathematical operations, string operations, and boolean expressions</li>
-                            </ul>
-
-                            <h3>Notebook Post</h3>
-                            <p>This content comes from the Aquatic arrays and booleans lesson notebook and is published as a blog post in the portfolio.</p>
-                            <p><a class="portal-button" href="{{ site.baseurl }}/blog/aquatic-arrays-booleans"><span class="spark"></span>Open Yiming's CSS1</a></p>
-                        `
-                    },
-                    {
-                        title: "Lance's CSS1",
-                        description: 'Basketball evasion CSS1 concept review from Lance\'s notebook',
-                        link: '{{ site.baseurl }}/blog/lance-css1',
-                        content: `
-                            <h3>Lance's CSS1</h3>
-                            <p>This planet now reflects the notebook file <strong>2026-03-20-check-one.ipynb</strong>, published through the site as <strong>CSSE-2 Personal Blog</strong>.</p>
-
-                            <h3>Overview</h3>
-                            <p>The post explains a <strong>Basketball Evasion</strong> game and uses real project code to break down CS1 programming concepts in a practical way.</p>
-
-                            <h3>What It Covers</h3>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li>Control structures including loops, conditionals, and nested conditions</li>
-                                <li>Data types such as numbers, strings, booleans, arrays, and objects</li>
-                                <li>Operators used for movement, collision, timing, and game math</li>
-                                <li>An embedded playable basketball evasion demo</li>
-                                <li>A final reflection connecting code concepts to the real project</li>
-                            </ul>
-
-                            <h3>Main Topic</h3>
-                            <p>The notebook centers on a basketball game where the player dodges LeBron James on a court, then explains how CS111 concepts appear directly in that game code.</p>
-
-                            <h3>Published Post Details</h3>
-                            <p><strong>Title:</strong> CSSE-2 Personal Blog</p>
-                            <p><strong>Description:</strong> Reflection on Beginning of Trimester 3</p>
-                            <p><strong>Permalink:</strong> <code>/blog/lance-css1</code></p>
-
-                            <h3>Notebook Post</h3>
-                            <p>This content comes directly from the attached notebook file and is represented here as a Blog planet in Team Space.</p>
-                            <p><a class="portal-button" href="{{ site.baseurl }}/blog/lance-css1"><span class="spark"></span>Open Lance's CSS1</a></p>
-                        `
-                    },
-                    {
-                        title: "Arjun's Seek CSS1",
-                        description: 'Seek game arrays and booleans breakdown from Arjun\'s notebook',
-                        link: '{{ site.baseurl }}/blog/arjun-seek-arrays-booleans',
-                        content: `
-                            <h3>Arjun's Seek CSS1</h3>
-                            <p>This blog post explains how CS concepts like arrays, booleans, control structures, and operators appear in <strong>GameLevelSeek.js</strong>.</p>
-
-                            <h3>What It Covers</h3>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li>Iteration and conditionals used in the Seek level</li>
-                                <li>Data types such as numbers, strings, arrays, booleans, and objects</li>
-                                <li>Operators used in level logic and player interactions</li>
-                                <li>An embedded playable Seek game runner</li>
-                            </ul>
-
-                            <h3>Notebook Post</h3>
-                            <p>This content comes from Arjun's notebook and is published as its own blog page in the portfolio.</p>
-                            <p><strong>Permalink:</strong> <code>/blog/arjun-seek-arrays-booleans</code></p>
-                            <p><a class="portal-button" href="{{ site.baseurl }}/blog/arjun-seek-arrays-booleans"><span class="spark"></span>Open Arjun's Seek CSS1</a></p>
-                        `
-                    },
-                    {
-                        title: "Arjun's Game Blog V2",
-                        description: 'Game development progress blog for a custom seek level',
-                        content: `
-                            <h3>Game Development Progress Blog – Custom Seek Level</h3>
-                            <p>In this update, Arjun created a custom level called <strong>GameLevelSeek</strong> using the GameBuilder engine. The goal of the level is simple: the player must navigate the map and find the hidden NPC.</p>
-
-                            <h3>What I Built</h3>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li>A background environment</li>
-                                <li>A controllable player</li>
-                                <li>An NPC (Kirby) to find</li>
-                                <li>Multiple invisible barriers to shape the map</li>
-                            </ul>
-
-                            <h3>Background Setup</h3>
-                            <p>A custom background image, <strong>tagplayground.png</strong>, was added as the main map where the player moves around.</p>
-
-                            <h3>Player Mechanics</h3>
-                            <p>The player uses <strong>WASD</strong> controls for movement and includes animations for up, down, left, right, and diagonal directions.</p>
-                            <p>The player starts at position <strong>(32, 300)</strong>, with custom animation speed, sprite scaling, and movement speed settings.</p>
-
-                            <h3>NPC Interaction</h3>
-                            <p>An NPC, <strong>Kirby</strong>, is placed far from the start to encourage exploration.</p>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li>Displays the message: <strong>"Oh you found me"</strong></li>
-                                <li>Ends the level after interaction</li>
-                                <li>Creates a simple seek-and-find objective</li>
-                            </ul>
-
-                            <h3>Barriers & Map Design</h3>
-                            <p>Multiple invisible barriers were added to shape the level and guide the player:</p>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li>Prevent the player from walking through certain spaces</li>
-                                <li>Create a maze-like layout</li>
-                                <li>Remain hidden with <code>visible: false</code> for a cleaner look</li>
-                            </ul>
-
-                            <h3>Game Structure</h3>
-                            <p>All game elements are registered through the class array:</p>
-                            <pre class="code-box"><code>this.classes = [
-GameEnvBackground,
-Player,
-Npc,
-Barrier
-];</code></pre>
-                            <p>Each object is passed custom data to control placement and behavior.</p>
-
-                            <h3>Goal of the Level</h3>
-                            <p>The objective is to:</p>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li>Move around the map</li>
-                                <li>Avoid obstacles</li>
-                                <li>Find the NPC</li>
-                                <li>Interact to win</li>
-                            </ul>
-
-                            <h3>Challenges Faced</h3>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li>Positioning barriers correctly without blocking the player completely</li>
-                                <li>Getting NPC interaction to properly end the level</li>
-                                <li>Adjusting player movement and animation to feel smooth</li>
-                            </ul>
-
-                            <h3>Next Steps</h3>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li>Make Kirby invisible and make it jump out</li>
-                                <li>Introduce a timer or scoring system</li>
-                                <li>Improve map complexity</li>
-                                <li>Add sound effects or background music</li>
-                            </ul>
-                        `
-                    }
-                ]
-            },
-            {
-                title: 'Individual Contribution',
-                description: 'Discover individual team member work',
-                icon: '👤',
-                color: 'green',
-                planets: [
-                    {
-                        title: "Yiming",
-                        description: 'Team member contributions and projects',
-                        content: `
-                            <h3>Yiming's Contributions</h3>
-                            <p>Lead full-stack developer responsible for the entire Team Space portfolio website architecture and integration.</p>
-
-                            <h3>Key Responsibilities</h3>
-                            <p><strong>Frontend Architecture:</strong> Designed and implemented the interactive space-themed UI with 4 galaxy categories using vanilla JavaScript, CSS3 animations, and 3D transforms.</p>
-                            <p><strong>Backend Integration:</strong> Set up Jekyll static site generator with custom layouts and configuration for GitHub Pages deployment.</p>
-                            <p><strong>Interactive Features:</strong> Created the controllable rocket system with physics engine, view toggle system (list/traveler modes), and modal system for detailed information display.</p>
-                            <p><strong>Optimization:</strong> Implemented non-overlapping position algorithm for 3D space exploration, cache-busting techniques for GitHub Pages, and performance optimizations.</p>
-
-                            <h3>Technologies Used</h3>
-                            <p>HTML5, CSS3, Vanilla JavaScript (ES6+), Jekyll, Git/GitHub, Python 3.14, Ruby, Responsive Design</p>
-
-                            <h3>Key Features Developed</h3>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li>Starfield with 200 animated stars</li>
-                                <li>5 detailed planet types with unique textures</li>
-                                <li>Rocket physics and movement controls</li>
-                                <li>3D space navigation system</li>
-                                <li>Modal information system</li>
-                            </ul>
-                        `
-                    },
-                    {
-                        title: "Lance",
-                        description: 'Team member contributions and projects',
-                        content: `
-                            <h3>Lance's Contributions</h3>
-                            <p>Game designer and narrative architect responsible for creating engaging mini-game experiences and interactive content design.</p>
-
-                            <h3>Key Responsibilities</h3>
-                            <p><strong>Game Design:</strong> Designed "Lance's Mini Game Basketball" - a navigational puzzle game where players must traverse a basketball court to reach LeBron James.</p>
-                            <p><strong>Level Configuration:</strong> Expertly configured game objects including sprite animation (STEP_FACTOR: 400), NPC behavior (zero-speed freezing), and collision hitboxes for intuitive player interaction.</p>
-                            <p><strong>Narrative Integration:</strong> Created dialogue-driven interactions and obstacle placement strategy to guide player progression through game levels.</p>
-                            <p><strong>User Experience:</strong> Focused on accessibility and player feedback through responsive controls and clear visual communication of game mechanics.</p>
-
-                            <h3>Technologies Used</h3>
-                            <p>Game Builder Engine, Sprite Configuration, Level Design, Game Mechanics Programming, Interactive Storytelling</p>
-
-                            <h3>Game Portfolio</h3>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li><strong>Basketball Court Mini Game</strong> - Navigate obstacles to reach LeBron</li>
-                                <li>Sprite-based character animation</li>
-                                <li>Invisible barrier systems</li>
-                                <li>NPC interaction mechanics</li>
-                            </ul>
-                        `
-                    },
-                    {
-                        title: "Arjun",
-                        description: 'Team member contributions and projects',
-                        content: `
-                            <h3>Arjun's Contributions</h3>
-                            <p>Game developer and systems programmer focused on game mechanics implementation and interactive level design.</p>
-
-                            <h3>Key Responsibilities</h3>
-                            <p><strong>Game Development:</strong> Created "Arjun's Mini Game Level" - a search and discovery game where players must find Kirby hiding in a corner of a playground.</p>
-                            <p><strong>Mechanics Implementation:</strong> Configured character movement (STEP_FACTOR: 400), NPC behavior with single-frame idle animations, and precise hitbox tuning (0.01 scale) for seamless interaction.</p>
-                            <p><strong>Gameplay Balance:</strong> Designed strategic barrier placement and level layout to create engaging exploration challenges with appropriate difficulty curves.</p>
-                            <p><strong>Quality Assurance:</strong> Ensured smooth controls, responsive feedback, and polished player experience throughout game progression.</p>
-
-                            <h3>Technologies Used</h3>
-                            <p>Game Builder Engine, Sprite Asset Management, Collision Detection, Game State Management, Interactive Puzzle Design</p>
-
-                            <h3>Game Portfolio</h3>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li><strong>Kirby Search Mini Game</strong> - Find hidden character in playground</li>
-                                <li>Dynamic sprite character control</li>
-                                <li>Environmental barrier systems</li>
-                                <li>NPC discovery mechanics</li>
-                            </ul>
-                        `
-                    }
-                ]
-            },
-            {
-                title: 'Trivia',
-                description: 'Unrelated topics/behind the scenes.',
-                icon: '🧠',
-                color: 'orange',
-                planets: [
-                    // paste new planet here
-                    // paste new planet here
-                    // paste new planet here
-                    // paste new planet here
-                    // paste new planet here
-                    // paste new planet here
-                    // paste new planet here
-                    // paste new planet here
-                    // paste new planet here
-                    // paste new planet here
-                    {
-                        title: '3/25 Deployment Debugging — Yiming',
-                        description: 'Yiming debugged the DNS switch deployment, added the homepage-to-portal transition, and refined the rocket model.',
-                        content: `
-                            <h3>3/25 Update</h3>
-                            <p>After switching the DNS setup for <strong>teamspace.opencodingsociety.com</strong>, <strong>Yiming</strong> debugged the deployed website to make sure the custom domain loaded the correct Team Space experience instead of landing in the wrong flow.</p>
-
-                            <h3>Deployment Debugging</h3>
-                            <p>Yiming checked how the deployed site behaved after the DNS change and verified that the homepage and portal routing still matched the intended custom-domain setup.</p>
-                            <ul style="text-align: left; display: inline-block;">
-                                <li>Reviewed the deployed behavior after the DNS switch</li>
-                                <li>Verified the custom-domain routing path into Team Space</li>
-                                <li>Tracked down issues between the deployed homepage and the portal destination</li>
-                            </ul>
-
-                            <h3>Portal Transition</h3>
-                            <p>Yiming added a transition between <strong>teamspace.opencodingsociety.com</strong> and <strong>/team-space-portal</strong> so entering the site feels more intentional and polished instead of acting like an abrupt redirect.</p>
-
-                            <h3>Rocket Model Refinement</h3>
-                            <p>Yiming also refined the rocket model to better match the Team Space theme and make the portal experience feel more interactive and visually cohesive.</p>
-                        `
-                    }
-                ]
-            }
-        ];
-
-        // Populate galaxy grid
-        function populateGalaxies() {
-            console.log('Populating galaxies...');
-            const grid = document.getElementById('galaxyGrid');
-            if (!grid) {
-                console.error('Galaxy grid element not found!');
-                return;
-            }
-            
-            galaxies.forEach((galaxy, index) => {
-                const galaxyDiv = document.createElement('div');
-                galaxyDiv.className = 'galaxy-cloud';
-                galaxyDiv.innerHTML = `
-                    <div class="cloud-inner">
-                        <div class="cloud-background"></div>
-                        <div class="particles"></div>
-                        <div class="cloud-content">
-                            <div class="cloud-icon">${galaxy.icon}</div>
-                            <div class="cloud-title">${galaxy.title}</div>
-                            <div class="cloud-description">${galaxy.description}</div>
-                        </div>
-                    </div>
-                `;
-                
-                galaxyDiv.addEventListener('click', function() {
-                    handleGalaxyClick(galaxy.title, index);
-                });
-
-                grid.appendChild(galaxyDiv);
-                generateParticles(galaxyDiv);
-            });
-            console.log('Galaxies populated: ' + galaxies.length);
-        }
-
-        // Handle galaxy click
-        function handleGalaxyClick(title, index) {
-            console.log(`Navigating to: ${title} (Index: ${index})`);
-            const galaxy = galaxies[index];
-            
-            // If galaxy has planets, show them instead of alert
-            if (galaxy.planets && galaxy.planets.length > 0) {
-                showPlanets(galaxy);
-            } else {
-                alert(`Welcome to ${title}!\n\nThis category page will be available soon.`);
-            }
-        }
-
-        // Show planets for a galaxy
-        function showPlanets(galaxy) {
-            const container = document.getElementById('galaxyGrid');
-            const currentGalaxies = document.querySelectorAll('.galaxy-cloud');
-            
-            // Hide current galaxies
-            currentGalaxies.forEach(g => g.style.display = 'none');
-            
-            // Create planets container
-            const planetsContainer = document.createElement('div');
-            planetsContainer.id = 'planetsContainer';
-            planetsContainer.innerHTML = `
-                <div style="width: 100%; text-align: center; margin-bottom: 40px;">
-                    <button onclick="backToGalaxies()" style="
-                        background: linear-gradient(135deg, rgba(100, 181, 246, 0.3), rgba(33, 150, 243, 0.2));
-                        border: 2px solid rgba(129, 212, 250, 0.6);
-                        color: #81d4fa;
-                        padding: 10px 25px;
-                        font-size: 1rem;
-                        border-radius: 25px;
-                        cursor: pointer;
-                        transition: all 0.3s;
-                    " onmouseover="this.style.boxShadow='0 0 20px rgba(129, 212, 250, 0.6)'" onmouseout="this.style.boxShadow='none'">
-                        ← Back to Galaxies
-                    </button>
-                </div>
-                <h2 style="text-align: center; color: #81d4fa; font-size: 2rem; margin-bottom: 40px; text-shadow: 0 0 20px rgba(129, 212, 250, 0.5);">${galaxy.title}</h2>
-                <div class="planets-grid" id="planetsGrid"></div>
-            `;
-            
-            container.appendChild(planetsContainer);
-            
-            // Planet type colors
-            const planetTypes = ['ice', 'lava', 'gas', 'ocean', 'jungle'];
-            
-            // Create planet elements
-            const planetsGrid = document.getElementById('planetsGrid');
-            galaxy.planets.forEach((planet, index) => {
-                const planetDiv = document.createElement('div');
-                planetDiv.className = 'planet';
-                const planetType = planetTypes[index % planetTypes.length];
-                
-                planetDiv.innerHTML = `
-                    <div class="planet-inner">
-                        <div class="planet-surface planet-${planetType}"></div>
-                        <div class="planet-atmosphere"></div>
-                        <div class="planet-ring" style="width: 150px; height: 40px; border-width: 2px;"></div>
-                        <div class="planet-content">
-                            <div class="planet-title">${planet.title}</div>
-                            <div class="planet-description">${planet.description}</div>
-                        </div>
-                    </div>
-                `;
-                
-                planetDiv.addEventListener('click', () => {
-                    if (planet.link) {
-                        window.location.href = planet.link;
-                        return;
-                    }
-                    openPlanetModal(planet);
-                });
-                
-                planetsGrid.appendChild(planetDiv);
-            });
-        }
-
-        // Back to galaxies view
-        function backToGalaxies() {
-            const planetsContainer = document.getElementById('planetsContainer');
-            if (planetsContainer) {
-                planetsContainer.remove();
-            }
-            
-            const currentGalaxies = document.querySelectorAll('.galaxy-cloud');
-            currentGalaxies.forEach(g => g.style.display = 'block');
-        }
-
-        // Open planet modal
-        function openPlanetModal(planet) {
-            // Remove existing modal if any
-            const existingModal = document.getElementById('planetModal');
-            if (existingModal) {
-                existingModal.remove();
-            }
-            
-            // Create modal
-            const modal = document.createElement('div');
-            modal.id = 'planetModal';
-            modal.className = 'modal active';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 class="modal-title">${planet.title}</h2>
-                        <button class="close-btn" onclick="closePlanetModal()">×</button>
-                    </div>
-                    <div class="modal-body">
-                        ${planet.content}
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // Close modal on background click
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    closePlanetModal();
-                }
-            });
-        }
-
-        // Close planet modal
-        function closePlanetModal() {
-            const modal = document.getElementById('planetModal');
-            if (modal) {
-                modal.remove();
-            }
-        }
-
-        // Rocket control system
-        const rocketState = {
-            x: window.innerWidth - 132,
-            y: window.innerHeight - 180,
-            vx: 0,
-            vy: 0,
-            speed: 5,
-            friction: 0.95,
-            targetX: window.innerWidth - 132,
-            targetY: window.innerHeight - 180,
-            followMouse: true
-        };
-
-        const keys = {};
-        let travelerModeState = {
-            level: 'galaxies',
-            activeGalaxyIndex: null,
-            interactableTargets: [],
-            activeDockTarget: null
-        };
-
-        function setTravelerInstruction(message) {
-            const el = document.getElementById('travelerInstruction');
-            if (el) {
-                el.textContent = message;
-            }
-        }
-
-        function setTravelerTargets(targets = []) {
-            travelerModeState.interactableTargets = targets;
-            travelerModeState.activeDockTarget = null;
-            updateDockingState();
-        }
-
-        function updateDockingState() {
-            const rocketContainer = document.getElementById('rocketContainer');
-            if (!rocketContainer) return;
-            const hudDistance = document.getElementById('hudDistance');
-
-            travelerModeState.interactableTargets.forEach(target => {
-                if (target.element) target.element.classList.remove('traveler-docked');
-            });
-
-            if (currentView !== 'traveler') {
-                rocketContainer.classList.remove('traveler-active', 'docked');
-                travelerModeState.activeDockTarget = null;
-                if (hudDistance) hudDistance.textContent = 'N/A';
-                return;
-            }
-
-            rocketContainer.classList.add('traveler-active');
-
-            const rocketCenterX = rocketState.x + 42;
-            const rocketCenterY = rocketState.y + 56;
-            let nearest = null;
-
-            travelerModeState.interactableTargets.forEach(target => {
-                if (!target.element) return;
-                const bounds = target.element.getBoundingClientRect();
-                const centerX = bounds.left + bounds.width / 2;
-                const centerY = bounds.top + bounds.height / 2;
-                const dx = centerX - rocketCenterX;
-                const dy = centerY - rocketCenterY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                if (!nearest || distance < nearest.distance) {
-                    nearest = { ...target, distance };
-                }
-            });
-
-            if (nearest) {
-                if (hudDistance) hudDistance.textContent = `${nearest.distance.toFixed(0)} px`;
-            } else {
-                if (hudDistance) hudDistance.textContent = 'N/A';
-            }
-
-            if (nearest && nearest.distance < 120) {
-                travelerModeState.activeDockTarget = nearest;
-                rocketContainer.classList.add('docked');
-                if (nearest.element) nearest.element.classList.add('traveler-docked');
-                setTravelerInstruction(`Docked with ${nearest.title}. Press Enter to explore.`);
-            } else {
-                travelerModeState.activeDockTarget = null;
-                rocketContainer.classList.remove('docked');
-                setTravelerInstruction(
-                    travelerModeState.level === 'galaxies'
-                        ? 'Use WASD to fly. Dock with a galaxy cloud and press Enter.'
-                        : 'Use WASD to fly. Dock with a planet and press Enter, or go back.'
-                );
-            }
-        }
-
-        function activateDockedTarget() {
-            if (currentView !== 'traveler' || !travelerModeState.activeDockTarget) return;
-            const target = travelerModeState.activeDockTarget;
-
-            if (target.type === 'galaxy') {
-                showTravelerPlanets(target.index);
-            } else if (target.type === 'planet') {
-                if (target.planet.link) {
-                    window.location.href = target.planet.link;
-                } else {
-                    openPlanetModal(target.planet);
-                }
-            }
-        }
-
-        function updateTravelerHud() {
-            const hudCoords = document.getElementById('hudCoords');
-            if (hudCoords) {
-                hudCoords.textContent = `${rocketState.x.toFixed(0)}, ${rocketState.y.toFixed(0)}`;
-            }
-        }
-
-        // Handle rocket movement
-        function updateRocketPosition() {
-            const rocket = document.getElementById('rocket');
-            if (!rocket) return;
-
-            const rocketContainer = document.getElementById('rocketContainer');
-            if (!rocketContainer) return;
-
-            if (currentView === 'traveler') {
-                rocketState.followMouse = false;
-
-                if (keys['ArrowLeft'] || keys['a']) rocketState.vx -= rocketState.speed;
-                if (keys['ArrowRight'] || keys['d']) rocketState.vx += rocketState.speed;
-                if (keys['ArrowUp'] || keys['w']) rocketState.vy -= rocketState.speed;
-                if (keys['ArrowDown'] || keys['s']) rocketState.vy += rocketState.speed;
-
-                rocketState.vx *= rocketState.friction;
-                rocketState.vy *= rocketState.friction;
-
-                rocketState.x += rocketState.vx;
-                rocketState.y += rocketState.vy;
-            } else {
-                rocketState.followMouse = true;
-                const followStrength = 0.1;
-                const dx = rocketState.targetX - rocketState.x;
-                const dy = rocketState.targetY - rocketState.y;
-
-                rocketState.vx = dx * followStrength;
-                rocketState.vy = dy * followStrength;
-                rocketState.x += rocketState.vx;
-                rocketState.y += rocketState.vy;
-            }
-
-            // Boundary constraints
-            rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 108));
-            rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 138));
-
-            rocketContainer.style.left = rocketState.x + 'px';
-            rocketContainer.style.top = rocketState.y + 'px';
-
-            const tilt = currentView === 'traveler'
-                ? Math.max(-22, Math.min(22, rocketState.vx * 1.3 - 12))
-                : Math.max(-20, Math.min(10, rocketState.vx * 0.9 - 12));
-            rocket.style.transform = `rotate(${tilt}deg)`;
-
-            updateTravelerHud();
-            updateDockingState();
-
-            requestAnimationFrame(updateRocketPosition);
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'enter'].includes(e.key.toLowerCase())) {
-                e.preventDefault();
-            }
-            keys[e.key.toLowerCase()] = true;
-            if (e.key === 'Enter') {
-                activateDockedTarget();
-            }
-        });
-
-        document.addEventListener('keyup', (e) => {
-            keys[e.key.toLowerCase()] = false;
-        });
-
-        window.addEventListener('blur', () => {
-            Object.keys(keys).forEach(key => keys[key] = false);
-        });
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                Object.keys(keys).forEach(key => keys[key] = false);
-            }
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (currentView !== 'traveler' && rocketState.followMouse) {
-                rocketState.targetX = Math.max(0, Math.min(e.clientX + 28, window.innerWidth - 108));
-                rocketState.targetY = Math.max(0, Math.min(e.clientY - 72, window.innerHeight - 138));
-            }
-        });
-
-        window.addEventListener('resize', () => {
-            rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 108));
-            rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 138));
-            rocketState.targetX = Math.max(0, Math.min(rocketState.targetX, window.innerWidth - 108));
-            rocketState.targetY = Math.max(0, Math.min(rocketState.targetY, window.innerHeight - 138));
-        });
-
-        // View management system
-        let currentView = 'list';
-        let travelerGalaxies = [];
-
-        function switchToListView() {
-            currentView = 'list';
-            document.getElementById('container').style.display = 'flex';
-            document.getElementById('travelerView').style.display = 'none';
-            document.getElementById('travelerSpace').innerHTML = '';
-            document.getElementById('listViewBtn').classList.add('active');
-            document.getElementById('travelerViewBtn').classList.remove('active');
-            document.getElementById('hudDisplay').classList.remove('active');
-            document.getElementById('travelerBackBtn').classList.remove('active');
-            document.getElementById('travelerInstruction').classList.remove('active');
-            travelerModeState = {
-                level: 'galaxies',
-                activeGalaxyIndex: null,
-                interactableTargets: [],
-                activeDockTarget: null
-            };
-            rocketState.followMouse = true;
-            rocketState.vx = 0;
-            rocketState.vy = 0;
-            rocketState.targetX = window.innerWidth - 132;
-            rocketState.targetY = window.innerHeight - 180;
-            setTravelerTargets([]);
-        }
-
-        function switchToTravelerView() {
-            currentView = 'traveler';
-            document.getElementById('container').style.display = 'none';
-            document.getElementById('travelerView').style.display = 'block';
-            document.getElementById('listViewBtn').classList.remove('active');
-            document.getElementById('travelerViewBtn').classList.add('active');
-            document.getElementById('hudDisplay').classList.add('active');
-            document.getElementById('travelerInstruction').classList.add('active');
-
-            travelerModeState.level = 'galaxies';
-            travelerModeState.activeGalaxyIndex = null;
-            Object.keys(keys).forEach(key => keys[key] = false);
-            window.focus();
-            rocketState.followMouse = false;
-            rocketState.vx = 0;
-            rocketState.vy = 0;
-            rocketState.x = window.innerWidth - 120;
-            rocketState.y = window.innerHeight - 180;
-            rocketState.targetX = rocketState.x;
-            rocketState.targetY = rocketState.y;
-            
-            initializeTravelerView();
-        }
-
-        function initializeTravelerView() {
-            const travelerSpace = document.getElementById('travelerSpace');
-            travelerSpace.innerHTML = '';
-            travelerGalaxies = [];
-            travelerModeState.level = 'galaxies';
-            travelerModeState.activeGalaxyIndex = null;
-            document.getElementById('travelerBackBtn').classList.remove('active');
-            setTravelerInstruction('Use WASD to fly. Dock with a galaxy cloud and press Enter.');
-
-            const availableWidth = Math.max(window.innerWidth - 220, 600);
-            const availableHeight = Math.max(window.innerHeight - 220, 420);
-
-            // Generate random non-overlapping positions for galaxies
-            const positions = generateNonOverlappingPositions(galaxies.length, 220, 210, availableWidth, availableHeight, 60, 80);
-            const targets = [];
-
-            galaxies.forEach((galaxy, index) => {
-                const pos = positions[index];
-                const galaxyDiv = document.createElement('div');
-                galaxyDiv.className = 'galaxy-cloud-traveler';
-                galaxyDiv.style.left = pos.x + 'px';
-                galaxyDiv.style.top = pos.y + 'px';
-                galaxyDiv.style.width = '200px';
-                galaxyDiv.style.height = '200px';
-                
-                galaxyDiv.innerHTML = `
-                    <div class="cloud-inner" style="width: 100%; height: 100%; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <div class="cloud-background" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 1;"></div>
-                        <div class="cloud-atmosphere" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 2;"></div>
-                        <div class="cloud-content" style="position: relative; z-index: 3; text-align: center;">
-                            <div class="cloud-icon" style="font-size: 3rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(100, 181, 246, 0.6));">${galaxy.icon}</div>
-                            <div class="cloud-title" style="font-size: 1.2rem; font-weight: 700; color: #ffffff; text-shadow: 0 0 10px rgba(100, 181, 246, 0.5);">${galaxy.title}</div>
-                        </div>
-                    </div>
-                `;
-
-                // Set galaxy-specific colors
-                const cloudBackground = galaxyDiv.querySelector('.cloud-background');
-                const cloudAtmosphere = galaxyDiv.querySelector('.cloud-atmosphere');
-                
-                if (galaxy.color === 'blue') {
-                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(100, 181, 246, 0.4), rgba(33, 150, 243, 0.2), transparent)';
-                    cloudBackground.style.boxShadow = '0 0 30px rgba(100, 181, 246, 0.4), inset 0 0 30px rgba(129, 212, 250, 0.2), 0 0 60px rgba(33, 150, 243, 0.3)';
-                } else if (galaxy.color === 'purple') {
-                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(156, 39, 176, 0.4), rgba(103, 58, 183, 0.2), transparent)';
-                    cloudBackground.style.boxShadow = '0 0 30px rgba(156, 39, 176, 0.4), inset 0 0 30px rgba(171, 71, 188, 0.2), 0 0 60px rgba(103, 58, 183, 0.3)';
-                } else if (galaxy.color === 'green') {
-                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(76, 175, 80, 0.4), rgba(56, 142, 60, 0.2), transparent)';
-                    cloudBackground.style.boxShadow = '0 0 30px rgba(76, 175, 80, 0.4), inset 0 0 30px rgba(102, 187, 106, 0.2), 0 0 60px rgba(56, 142, 60, 0.3)';
-                } else if (galaxy.color === 'orange') {
-                    cloudBackground.style.background = 'radial-gradient(circle at 30% 30%, rgba(255, 152, 0, 0.4), rgba(255, 111, 0, 0.2), transparent)';
-                    cloudBackground.style.boxShadow = '0 0 30px rgba(255, 152, 0, 0.4), inset 0 0 30px rgba(255, 167, 38, 0.2), 0 0 60px rgba(255, 111, 0, 0.3)';
-                }
-
-                galaxyDiv.addEventListener('click', () => {
-                    showTravelerPlanets(index);
-                });
-
-                travelerSpace.appendChild(galaxyDiv);
-
-                travelerGalaxies.push({
-                    element: galaxyDiv,
-                    ...galaxy,
-                    position: pos
-                });
-
-                targets.push({
-                    type: 'galaxy',
-                    index,
-                    title: galaxy.title,
-                    galaxy,
-                    element: galaxyDiv
-                });
-            });
-
-            setTravelerTargets(targets);
-        }
-
-        function showTravelerPlanets(galaxyIndex) {
-            const travelerSpace = document.getElementById('travelerSpace');
-            const galaxy = galaxies[galaxyIndex];
-            travelerSpace.innerHTML = '';
-            travelerModeState.level = 'planets';
-            travelerModeState.activeGalaxyIndex = galaxyIndex;
-            document.getElementById('travelerBackBtn').classList.add('active');
-            setTravelerInstruction(`Exploring ${galaxy.title}. Dock with a planet and press Enter.`);
-
-            const availableWidth = Math.max(window.innerWidth - 220, 600);
-            const availableHeight = Math.max(window.innerHeight - 260, 420);
-
-            const titleBanner = document.createElement('div');
-            titleBanner.style.position = 'absolute';
-            titleBanner.style.left = '50%';
-            titleBanner.style.top = '90px';
-            titleBanner.style.transform = 'translateX(-50%)';
-            titleBanner.style.color = '#ffffff';
-            titleBanner.style.fontSize = '2rem';
-            titleBanner.style.fontWeight = '700';
-            titleBanner.style.textShadow = '0 0 20px rgba(129, 212, 250, 0.7)';
-            titleBanner.textContent = galaxy.title;
-            travelerSpace.appendChild(titleBanner);
-
-            const positions = generateNonOverlappingPositions(
-                galaxy.planets.length,
-                150,
-                120,
-                availableWidth,
-                availableHeight,
-                70,
-                150
-            );
-
-            const planetTypes = ['ice', 'lava', 'gas', 'ocean', 'jungle'];
-            const targets = [];
-
-            galaxy.planets.forEach((planet, pIndex) => {
-                const pPos = positions[pIndex];
-                const planetDiv = document.createElement('div');
-                planetDiv.className = 'planet-traveler';
-                planetDiv.style.left = pPos.x + 'px';
-                planetDiv.style.top = pPos.y + 'px';
-                planetDiv.style.width = '120px';
-                planetDiv.style.height = '120px';
-
-                const planetType = planetTypes[pIndex % planetTypes.length];
-
-                planetDiv.innerHTML = `
-                    <div class="planet-inner" style="width: 100%; height: 100%; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <div class="planet-surface planet-${planetType}" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 1;"></div>
-                        <div class="planet-atmosphere" style="position: absolute; width: 100%; height: 100%; border-radius: 50%; z-index: 2;"></div>
-                        <div class="planet-ring" style="width: 140px; height: 34px; border-width: 2px;"></div>
-                        <div class="planet-content" style="position: relative; z-index: 3; text-align: center; padding: 12px;">
-                            <div class="planet-title" style="font-size: 0.88rem; font-weight: 700; color: #ffffff; text-shadow: 0 0 10px rgba(100, 181, 246, 0.8);">${planet.title}</div>
-                        </div>
-                    </div>
-                `;
-
-                planetDiv.addEventListener('click', () => {
-                    if (planet.link) {
-                        window.location.href = planet.link;
-                    } else {
-                        openPlanetModal(planet);
-                    }
-                });
-
-                travelerSpace.appendChild(planetDiv);
-                targets.push({
-                    type: 'planet',
-                    title: planet.title,
-                    planet,
-                    element: planetDiv
-                });
-            });
-
-            setTravelerTargets(targets);
-        }
-
-        function backToTravelerGalaxies() {
-            initializeTravelerView();
-        }
-
-        function generateNonOverlappingPositions(count, minSpacing, objectSize, maxWidth, maxHeight, minX = 0, minY = 0) {
-            const positions = [];
-            const maxAttempts = 100;
-            
-            for (let i = 0; i < count; i++) {
-                let position = null;
-                let attempts = 0;
-                
-                while (!position && attempts < maxAttempts) {
-                    const x = minX + Math.random() * Math.max(1, (maxWidth - minX - objectSize));
-                    const y = minY + Math.random() * Math.max(1, (maxHeight - minY - objectSize));
-                    
-                    // Check if this position overlaps with existing positions
-                    const overlaps = positions.some(pos => {
-                        const dx = pos.x - x;
-                        const dy = pos.y - y;
-                        const distance = Math.sqrt(dx * dx + dy * dy);
-                        return distance < minSpacing;
-                    });
-                    
-                    if (!overlaps) {
-                        position = { x, y };
-                    }
-                    attempts++;
-                }
-                
-                if (position) {
-                    positions.push(position);
-                } else {
-                    // Fallback if we can't find a non-overlapping position
-                    positions.push({
-                        x: minX + (i % 4) * Math.max(150, ((maxWidth - minX) / 4)),
-                        y: minY + Math.floor(i / 4) * Math.max(150, ((maxHeight - minY) / 4))
-                    });
-                }
-            }
-            
-            return positions;
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            generateStars();
-            populateGalaxies();
-            updateRocketPosition();
-
-            // Force style refresh for GitHub Pages
-            const stylesheet = document.querySelector('style');
-            if (stylesheet) {
-                stylesheet.textContent = stylesheet.textContent;
-            }
-        });
-
-        // Prevent caching on GitHub Pages
-        window.addEventListener('load', function() {
-            // Force body background to be visible
-            document.body.style.cssText = 'background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 50%, #0d1b2a 100%) !important; color: #e0e0ff !important; overflow-x: hidden !important;';
+        frame.addEventListener('load', () => {
+            loader.classList.add('hidden');
         });
     </script>
 </body>
