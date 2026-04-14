@@ -513,18 +513,18 @@ layout: null
         /* Submarine styles */
         .rocket-container {
             position: fixed !important;
-            left: calc(100% - 100px) !important;
+            left: calc(100% - 160px) !important;
             top: calc(100% - 150px) !important;
             z-index: 999 !important;
             user-select: none !important;
-            width: 60px !important;
-            height: 80px !important;
+            width: 120px !important;
+            height: 72px !important;
         }
 
         .rocket {
             position: relative !important;
-            width: 60px !important;
-            height: 80px !important;
+            width: 120px !important;
+            height: 72px !important;
             cursor: inherit !important;
             animation: rocketFloat 3s ease-in-out infinite !important;
         }
@@ -535,88 +535,132 @@ layout: null
 
         .rocket-body {
             position: absolute !important;
-            width: 50px !important;
-            height: 32px !important;
-            background: linear-gradient(90deg, #ffd16b 0%, #ffb347 48%, #ffcf6a 100%) !important;
-            border-radius: 18px 20px 16px 16px !important;
-            left: 5px !important;
-            top: 22px !important;
-            box-shadow: 0 0 20px rgba(255, 209, 107, 0.38) !important;
+            width: 92px !important;
+            height: 34px !important;
+            left: 10px !important;
+            top: 26px !important;
+            border-radius: 20px 24px 24px 20px !important;
+            background: linear-gradient(90deg, #ffd56d 0%, #ffbf59 40%, #f5a623 100%) !important;
+            border: 2px solid rgba(255, 241, 210, 0.42) !important;
+            box-shadow: inset 0 -8px 14px rgba(158, 88, 5, 0.24), inset 0 10px 14px rgba(255, 245, 225, 0.2), 0 0 18px rgba(255, 209, 107, 0.24) !important;
+        }
+
+        .rocket-body::before {
+            content: '' !important;
+            position: absolute !important;
+            right: -14px !important;
+            top: -2px !important;
+            width: 26px !important;
+            height: 34px !important;
+            border-radius: 0 24px 24px 0 !important;
+            background: linear-gradient(90deg, #ffca63, #f39b1e) !important;
+            border: 2px solid rgba(255, 241, 210, 0.36) !important;
+            border-left: none !important;
+        }
+
+        .rocket-body::after {
+            content: '' !important;
+            position: absolute !important;
+            left: 18px !important;
+            top: -14px !important;
+            width: 18px !important;
+            height: 16px !important;
+            border-radius: 8px 8px 2px 2px !important;
+            background: linear-gradient(180deg, #ffd873, #e9a73d) !important;
+            border: 2px solid rgba(255, 241, 210, 0.34) !important;
+            box-shadow: inset 0 4px 6px rgba(255,255,255,0.16) !important;
         }
 
         .rocket-window {
             position: absolute !important;
-            width: 16px !important;
-            height: 16px !important;
+            width: 14px !important;
+            height: 14px !important;
             background: radial-gradient(circle at 35% 35%, #ffffff, #7af3ff) !important;
             border-radius: 50% !important;
-            left: 22px !important;
-            top: 29px !important;
-            box-shadow: inset 0 0 10px rgba(122, 243, 255, 0.46) !important;
+            top: 9px !important;
+            box-shadow: inset 0 0 10px rgba(122, 243, 255, 0.46), 0 0 8px rgba(122, 243, 255, 0.24) !important;
+        }
+
+        .rocket-window:nth-child(1) {
+            left: 20px !important;
+        }
+
+        .rocket-window:nth-child(2) {
+            left: 40px !important;
+        }
+
+        .rocket-window:nth-child(3) {
+            left: 60px !important;
         }
 
         .rocket-fins {
             position: absolute !important;
-            bottom: 21px !important;
-            left: 46px !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 120px !important;
+            height: 72px !important;
         }
 
         .rocket-fin {
             position: absolute !important;
-            width: 0 !important;
-            height: 0 !important;
-            border-top: 8px solid transparent !important;
-            border-bottom: 8px solid transparent !important;
-            border-left: 14px solid #ffb347 !important;
+            background: linear-gradient(180deg, #f8bf58, #de8f1a) !important;
+            border: 2px solid rgba(255, 241, 210, 0.26) !important;
+            box-shadow: inset 0 6px 6px rgba(255,255,255,0.12) !important;
         }
 
         .rocket-fin-left {
-            left: -3px !important;
-            top: 2px !important;
-            transform: rotate(-18deg) !important;
+            left: 28px !important;
+            top: 50px !important;
+            width: 24px !important;
+            height: 12px !important;
+            border-radius: 4px 4px 14px 14px !important;
+            transform: skewX(-24deg) !important;
         }
 
         .rocket-fin-right {
-            left: -2px !important;
-            top: 14px !important;
-            transform: rotate(18deg) !important;
+            left: 58px !important;
+            top: 50px !important;
+            width: 24px !important;
+            height: 12px !important;
+            border-radius: 4px 4px 14px 14px !important;
+            transform: skewX(-24deg) !important;
         }
 
         .rocket-flame {
             position: absolute !important;
-            bottom: 10px !important;
-            left: -2px !important;
-            width: 24px !important;
-            height: 44px !important;
+            left: -4px !important;
+            top: 33px !important;
+            width: 22px !important;
+            height: 18px !important;
             background:
-                radial-gradient(circle at 50% 15%, rgba(255,255,255,0.9) 0 18%, transparent 19%),
-                radial-gradient(circle at 30% 42%, rgba(122,243,255,0.65) 0 16%, transparent 17%),
-                radial-gradient(circle at 70% 72%, rgba(255,255,255,0.52) 0 12%, transparent 13%) !important;
-            border-radius: 50% !important;
+                radial-gradient(circle at 18% 50%, rgba(255,255,255,0.9) 0 16%, transparent 17%),
+                radial-gradient(circle at 48% 50%, rgba(122,243,255,0.82) 0 22%, transparent 23%),
+                radial-gradient(circle at 84% 50%, rgba(255,255,255,0.55) 0 14%, transparent 15%) !important;
+            border-radius: 50% 0 0 50% !important;
             filter: blur(1px) !important;
             animation: flame 0.3s ease-in-out infinite !important;
         }
 
         @keyframes rocketFloat {
-            0%, 100% { transform: translateY(0px) rotate(-15deg); }
-            50% { transform: translateY(-20px) rotate(-15deg); }
+            0%, 100% { transform: translateY(0px) rotate(-6deg); }
+            50% { transform: translateY(-12px) rotate(-4deg); }
         }
 
         @keyframes flame {
             0%, 100% { 
                 opacity: 0.7;
-                height: 25px;
+                width: 18px;
             }
             50% { 
                 opacity: 1;
-                height: 35px;
+                width: 26px;
             }
         }
 
         .rocket-tooltip {
             position: absolute !important;
-            bottom: 100px !important;
-            right: 0 !important;
+            bottom: 82px !important;
+            right: -8px !important;
             background: rgba(0, 0, 0, 0.8) !important;
             color: #b8fbff !important;
             padding: 8px 12px !important;
@@ -730,6 +774,32 @@ layout: null
 
         .modal-body p {
             margin-bottom: 15px !important;
+        }
+
+        .modal-action {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            min-height: 42px !important;
+            padding: 10px 16px !important;
+            border-radius: 14px !important;
+            border: 1px solid rgba(122, 243, 255, 0.34) !important;
+            background: linear-gradient(135deg, rgba(122, 243, 255, 0.22), rgba(32, 183, 192, 0.26)) !important;
+            color: #eafcff !important;
+            text-decoration: none !important;
+            font-weight: 700 !important;
+            box-shadow: 0 12px 24px rgba(8, 30, 38, 0.22) !important;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+        }
+
+        .modal-action:hover {
+            transform: translateY(-2px) !important;
+            border-color: rgba(122, 243, 255, 0.5) !important;
+            box-shadow: 0 16px 28px rgba(8, 30, 38, 0.28) !important;
+        }
+
+        .modal-action-row {
+            margin-top: 18px !important;
         }
 
         /* Responsive design */
@@ -934,6 +1004,7 @@ layout: null
     <div class="view-toggle" id="viewToggle">
         <button class="view-btn active" id="listViewBtn" onclick="switchToListView()">📋 View as List</button>
         <button class="view-btn" id="travelerViewBtn" onclick="switchToTravelerView()">🤿 View as Dive</button>
+        <a class="view-btn" id="legacyHomeBtn" href="{{ site.baseurl }}/legacy-home">🌀 Legacy Home</a>
     </div>
 
     <!-- Traveler View -->
@@ -950,6 +1021,8 @@ layout: null
         <div class="rocket-tooltip">Use arrow keys or WASD to pilot the submarine.</div>
         <div class="rocket" id="rocket">
             <div class="rocket-body">
+                <div class="rocket-window"></div>
+                <div class="rocket-window"></div>
                 <div class="rocket-window"></div>
             </div>
             <div class="rocket-fins">
@@ -1057,14 +1130,14 @@ layout: null
                             <h3>Game Library</h3>
                             <p>Browse existing games created with this engine:</p>
                             <ul style="text-align: left; display: inline-block;">
-                                <li><a href="{{ site.baseurl }}/games/aquatic.html" style="color: #81d4fa; text-decoration: underline;">Aquatic Game Level</a> - Explore the reef and complete the aquatic challenge</li>
-                                <li><a href="{{ site.baseurl }}/gamify/seek.html" style="color: #81d4fa; text-decoration: underline;">Find Kirby (Seek)</a> - Search the playground and find Kirby</li>
-                                <li><a href="{{ site.baseurl }}/games/basketball.html" style="color: #81d4fa; text-decoration: underline;">Basketball Game Level</a> - Navigate the court and meet LeBron</li>
-                                <li><a href="{{ site.baseurl }}/games/combined.html" style="color: #81d4fa; text-decoration: underline;">Combined Game Levels</a> - Run Aquatic, Seek, and Basketball in one session</li>
+                                <li><a href="{{ site.baseurl }}/games/aquatic.html" class="modal-action">Aquatic Game Level</a> - Explore the reef and complete the aquatic challenge</li>
+                                <li><a href="{{ site.baseurl }}/gamify/seek.html" class="modal-action">Find Kirby (Seek)</a> - Search the playground and find Kirby</li>
+                                <li><a href="{{ site.baseurl }}/games/basketball.html" class="modal-action">Basketball Game Level</a> - Navigate the court and meet LeBron</li>
+                                <li><a href="{{ site.baseurl }}/games/combined.html" class="modal-action">Combined Game Levels</a> - Run Aquatic, Seek, and Basketball in one session</li>
                             </ul>
 
                             <h3>Getting Started</h3>
-                            <p>Access the Game Builder at <a href="{{ site.baseurl }}/team-space-portal/gamebuilder" style="color: #81d4fa; text-decoration: underline;">Game Builder</a> to create your own interactive game. Upload custom assets, configure game mechanics, and export your game in minutes!</p>
+                            <p>Access the Game Builder at <a href="{{ site.baseurl }}/team-space-portal/gamebuilder" class="modal-action">Game Builder</a> to create your own interactive game. Upload custom assets, configure game mechanics, and export your game in minutes!</p>
 
                             <h3>Technologies</h3>
                             <p>Built with JavaScript ES6+, featuring modular architecture for easy customization and extension. Supports responsive design for both desktop and mobile gaming experiences.</p>
@@ -1076,7 +1149,7 @@ layout: null
                         content: `
                             <h3>Aquatic Game Level</h3>
                             <p>Play as a scuba diver, explore the reef, and complete the underwater mission.</p>
-                            <p><a href="{{ site.baseurl }}/games/aquatic.html" style="color: #81d4fa; text-decoration: underline;">Launch Aquatic Game</a></p>
+                            <p class="modal-action-row"><a href="{{ site.baseurl }}/games/aquatic.html" class="modal-action">Launch Aquatic Game</a></p>
                         `
                     },
                     {
@@ -1085,7 +1158,7 @@ layout: null
                         content: `
                             <h3>Basketball Game Level</h3>
                             <p>Work through the court obstacles and reach LeBron to finish the level.</p>
-                            <p><a href="{{ site.baseurl }}/games/basketball.html" style="color: #81d4fa; text-decoration: underline;">Launch Basketball Game</a></p>
+                            <p class="modal-action-row"><a href="{{ site.baseurl }}/games/basketball.html" class="modal-action">Launch Basketball Game</a></p>
                         `
                     },
                     {
@@ -1094,7 +1167,7 @@ layout: null
                         content: `
                             <h3>Find Kirby (Seek)</h3>
                             <p>Find Kirby hiding in the corner of the map.</p>
-                            <p><a href="{{ site.baseurl }}/gamify/seek.html" style="color: #81d4fa; text-decoration: underline;">Launch Seek Game</a></p>
+                            <p class="modal-action-row"><a href="{{ site.baseurl }}/gamify/seek.html" class="modal-action">Launch Seek Game</a></p>
                         `
                     },
                     {
@@ -1103,7 +1176,7 @@ layout: null
                         content: `
                             <h3>Combined Game Levels</h3>
                             <p>Play the Aquatic level, find Kirby, then head to the basketball court — all in a single run.</p>
-                            <p><a href="{{ site.baseurl }}/games/combined.html" style="color: #81d4fa; text-decoration: underline;">Launch Combined Game Levels</a></p>
+                            <p class="modal-action-row"><a href="{{ site.baseurl }}/games/combined.html" class="modal-action">Launch Combined Game Levels</a></p>
                         `
                     }
                 ]
@@ -1415,7 +1488,7 @@ export default GameLevelAquaticGameLevel;</code></pre>
 
                             <h3>Published Post</h3>
                             <p>This content comes from the Aquatic arrays and booleans notebook and is published as a blog post in the portfolio.</p>
-                            <p><a href="{{ site.baseurl }}/blog/aquatic-arrays-booleans" style="color: #81d4fa; text-decoration: underline;">Open Yiming's CSS1</a></p>
+                            <p class="modal-action-row"><a href="{{ site.baseurl }}/blog/aquatic-arrays-booleans" class="modal-action">Open Yiming's CSS1</a></p>
                         `
                     },
                     {
@@ -1436,7 +1509,7 @@ export default GameLevelAquaticGameLevel;</code></pre>
                             <h3>Published Post</h3>
                             <p><strong>Title:</strong> CSSE-2 Personal Blog</p>
                             <p><strong>Permalink:</strong> <code>/blog/lance-css1</code></p>
-                            <p><a href="{{ site.baseurl }}/blog/lance-css1" style="color: #81d4fa; text-decoration: underline;">Open Lance's CSS1</a></p>
+                            <p class="modal-action-row"><a href="{{ site.baseurl }}/blog/lance-css1" class="modal-action">Open Lance's CSS1</a></p>
                         `
                     },
                     {
@@ -1455,7 +1528,7 @@ export default GameLevelAquaticGameLevel;</code></pre>
                             </ul>
 
                             <h3>Published Post</h3>
-                            <p><a href="{{ site.baseurl }}/blog/arjun-seek-arrays-booleans" style="color: #81d4fa; text-decoration: underline;">Open Arjun's Seek CSS1</a></p>
+                            <p class="modal-action-row"><a href="{{ site.baseurl }}/blog/arjun-seek-arrays-booleans" class="modal-action">Open Arjun's Seek CSS1</a></p>
                         `
                     },
                     {
@@ -1474,7 +1547,7 @@ export default GameLevelAquaticGameLevel;</code></pre>
                             </ul>
 
                             <h3>Published Post</h3>
-                            <p><a href="{{ site.baseurl }}/blog/arjun-v2-seek-level" style="color: #81d4fa; text-decoration: underline;">Open Arjun's Game Blog V2</a></p>
+                            <p class="modal-action-row"><a href="{{ site.baseurl }}/blog/arjun-v2-seek-level" class="modal-action">Open Arjun's Game Blog V2</a></p>
                         `
                     }
                 ]
@@ -1735,8 +1808,8 @@ export default GameLevelAquaticGameLevel;</code></pre>
 
         // Submarine control system
         const rocketState = {
-            x: window.innerWidth - 100,
-            y: window.innerHeight - 150,
+            x: 0,
+            y: 0,
             vx: 0,
             vy: 0,
             speed: 5,
@@ -1744,6 +1817,45 @@ export default GameLevelAquaticGameLevel;</code></pre>
         };
 
         const keys = {};
+
+        function getRocketBounds() {
+            const rocketContainer = document.getElementById('rocketContainer');
+            const width = rocketContainer ? rocketContainer.offsetWidth : 120;
+            const height = rocketContainer ? rocketContainer.offsetHeight : 72;
+            return { width, height };
+        }
+
+        function getRocketMovementBounds() {
+            const bounds = getRocketBounds();
+            const viewToggle = document.getElementById('viewToggle');
+            const bottomInset = viewToggle ? viewToggle.offsetHeight + 54 : 54;
+
+            return {
+                maxX: Math.max(0, window.innerWidth - bounds.width),
+                maxY: Math.max(0, window.innerHeight - bounds.height - bottomInset)
+            };
+        }
+
+        function clampRocketState() {
+            const movementBounds = getRocketMovementBounds();
+            rocketState.x = Math.max(0, Math.min(rocketState.x, movementBounds.maxX));
+            rocketState.y = Math.max(0, Math.min(rocketState.y, movementBounds.maxY));
+        }
+
+        function syncRocketPosition() {
+            const rocketContainer = document.getElementById('rocketContainer');
+            if (rocketContainer) {
+                rocketContainer.style.left = rocketState.x + 'px';
+                rocketContainer.style.top = rocketState.y + 'px';
+            }
+        }
+
+        function initializeRocketPosition() {
+            const movementBounds = getRocketMovementBounds();
+            rocketState.x = Math.max(0, movementBounds.maxX - 18);
+            rocketState.y = Math.max(0, movementBounds.maxY - 8);
+            syncRocketPosition();
+        }
 
         // Handle submarine movement
         function updateRocketPosition() {
@@ -1765,15 +1877,10 @@ export default GameLevelAquaticGameLevel;</code></pre>
             rocketState.y += rocketState.vy;
 
             // Boundary constraints
-            rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 70));
-            rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 110));
+            clampRocketState();
 
             // Update submarine container position
-            const rocketContainer = document.getElementById('rocketContainer');
-            if (rocketContainer) {
-                rocketContainer.style.left = rocketState.x + 'px';
-                rocketContainer.style.top = rocketState.y + 'px';
-            }
+            syncRocketPosition();
 
             requestAnimationFrame(updateRocketPosition);
         }
@@ -1807,19 +1914,18 @@ export default GameLevelAquaticGameLevel;</code></pre>
                 rocketState.y = e.clientY - dragOffsetY;
 
                 // Boundary constraints
-                rocketState.x = Math.max(0, Math.min(rocketState.x, window.innerWidth - 70));
-                rocketState.y = Math.max(0, Math.min(rocketState.y, window.innerHeight - 110));
-
-                const rocketContainer = document.getElementById('rocketContainer');
-                if (rocketContainer) {
-                    rocketContainer.style.left = rocketState.x + 'px';
-                    rocketContainer.style.top = rocketState.y + 'px';
-                }
+                clampRocketState();
+                syncRocketPosition();
             }
         });
 
         document.addEventListener('mouseup', () => {
             isDraggingRocket = false;
+        });
+
+        window.addEventListener('resize', () => {
+            clampRocketState();
+            syncRocketPosition();
         });
 
         // View management system
@@ -1990,6 +2096,7 @@ export default GameLevelAquaticGameLevel;</code></pre>
         document.addEventListener('DOMContentLoaded', function() {
             generateStars();
             populateGalaxies();
+            initializeRocketPosition();
             updateRocketPosition();
 
             // Force style refresh for GitHub Pages
