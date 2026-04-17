@@ -19,6 +19,406 @@ Our three logic ideas are:
 - a menu that swaps the active sprite
 - an NPC message system with an unlockable password interaction
 
+## Real Example: `GameLevelBasketball.js`
+
+Before building our own smaller examples, this lesson can start with a real project file from the repo: `assets/js/GameEnginev1/GameLevelBasketball.js`.
+
+This is a strong example for **characters**, **interactions**, and **messages** because it already combines a moving player, a chasing character, keyboard input, HUD text, and interaction feedback in one level.
+
+### How Characters Show Up in Basketball
+
+In `GameLevelBasketball.js`, the main characters are created through sprite data objects and then added to `this.classes`.
+
+- the player character is `BasketballPlayer`
+- the chasing character is `LeBron`
+- both characters use sprite sheets, scale factors, hitboxes, and starting positions
+
+That means this file is already teaching one of the biggest ideas in this lesson: characters are not just pictures, they are data objects with movement, animation, and collision behavior.
+
+### How Interactions Show Up in Basketball
+
+This file also shows interaction logic in a few different ways:
+
+- the player moves with `WASD`
+- the player presses `E` to shoot
+- LeBron chases the player using distance math
+- collisions between the player and chaser trigger the caught state
+- projectile hits can stun the chaser
+
+So even though this is a basketball-themed level, it is still a characters/interact/messages lesson because the gameplay is built from characters reacting to one another.
+
+### How Messages Show Up in Basketball
+
+Messages are important because they tell the player what is happening.
+
+In this file, messages and UI appear through:
+
+- the intro dialogue before the round starts
+- the HUD for time and coins
+- the caught message after a collision
+- score and best-score feedback
+
+That gives students a good reminder that messages are not only NPC dialogue boxes. Messages can also be status text, instructions, warnings, and score updates.
+
+{% capture challenge_basketball %}
+Basketball example using the real `GameLevelBasketball.js` file. Move with WASD, press E to shoot, and observe how characters, interaction logic, and messages work together.
+{% endcapture %}
+
+{% capture code_basketball %}
+import GameControl from '/assets/js/GameEnginev1/essentials/GameControl.js';
+import GameEnvBackground from '/assets/js/GameEnginev1/essentials/GameEnvBackground.js';
+import Player from '/assets/js/GameEnginev1/essentials/Player.js';
+import Npc from '/assets/js/GameEnginev1/essentials/Npc.js';
+
+class BasketballLessonLevel {
+  constructor(gameEnv) {
+    this.gameEnv = gameEnv;
+    const width = gameEnv.innerWidth;
+    const height = gameEnv.innerHeight;
+    const path = gameEnv.path;
+
+    this.playerStart = { x: Math.round(width * 0.12), y: Math.round(height * 0.68) };
+    this.chaserStart = { x: Math.round(width * 0.72), y: Math.round(height * 0.55) };
+    this.caught = false;
+    this.caughtAt = 0;
+    this.roundResetDelayMs = 1400;
+    this.startTime = 0;
+    this.currentTime = 0;
+    this.preGameLocked = false;
+    this.messageHud = null;
+    this.timeHud = null;
+    this.projectiles = [];
+    this.projectileSpeed = 9;
+    this.projectileRadius = 10;
+    this.projectileLifeMs = 2200;
+    this.shootCooldownMs = 1200;
+    this.lastShotAt = -Infinity;
+    this.lebronStunUntil = 0;
+    this.lebronStunDurationMs = 2000;
+    this.handleShootKey = this.handleShootKey.bind(this);
+
+    const image_data_court = {
+      id: 'BasketballCourt',
+      src: path + '/images/gamebuilder/bg/BaskCourt.png',
+      pixels: { height: 720, width: 1478 }
+    };
+
+    const sprite_data_player = {
+      id: 'BasketballPlayer',
+      greeting: 'Ball handler ready.',
+      src: path + '/images/gamebuilder/sprites/astro.png',
+      SCALE_FACTOR: 11,
+      STEP_FACTOR: 1000,
+      ANIMATION_RATE: 110,
+      INIT_POSITION: { ...this.playerStart },
+      pixels: { height: 770, width: 513 },
+      orientation: { rows: 4, columns: 4 },
+      down: { row: 0, start: 0, columns: 4 },
+      left: { row: 1, start: 0, columns: 4 },
+      right: { row: 2, start: 0, columns: 4 },
+      up: { row: 3, start: 0, columns: 4 },
+      downRight: { row: 2, start: 0, columns: 4 },
+      downLeft: { row: 1, start: 0, columns: 4 },
+      upRight: { row: 2, start: 0, columns: 4 },
+      upLeft: { row: 1, start: 0, columns: 4 },
+      hitbox: { widthPercentage: 0.45, heightPercentage: 0.5 },
+      keypress: { up: 87, left: 65, down: 83, right: 68 }
+    };
+
+    const sprite_data_chaser = {
+      id: 'LeBron',
+      greeting: 'You reached LeBron.',
+      src: path + '/images/gamebuilder/sprites/kirby.png',
+      SCALE_FACTOR: 7,
+      ANIMATION_RATE: 8,
+      INIT_POSITION: { ...this.chaserStart },
+      pixels: { height: 36, width: 569 },
+      orientation: { rows: 1, columns: 13 },
+      down: { row: 0, start: 0, columns: 13 },
+      left: { row: 0, start: 0, columns: 13 },
+      right: { row: 0, start: 0, columns: 13 },
+      up: { row: 0, start: 0, columns: 13 },
+      downRight: { row: 0, start: 0, columns: 13 },
+      downLeft: { row: 0, start: 0, columns: 13 },
+      upRight: { row: 0, start: 0, columns: 13 },
+      upLeft: { row: 0, start: 0, columns: 13 },
+      hitbox: { widthPercentage: 0.2, heightPercentage: 0.2 },
+      reaction: function () {}
+    };
+
+    this.classes = [
+      { class: GameEnvBackground, data: image_data_court },
+      { class: Player, data: sprite_data_player },
+      { class: Npc, data: sprite_data_chaser }
+    ];
+  }
+
+  initialize() {
+    this.createHud();
+    this.startTime = performance.now();
+    document.addEventListener('keydown', this.handleShootKey);
+  }
+
+  createHud() {
+    this.timeHud = document.createElement('div');
+    this.timeHud.style.position = 'fixed';
+    this.timeHud.style.top = '90px';
+    this.timeHud.style.left = '20px';
+    this.timeHud.style.zIndex = '1000';
+    this.timeHud.style.padding = '10px 14px';
+    this.timeHud.style.background = 'rgba(0,0,0,0.75)';
+    this.timeHud.style.color = 'white';
+    this.timeHud.style.borderRadius = '10px';
+    this.timeHud.style.fontFamily = 'monospace';
+    document.body.appendChild(this.timeHud);
+
+    this.messageHud = document.createElement('div');
+    this.messageHud.style.position = 'fixed';
+    this.messageHud.style.top = '140px';
+    this.messageHud.style.left = '20px';
+    this.messageHud.style.zIndex = '1000';
+    this.messageHud.style.padding = '10px 14px';
+    this.messageHud.style.background = 'rgba(0,0,0,0.75)';
+    this.messageHud.style.color = 'white';
+    this.messageHud.style.borderRadius = '10px';
+    this.messageHud.style.fontFamily = 'monospace';
+    this.messageHud.style.display = 'none';
+    document.body.appendChild(this.messageHud);
+  }
+
+  findById(id) {
+    return this.gameEnv.gameObjects.find((obj) => obj?.spriteData?.id === id);
+  }
+
+  update() {
+    const player = this.findById('BasketballPlayer');
+    const lebron = this.findById('LeBron');
+    if (!player || !lebron) return;
+
+    const now = performance.now();
+    this.updateProjectiles(now, lebron);
+
+    if (!this.caught) {
+      this.currentTime = (now - this.startTime) / 1000;
+      this.timeHud.textContent = 'Time: ' + this.currentTime.toFixed(1) + 's | Controls: WASD move, E shoot';
+    }
+
+    if (this.caught) {
+      if (now - this.caughtAt >= this.roundResetDelayMs) {
+        this.resetRound();
+      }
+      return;
+    }
+
+    if (now < this.lebronStunUntil) {
+      lebron.velocity.x = 0;
+      lebron.velocity.y = 0;
+      return;
+    }
+
+    const dx = player.position.x - lebron.position.x;
+    const dy = player.position.y - lebron.position.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist < 1) return;
+
+    const speed = 2.2;
+    lebron.position.x += (dx / dist) * speed;
+    lebron.position.y += (dy / dist) * speed;
+    lebron.position.x = Math.max(0, Math.min(lebron.position.x, this.gameEnv.innerWidth - (lebron.width || 0)));
+    lebron.position.y = Math.max(0, Math.min(lebron.position.y, this.gameEnv.innerHeight - (lebron.height || 0)));
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+      lebron.direction = dx >= 0 ? 'right' : 'left';
+    } else {
+      lebron.direction = dy >= 0 ? 'down' : 'up';
+    }
+
+    if (this.isHitboxCollision(player, lebron)) {
+      this.caught = true;
+      this.caughtAt = now;
+      this.messageHud.innerHTML = 'Kirby stole the ball!<br>Resetting round...';
+      this.messageHud.style.display = 'block';
+    }
+  }
+
+  handleShootKey(event) {
+    if (event.key.toLowerCase() !== 'e' || event.repeat) return;
+    if (this.caught) return;
+    const now = performance.now();
+    if (now - this.lastShotAt < this.shootCooldownMs) return;
+
+    const player = this.findById('BasketballPlayer');
+    if (!player) return;
+
+    const directionMap = {
+      up: { x: 0, y: -1 },
+      down: { x: 0, y: 1 },
+      left: { x: -1, y: 0 },
+      right: { x: 1, y: 0 },
+      upRight: { x: 1, y: -1 },
+      upLeft: { x: -1, y: -1 },
+      downRight: { x: 1, y: 1 },
+      downLeft: { x: -1, y: 1 }
+    };
+
+    const vector = directionMap[player.direction] || { x: 1, y: 0 };
+    const magnitude = Math.hypot(vector.x, vector.y) || 1;
+    const dir = { x: vector.x / magnitude, y: vector.y / magnitude };
+
+    const projectile = {
+      x: player.position.x + (player.width || 0) / 2,
+      y: player.position.y + (player.height || 0) / 2,
+      vx: dir.x * this.projectileSpeed,
+      vy: dir.y * this.projectileSpeed,
+      radius: this.projectileRadius,
+      bornAt: now,
+      canvas: document.createElement('canvas')
+    };
+
+    projectile.canvas.width = this.projectileRadius * 2;
+    projectile.canvas.height = this.projectileRadius * 2;
+    projectile.canvas.style.position = 'absolute';
+    projectile.canvas.style.zIndex = '8';
+    const ctx = projectile.canvas.getContext('2d');
+    ctx.fillStyle = '#ff8c00';
+    ctx.beginPath();
+    ctx.arc(this.projectileRadius, this.projectileRadius, this.projectileRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    this.gameEnv.container.appendChild(projectile.canvas);
+    this.projectiles.push(projectile);
+    this.lastShotAt = now;
+  }
+
+  updateProjectiles(now, lebron) {
+    for (let i = this.projectiles.length - 1; i >= 0; i--) {
+      const projectile = this.projectiles[i];
+      projectile.x += projectile.vx;
+      projectile.y += projectile.vy;
+      projectile.canvas.style.left = projectile.x + 'px';
+      projectile.canvas.style.top = projectile.y + 'px';
+
+      const expired = now - projectile.bornAt > this.projectileLifeMs;
+      const offscreen =
+        projectile.x < 0 ||
+        projectile.y < 0 ||
+        projectile.x > this.gameEnv.innerWidth ||
+        projectile.y > this.gameEnv.innerHeight;
+
+      if (expired || offscreen) {
+        projectile.canvas.remove();
+        this.projectiles.splice(i, 1);
+        continue;
+      }
+
+      if (lebron && this.isCircleHittingObject(projectile, lebron)) {
+        this.lebronStunUntil = Math.max(this.lebronStunUntil, now + this.lebronStunDurationMs);
+        projectile.canvas.remove();
+        this.projectiles.splice(i, 1);
+        this.messageHud.textContent = 'Nice shot! Kirby is stunned.';
+        this.messageHud.style.display = 'block';
+      }
+    }
+  }
+
+  isHitboxCollision(a, b) {
+    const aRect = a.canvas.getBoundingClientRect();
+    const bRect = b.canvas.getBoundingClientRect();
+    return (
+      aRect.left < bRect.right &&
+      aRect.right > bRect.left &&
+      aRect.top < bRect.bottom &&
+      aRect.bottom > bRect.top
+    );
+  }
+
+  isCircleHittingObject(circle, obj) {
+    const objRect = obj.canvas.getBoundingClientRect();
+    const objLeft = obj.position.x;
+    const objTop = obj.position.y;
+    const objRight = objLeft + objRect.width;
+    const objBottom = objTop + objRect.height;
+    const closestX = Math.max(objLeft, Math.min(circle.x, objRight));
+    const closestY = Math.max(objTop, Math.min(circle.y, objBottom));
+    const dx = circle.x - closestX;
+    const dy = circle.y - closestY;
+    return (dx * dx + dy * dy) <= (circle.radius * circle.radius);
+  }
+
+  resetRound() {
+    const player = this.findById('BasketballPlayer');
+    const lebron = this.findById('LeBron');
+
+    if (player) {
+      player.position.x = this.playerStart.x;
+      player.position.y = this.playerStart.y;
+      player.velocity.x = 0;
+      player.velocity.y = 0;
+      player.direction = 'down';
+    }
+
+    if (lebron) {
+      lebron.position.x = this.chaserStart.x;
+      lebron.position.y = this.chaserStart.y;
+      lebron.velocity.x = 0;
+      lebron.velocity.y = 0;
+      lebron.direction = 'left';
+    }
+
+    this.caught = false;
+    this.caughtAt = 0;
+    this.lebronStunUntil = 0;
+    this.startTime = performance.now();
+    this.currentTime = 0;
+    this.messageHud.style.display = 'none';
+    this.clearProjectiles();
+  }
+
+  clearProjectiles() {
+    this.projectiles.forEach((projectile) => projectile?.canvas?.remove());
+    this.projectiles = [];
+  }
+
+  destroy() {
+    document.removeEventListener('keydown', this.handleShootKey);
+    if (this.timeHud) this.timeHud.remove();
+    if (this.messageHud) this.messageHud.remove();
+    this.clearProjectiles();
+  }
+}
+
+export const gameLevelClasses = [BasketballLessonLevel];
+export { GameControl };
+{% endcapture %}
+
+{% include game-runner.html
+   runner_id="characters-interact-basketball"
+   challenge=challenge_basketball
+   code=code_basketball
+%}
+
+### Build It in GameBuilder: Basketball Setup
+
+If you want to introduce this lesson through GameBuilder first, students can sketch the main basketball ideas there before reading the smaller examples below.
+
+Suggested setup in GameBuilder:
+
+- background: a court-style background like `BaskCourt`
+- player sprite: `astro` or another athlete-like sprite
+- NPC sprite: `kirby` or another chasing sprite
+- place the player on the left side of the court
+- place the chaser on the right side
+- then move to Freestyle mode to add the real chase, projectile, HUD, and message logic from `GameLevelBasketball.js`
+
+Open the full builder in a new tab if you want more room: [GameBuilder]({{site.baseurl}}/team-space-portal/gamebuilder)
+
+<iframe
+  src="{{site.baseurl}}/team-space-portal/gamebuilder"
+  style="width: 100%; height: 850px; border: none; border-radius: 12px; margin-top: 12px;"
+  loading="lazy"
+  allowfullscreen
+></iframe>
+
 ## Quick Sprite Sheet Definitions
 
 A **sprite sheet** is one image that stores many animation frames for a character.
@@ -174,6 +574,28 @@ export { GameControl };
    challenge=challenge0
    code=code0
 %}
+
+### Build It in GameBuilder: Chase Logic
+
+Use GameBuilder to create the scene first, then move to Freestyle mode and add the chase behavior.
+
+Suggested setup in GameBuilder:
+
+- background: `clouds`
+- player sprite: `boysprite`
+- NPC sprite: `kirby`
+- place the player on the left side
+- place the chasing NPC on the right side
+- after generating the base code, add the `dx`, `dy`, and `Math.hypot()` chase logic from this lesson
+
+Open the full builder in a new tab if you want more room: [GameBuilder]({{site.baseurl}}/team-space-portal/gamebuilder)
+
+<iframe
+  src="{{site.baseurl}}/team-space-portal/gamebuilder"
+  style="width: 100%; height: 850px; border: none; border-radius: 12px; margin-top: 12px;"
+  loading="lazy"
+  allowfullscreen
+></iframe>
 
 ## 2. Sprite Swap Menu
 
@@ -393,12 +815,12 @@ Suggested setup in GameBuilder:
 
 Open the full builder in a new tab if you want more room: [GameBuilder]({{site.baseurl}}/team-space-portal/gamebuilder)
 
-{% include game-runner.html
-  runner_id="characters-interact-builder-swap"
-  game_page="/team-space-portal/gamebuilder"
-  game_page_type="page"
-  iframe_height="850px"
-%}
+<iframe
+  src="{{site.baseurl}}/team-space-portal/gamebuilder"
+  style="width: 100%; height: 850px; border: none; border-radius: 12px; margin-top: 12px;"
+  loading="lazy"
+  allowfullscreen
+></iframe>
 
 ## 3. NPC Messages and Interaction Logic
 
@@ -607,12 +1029,12 @@ This is a good workflow because GameBuilder handles placement and asset setup, w
 
 Open the full builder in a new tab if you want more room: [GameBuilder]({{site.baseurl}}/team-space-portal/gamebuilder)
 
-{% include game-runner.html
-  runner_id="characters-interact-builder-npc"
-  game_page="/team-space-portal/gamebuilder"
-  game_page_type="page"
-  iframe_height="850px"
-%}
+<iframe
+  src="{{site.baseurl}}/team-space-portal/gamebuilder"
+  style="width: 100%; height: 850px; border: none; border-radius: 12px; margin-top: 12px;"
+  loading="lazy"
+  allowfullscreen
+></iframe>
 
 ## Wrap Up
 
