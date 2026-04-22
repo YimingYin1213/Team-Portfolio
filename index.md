@@ -7,7 +7,7 @@ permalink: /
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Enter Team Space</title>
+  <title>Enter Team Aquatic</title>
   <link rel="canonical" href="{{ site.url }}{{ site.baseurl }}/team-space-portal">
   <style>
     :root {
@@ -563,7 +563,7 @@ permalink: /
           <div class="swim-tentacles"><span></span><span></span><span></span><span></span><span></span></div>
         </div>
       </div>
-      <div class="launch-text">Diving to Team Space</div>
+      <div class="launch-text">Diving to Team Aquatic</div>
     </div>
   </div>
 
@@ -590,16 +590,16 @@ permalink: /
 
       <div class="panel">
         <div class="eyebrow">teamspace.opencodingsociety.com</div>
-        <h1>Dive into <span class="gradient">Team Space</span></h1>
+        <h1<>Dive into <span class="gradient">Team Aquatic</span></h1>
         <p class="subtitle">
           Your reef gate is ready. Tap below to slip beneath the surface, follow the bubbles,
-          and enter an underwater Team Space experience built around reefs, currents, and jellyfish.
+          and enter an underwater Team Aquatic experience built around reefs, currents, and jellyfish.
         </p>
 
         <div class="status-bar">
           <div class="status-pill"><strong>Current:</strong> calm</div>
           <div class="status-pill"><strong>Reef gate:</strong> open</div>
-          <div class="status-pill"><strong>Destination:</strong> Team Space</div>
+          <div class="status-pill"><strong>Destination:</strong> Team Aquatic</div>
         </div>
 
         <div class="controls">
