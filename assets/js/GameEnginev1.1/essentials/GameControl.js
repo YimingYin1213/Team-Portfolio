@@ -260,6 +260,12 @@ class GameControl {
         }
 
         const GameLevelClass = this.levelClasses[this.currentLevelIndex];
+        if (typeof GameLevelClass !== 'function') {
+            console.warn('No valid GameLevelClass found for index', this.currentLevelIndex, GameLevelClass);
+            this.currentLevel = null;
+            return;
+        }
+
         this.currentLevel = new GameLevel(this);
         this.currentLevel.create(GameLevelClass);
 
@@ -326,7 +332,8 @@ class GameControl {
         this._loopRunning = false;
 
         // Alert the user that the level has ended
-        if (this.currentLevelIndex < this.levelClasses.length - 1) {
+        const hasNextLevel = this.currentLevelIndex < this.levelClasses.length - 1;
+        if (hasNextLevel) {
             alert("Level ended.");
         } else {
             alert("All levels completed.");
@@ -383,7 +390,7 @@ class GameControl {
 
         if (this.gameOver) {
             this.gameOver();
-        } else if (!this.isNested) {
+        } else if (!this.isNested && hasNextLevel) {
             this.currentLevelIndex++;
             this.transitionToLevel();
         }

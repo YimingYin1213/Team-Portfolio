@@ -103,12 +103,36 @@ class Character extends GameObject {
                 this.spriteReady = true;
                 // If pixels weren't provided or look invalid, populate from image natural size
                 try {
-                    if (!this.spriteData.pixels || this.spriteData.pixels.width === undefined || this.spriteData.pixels.height === undefined) {
-                        this.spriteData.pixels = { width: this.spriteSheet.naturalWidth, height: this.spriteSheet.naturalHeight };
-                    }
                     if (!this.spriteData.orientation) {
                         this.spriteData.orientation = { rows: 1, columns: 1 };
                     }
+                    const naturalPixels = {
+                        width: this.spriteSheet.naturalWidth,
+                        height: this.spriteSheet.naturalHeight
+                    };
+                    const orientation = this.spriteData.orientation;
+                    const configuredPixels = this.spriteData.pixels;
+                    const hasConfiguredPixels = Number.isFinite(configuredPixels?.width) && Number.isFinite(configuredPixels?.height);
+                    const naturalFrameAligned =
+                        naturalPixels.width % Math.max(1, orientation.columns) === 0 &&
+                        naturalPixels.height % Math.max(1, orientation.rows) === 0;
+                    const configuredFrameAligned =
+                        hasConfiguredPixels &&
+                        configuredPixels.width % Math.max(1, orientation.columns) === 0 &&
+                        configuredPixels.height % Math.max(1, orientation.rows) === 0;
+                    const configuredWithinImage =
+                        hasConfiguredPixels &&
+                        configuredPixels.width <= naturalPixels.width &&
+                        configuredPixels.height <= naturalPixels.height;
+
+                    if (
+                        !hasConfiguredPixels ||
+                        (!configuredFrameAligned && naturalFrameAligned) ||
+                        (!configuredWithinImage && naturalFrameAligned)
+                    ) {
+                        this.spriteData.pixels = naturalPixels;
+                    }
+
                     // Recalculate size in case dimensions changed
                     this.resize();
                     // Diagnostic logging to help ensure frames are calculated correctly
@@ -198,6 +222,23 @@ class Character extends GameObject {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
+    getFrameDimensions() {
+        const pixels = this.spriteData.pixels || { width: this.spriteSheet.naturalWidth, height: this.spriteSheet.naturalHeight };
+        const orientation = this.spriteData.orientation || { rows: 1, columns: 1 };
+
+        return {
+            frameWidth: Math.max(1, Math.round(pixels.width / Math.max(1, orientation.columns))),
+            frameHeight: Math.max(1, Math.round(pixels.height / Math.max(1, orientation.rows)))
+        };
+    }
+
+    getFrameAspectRatio() {
+        if (!this.spriteSheet) return 1;
+
+        const { frameWidth, frameHeight } = this.getFrameDimensions();
+        return frameHeight > 0 ? frameWidth / frameHeight : 1;
+    }
+
     /**
      * Draws the current frame of the sprite sheet.
      */
@@ -209,10 +250,7 @@ class Character extends GameObject {
         }
 
         // Calculate the frame dimensions
-        const pixels = this.spriteData.pixels || { width: this.spriteSheet.naturalWidth, height: this.spriteSheet.naturalHeight };
-        const orientation = this.spriteData.orientation || { rows: 1, columns: 1 };
-        const frameWidth = Math.max(1, Math.round(pixels.width / orientation.columns));
-        const frameHeight = Math.max(1, Math.round(pixels.height / orientation.rows));
+        const { frameWidth, frameHeight } = this.getFrameDimensions();
 
         // Calculate the frame position on the sprite sheet
         const directionData = this.spriteData[this.direction] || {};
@@ -380,7 +418,7 @@ class Character extends GameObject {
         this.yVelocity = (this.scale.height / this.stepFactor) * 3;
 
         // Set the object's width and height to the new size (object is a square)
-        this.width = this.size;
+        this.width = this.size * this.getFrameAspectRatio();
         this.height = this.size;
 
         // Ensure the object stays fully on screen after resize
