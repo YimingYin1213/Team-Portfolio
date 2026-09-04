@@ -1,11 +1,11 @@
 ---
 layout: post 
-title: Portfolio Home 
+title: Team Home 
 hide: true
 show_reading_time: false
 ---
 
-Hi! My name is [Your Full Name]
+Hi! Welcome to Team Aquatic CSP
 
 ### Development Environment
 
@@ -80,6 +80,9 @@ Hi! My name is [Your Full Name]
     <a href="{{site.baseurl}}/cs-pathway" class="btn" style="background-color: var(--orange);">
        CS Pathway
     </a>
+     <a href="{{site.baseurl}}/capstone/ideation" class="btn" style="background-color: var(--blue);">
+         Ideation Page
+     </a>
 </div>
 
 <br>
