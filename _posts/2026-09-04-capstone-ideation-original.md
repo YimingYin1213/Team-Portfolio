@@ -1,18 +1,16 @@
 ---
 layout: post
-title: Capstone Ideation Original - DeFlock SD and SD Auto
-description: Original ideation notes before slideshow conversion.
-permalink: /capstone/ideation-original/
+title: Capstone Ideation - Poway Women's Club
+description: Ideation notes for improving the Poway Women's Club website's clarity, usability, and pathways to get involved.
+permalink: /capstone/poway-womens-club-ideation/
 categories: Capstone
 tags: [capstone, ideation, nonprofit, web-redesign]
 ---
 
-- Transportation-mode-specific scoring (biking/walking factor in different risks than driving)
-- User-adjustable safety preference (e.g., "max 5 extra minutes for a safer route")
-- Saved places with default routing preferences attached
+Our team will be improving the Poway Women's Club website to make it easier for visitors to understand the organization, learn about its purpose, and find ways to get involved. The goal is not just to make the website look better, but to make it more useful for the people the club is trying to reach. The website should reflect the club's focus on women's rights, community involvement, and supporting women. Information should be easy to find, the design should feel welcoming and professional, and visitors should not have to spend too much time figuring out where to go.
 
 <style>
-    .ideation-infographic-wrap {
+    .ideation-infographic-wrap-pwc {
         margin-top: 2rem;
         margin-left: calc(50% - 50vw + 20px);
         margin-right: calc(50% - 50vw + 20px);
@@ -20,19 +18,19 @@ tags: [capstone, ideation, nonprofit, web-redesign]
         max-width: none;
         padding: 1rem;
         border-radius: 16px;
-        background: linear-gradient(135deg, #fffbe6 0%, #e8f7ff 45%, #f6ecff 100%);
-        border: 3px solid #ffd166;
+        background: linear-gradient(135deg, #fff0f5 0%, #f3f0ff 45%, #fff8e6 100%);
+        border: 3px solid #d94f70;
         box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
     }
 
-    .ideation-infographic-wrap h2 {
+    .ideation-infographic-wrap-pwc h2 {
         margin-top: 0;
-        color: #0f3d56;
+        color: #4a1942;
         font-weight: 800;
         letter-spacing: 0.4px;
     }
 
-    .ideation-infographic {
+    .ideation-infographic-pwc {
         width: 100%;
         border-collapse: collapse;
         font-size: 0.96rem;
@@ -42,62 +40,62 @@ tags: [capstone, ideation, nonprofit, web-redesign]
         table-layout: fixed;
     }
 
-    .ideation-infographic th,
-    .ideation-infographic td {
-        border: 2px solid #dbe9f4;
+    .ideation-infographic-pwc th,
+    .ideation-infographic-pwc td {
+        border: 2px solid #f0dbe4;
         padding: 0.65rem;
         vertical-align: top;
-        color: #1b2b34 !important;
+        color: #2a1b26 !important;
         background: #ffffff !important;
         word-wrap: break-word;
     }
 
-    .ideation-infographic thead th {
-        color: #102028 !important;
+    .ideation-infographic-pwc thead th {
+        color: #2a1020 !important;
         text-transform: uppercase;
         letter-spacing: 0.04em;
         font-size: 0.82rem;
     }
 
-    .ideation-infographic thead th:nth-child(1) { background: #ffe08a !important; }
-    .ideation-infographic thead th:nth-child(2) { background: #9be7ff !important; }
-    .ideation-infographic thead th:nth-child(3) { background: #b6f5c4 !important; }
-    .ideation-infographic thead th:nth-child(4) { background: #ffb3c7 !important; }
-    .ideation-infographic thead th:nth-child(5) { background: #d6c3ff !important; }
+    .ideation-infographic-pwc thead th:nth-child(1) { background: #ffc4d6 !important; }
+    .ideation-infographic-pwc thead th:nth-child(2) { background: #d6c3ff !important; }
+    .ideation-infographic-pwc thead th:nth-child(3) { background: #ffe08a !important; }
+    .ideation-infographic-pwc thead th:nth-child(4) { background: #b6f5c4 !important; }
+    .ideation-infographic-pwc thead th:nth-child(5) { background: #9be7ff !important; }
 
-    .ideation-infographic .cat {
+    .ideation-infographic-pwc .cat {
         font-weight: 800;
-        color: #0f3d56 !important;
+        color: #4a1942 !important;
     }
 
-    .ideation-infographic .cat-public { background: #fff4cf !important; }
-    .ideation-infographic .cat-option { background: #e8f8ff !important; }
-    .ideation-infographic .cat-prototype { background: #ecfff1 !important; }
-    .ideation-infographic .cat-macro { background: #ffeef4 !important; }
-    .ideation-infographic .cat-build { background: #f3ecff !important; }
+    .ideation-infographic-pwc .cat-public { background: #fff0f5 !important; }
+    .ideation-infographic-pwc .cat-option { background: #f3f0ff !important; }
+    .ideation-infographic-pwc .cat-prototype { background: #fffaf0 !important; }
+    .ideation-infographic-pwc .cat-macro { background: #eefcf3 !important; }
+    .ideation-infographic-pwc .cat-build { background: #eaf6ff !important; }
 
     @media (max-width: 900px) {
-        .ideation-infographic-wrap {
+        .ideation-infographic-wrap-pwc {
             margin-left: calc(50% - 50vw + 8px);
             margin-right: calc(50% - 50vw + 8px);
             width: calc(100vw - 16px);
             padding: 0.7rem;
         }
 
-        .ideation-infographic {
+        .ideation-infographic-pwc {
             font-size: 0.88rem;
         }
 
-        .ideation-infographic th,
-        .ideation-infographic td {
+        .ideation-infographic-pwc th,
+        .ideation-infographic-pwc td {
             padding: 0.5rem;
         }
     }
 </style>
 
-<div class="ideation-infographic-wrap">
-    <h2>Ideation Infographic Mega Table (Categorized)</h2>
-    <table class="ideation-infographic">
+<div class="ideation-infographic-wrap-pwc">
+    <h2>Ideation Infographic Mega Table</h2>
+    <table class="ideation-infographic-pwc">
         <thead>
             <tr>
                 <th>Category</th>
@@ -111,213 +109,159 @@ tags: [capstone, ideation, nonprofit, web-redesign]
             <tr>
                 <td class="cat cat-public">Public Mission</td>
                 <td>Why it matters</td>
-                <td>Privacy and road safety are community rights.</td>
-                <td>People rely on road systems and public data systems every day.</td>
-                <td>Build nonprofit web tools that support informed, practical decisions.</td>
+                <td>The club's work on women's rights and community support deserves a website that represents it well.</td>
+                <td>Many visitors' first impression of the club comes entirely from the site.</td>
+                <td>A clearer, more welcoming site builds trust and credibility.</td>
             </tr>
             <tr>
                 <td class="cat cat-public">Public Need</td>
                 <td>What people need today</td>
-                <td>Tools must be transparent, easy to understand, and useful.</td>
-                <td>Current systems can show data, but often do not explain impact clearly.</td>
-                <td>Create interfaces that explain risk and context, not just display points.</td>
+                <td>Visitors need to quickly understand who the club is and how to join in.</td>
+                <td>Current sites for small nonprofits often bury mission and involvement info in menus or long pages.</td>
+                <td>Surface mission and "get involved" paths within the first screen.</td>
             </tr>
             <tr>
-                <td class="cat cat-option">Option 1</td>
-                <td>DeFlock SD direction</td>
-                <td>Expand/remake ALPR visibility website.</td>
-                <td>Map ALPR locations and explain surveillance impact on civic privacy.</td>
-                <td>Increase transparency so communities understand where monitoring exists.</td>
+                <td class="cat cat-option">Direction 1</td>
+                <td>Information architecture cleanup</td>
+                <td>Reorganize navigation around what visitors actually come to do.</td>
+                <td>Group content into: About/Mission, Programs, Get Involved, Events, News, Contact.</td>
+                <td>No page is more than two clicks from the homepage.</td>
             </tr>
             <tr>
-                <td class="cat cat-option">Option 1</td>
-                <td>DeFlock SD urgency</td>
-                <td>Unchecked data collection can erode privacy freedoms over time.</td>
-                <td>ALPR collection may exceed what is necessary for safety outcomes.</td>
-                <td>Frame privacy cost clearly and accessibly for public-interest action.</td>
+                <td class="cat cat-option">Direction 1</td>
+                <td>Problem being solved</td>
+                <td>Visitors currently have to hunt for how to volunteer, donate, or join.</td>
+                <td>Calls to action are often scattered or missing from the homepage.</td>
+                <td>Add a consistent "Get Involved" entry point on every page.</td>
             </tr>
             <tr>
-                <td class="cat cat-option">Option 2</td>
-                <td>SD Auto big issue</td>
-                <td>Route users away from historically dangerous intersections.</td>
-                <td>Current hazard pins are mostly visual and not integrated into route decisions.</td>
-                <td>Integrate crash-risk history into actual routing recommendations.</td>
+                <td class="cat cat-option">Direction 2</td>
+                <td>Visual and tone redesign</td>
+                <td>Give the site a warmer, more professional look that reflects the club's values.</td>
+                <td>Typography, color palette, and imagery currently feel dated or generic.</td>
+                <td>Consistent, welcoming visual identity across every page.</td>
             </tr>
             <tr>
-                <td class="cat cat-option">Option 2</td>
-                <td>Problem statement</td>
-                <td>Commuters need safer route suggestions, not just post-fact flags.</td>
-                <td>Live pin-only design does not reduce exposure to known high-risk segments.</td>
-                <td>Shift from passive hazard display to active route guidance.</td>
-            </tr>
-            <tr>
-                <td class="cat cat-option">Option 2</td>
-                <td>How it helps</td>
-                <td>Use historical city collision data to score route risk.</td>
-                <td>Routing engine layers crash-risk scoring onto base optimization.</td>
-                <td>Return safer suggestions while preserving user choice.</td>
-            </tr>
-            <tr>
-                <td class="cat cat-option">Option 2</td>
-                <td>System logic chain</td>
-                <td>Commuter request - base route - risk scoring - safer recommendation.</td>
-                <td>Flow explicitly maps to: load historical collision data, score intersections, adjust route exposure.</td>
-                <td>Clear technical path from input to explainable output.</td>
-            </tr>
-            <tr>
-                <td class="cat cat-option">Option 2</td>
-                <td>Out of scope</td>
-                <td>No real-time new danger prediction, no crash-free guarantees.</td>
-                <td>No forced route lock; users may still choose flagged routes.</td>
-                <td>Informational, evidence-based routing enhancement only.</td>
+                <td class="cat cat-option">Direction 2</td>
+                <td>Trust signals</td>
+                <td>Show the club is active and credible: recent events, member stories, impact numbers.</td>
+                <td>Static, outdated-looking pages can make an active club look inactive.</td>
+                <td>A homepage that feels current builds visitor confidence.</td>
             </tr>
             <tr>
                 <td class="cat cat-prototype">Prototype Design</td>
-                <td>Landing and framing</td>
-                <td>Explain nonprofit mission and real-world problem first.</td>
-                <td>Content-rich structure anchors map and decision features.</td>
-                <td>Users understand context before interacting with data layers.</td>
+                <td>Homepage framing</td>
+                <td>Lead with mission statement, then immediate paths to Learn / Get Involved / Donate.</td>
+                <td>Short, plain-language mission summary above the fold.</td>
+                <td>Visitors understand the club's purpose in seconds.</td>
             </tr>
             <tr>
                 <td class="cat cat-prototype">Prototype Design</td>
-                <td>Interactive map</td>
-                <td>Dual path: ALPR visibility or crash-risk route layers.</td>
-                <td>DeFlock SD for surveillance context; SD Auto for safety scoring context.</td>
-                <td>Visual intelligence tied to practical civic/commuter decisions.</td>
+                <td>Get Involved hub</td>
+                <td>Single page consolidating membership, volunteering, donating, and upcoming events.</td>
+                <td>Replaces involvement info currently spread across multiple pages.</td>
+                <td>One clear destination for anyone who wants to act.</td>
             </tr>
             <tr>
                 <td class="cat cat-prototype">Prototype Design</td>
-                <td>Decision panel</td>
-                <td>Explain why route/area was suggested or flagged.</td>
-                <td>Human-readable rationale, not opaque algorithm output.</td>
-                <td>Trust and transparency through explainability.</td>
-            </tr>
-            <tr>
-                <td class="cat cat-prototype">Prototype Design</td>
-                <td>Scope and evidence</td>
-                <td>State non-claims and cite historical data sources.</td>
-                <td>Avoid overpromising by defining explicit limitations.</td>
-                <td>Responsible communication and realistic user expectations.</td>
+                <td>About / Mission page</td>
+                <td>Explain the club's history, focus on women's rights, and community impact.</td>
+                <td>Includes a short "why we exist" narrative and concrete examples of past work.</td>
+                <td>Builds emotional and factual connection to the cause.</td>
             </tr>
             <tr>
                 <td class="cat cat-macro">Macro Cosmos Selection</td>
                 <td>Chosen product direction</td>
-                <td>Safety-Aware Route Decision Engine + Smart Commute Planner.</td>
-                <td>Combines safety score routing with arrive-by/leave-by commute planning.</td>
-                <td>Transforms site from data viewer to decision engine.</td>
-            </tr>
-            <tr>
-                <td class="cat cat-macro">Macro Cosmos Selection</td>
-                <td>User controls</td>
-                <td>Fastest, Safest, Balanced route modes.</td>
-                <td>Show 2-3 route options with time, distance, and safety score.</td>
-                <td>User can compare tradeoffs explicitly.</td>
-            </tr>
-            <tr>
-                <td class="cat cat-macro">Macro Cosmos Selection</td>
-                <td>Decision transparency</td>
-                <td>Every recommendation includes a short "why this route" explanation.</td>
-                <td>Rationale references hazard/crash exposure tradeoffs versus alternatives.</td>
-                <td>Improves trust and reduces black-box route behavior.</td>
+                <td>Clarity-First Redesign with a dedicated Get Involved hub.</td>
+                <td>Combines simplified navigation, refreshed visual identity, and a single involvement page.</td>
+                <td>Transforms the site from a static brochure into a usable entry point for new members.</td>
             </tr>
             <tr>
                 <td class="cat cat-macro">Macro Cosmos Selection</td>
                 <td>One-sentence pitch</td>
-                <td>Use traffic/hazard data to make and explain route decisions.</td>
-                <td>Existing route finder, hazard reports, and traffic data are already present.</td>
-                <td>New value comes from integrating existing signals into recommendation logic.</td>
+                <td>Redesign the site so any visitor can understand the club and find a way to get involved in under a minute.</td>
+                <td>Existing content is largely present; the gap is structure and presentation, not missing information.</td>
+                <td>New value comes from organization and clarity, not new features.</td>
             </tr>
             <tr>
                 <td class="cat cat-macro">User + Problem</td>
                 <td>Primary user</td>
-                <td>San Diego commuter (student, parent, daily driver).</td>
-                <td>Needs reliable daily routing decisions for school/work destinations.</td>
-                <td>Actionable recommendation quality matters more than data quantity.</td>
-            </tr>
-            <tr>
-                <td class="cat cat-macro">User + Problem</td>
-                <td>Current gap</td>
-                <td>Single unexplained route and static routine-by-hour behavior.</td>
-                <td>Hazard/traffic data exists but is not used to select route.</td>
-                <td>Need dynamic leave-by calculator using current conditions.</td>
+                <td>A community member who has never heard of the club and is deciding whether to get involved.</td>
+                <td>Needs to quickly answer: who are you, what do you do, how do I join?</td>
+                <td>Design decisions should be judged against this first-time-visitor test.</td>
             </tr>
             <tr>
                 <td class="cat cat-macro">Feasibility Matrix</td>
                 <td>Stakeholder value</td>
-                <td>Direct utility for regular commuters in San Diego.</td>
-                <td>Connects safety evidence to routine daily choices.</td>
-                <td>High practical relevance and visible impact.</td>
+                <td>Directly supports club recruitment and community outreach goals.</td>
+                <td>A clearer site can increase membership sign-ups and event turnout.</td>
+                <td>High practical relevance for a small, volunteer-run organization.</td>
             </tr>
             <tr>
                 <td class="cat cat-macro">Feasibility Matrix</td>
                 <td>Team + learning fit</td>
-                <td>Matches transportation interest and algorithmic CS goals.</td>
-                <td>Uses scoring formulas, route comparison, and time calculations.</td>
-                <td>Strong AP CSP-aligned technical depth.</td>
-            </tr>
-            <tr>
-                <td class="cat cat-macro">Feasibility Matrix</td>
-                <td>Safety + originality</td>
-                <td>Add informative safety layer without replacing official routing.</td>
-                <td>Current system displays hazards separately; new system integrates them.</td>
-                <td>Original contribution with transparent guardrails.</td>
+                <td>Matches goals around UX design, information architecture, and front-end development.</td>
+                <td>Involves content strategy, responsive layout, and accessible design.</td>
+                <td>Strong alignment with web design and usability coursework.</td>
             </tr>
             <tr>
                 <td class="cat cat-build">Implementation Flow</td>
-                <td>User flow step 1-2</td>
-                <td>Enter trip, choose mode, compare 2-3 routes.</td>
-                <td>Each route includes time, distance, and safety score.</td>
-                <td>Selection becomes explicit and evidence-backed.</td>
+                <td>Step 1-2</td>
+                <td>Audit existing site content and interview club members on priorities.</td>
+                <td>Identify what to keep, cut, or rewrite.</td>
+                <td>Grounds the redesign in real club needs, not assumptions.</td>
             </tr>
             <tr>
                 <td class="cat cat-build">Implementation Flow</td>
-                <td>User flow step 3-4</td>
-                <td>Explain recommendation and allow commute save.</td>
-                <td>Example saved trip: School, arrive 8:35 AM.</td>
-                <td>Supports repeat-use routines and user trust.</td>
+                <td>Step 3-4</td>
+                <td>Build new navigation structure and homepage wireframe.</td>
+                <td>Test with a few outside readers for clarity within seconds.</td>
+                <td>Validates that a first-time visitor understands the club quickly.</td>
             </tr>
             <tr>
                 <td class="cat cat-build">Implementation Flow</td>
-                <td>User flow step 5-6</td>
-                <td>Compute leave-by time and support hazard confirm/clear.</td>
-                <td>Old hazards can expire automatically.</td>
-                <td>Keeps recommendations timely and cleaner over time.</td>
-            </tr>
-            <tr>
-                <td class="cat cat-build">Implementation Flow</td>
-                <td>Success indicators</td>
-                <td>Users can choose between routes using visible safety signals.</td>
-                <td>Expected checks: route options differ by mode, explanation text updates, leave-by time reacts to conditions.</td>
-                <td>Confirms data is influencing decisions, not only display.</td>
+                <td>Step 5-6</td>
+                <td>Build out Get Involved hub and About/Mission page content.</td>
+                <td>Include clear calls to action: Join, Volunteer, Donate, Attend an Event.</td>
+                <td>Gives visitors a concrete next step every time.</td>
             </tr>
             <tr>
                 <td class="cat cat-build">Phased Plan</td>
                 <td>Phase 1-2</td>
-                <td>Foundation audit, dataset prep, then scoring algorithm integration.</td>
-                <td>Connect to codebase reality and wire safety scores into backend routes.</td>
-                <td>Core decision engine becomes functional.</td>
+                <td>Content audit and information architecture, then visual design system.</td>
+                <td>Define navigation structure, then colors, type, and layout components.</td>
+                <td>Foundation is set before any page is finalized.</td>
             </tr>
             <tr>
                 <td class="cat cat-build">Phased Plan</td>
                 <td>Phase 3-4</td>
-                <td>Decision UI, planner logic, hazard lifecycle, full polish.</td>
-                <td>Build explanation panel and end-to-end test flow.</td>
-                <td>Demo-ready system with visible user value.</td>
-            </tr>
-            <tr>
-                <td class="cat cat-build">Phased Plan</td>
-                <td>Primary deliverables</td>
-                <td>Scored multi-route API outputs, comparison UI, leave-by planner, hazard lifecycle rules.</td>
-                <td>Each deliverable maps to a phase milestone and demo scenario.</td>
-                <td>Structured implementation path with measurable completion criteria.</td>
+                <td>Build core pages, then polish and test with real users.</td>
+                <td>Homepage, About, Get Involved, Events built first; refine after feedback.</td>
+                <td>Demo-ready site with a clear, tested user experience.</td>
             </tr>
             <tr>
                 <td class="cat cat-build">Later Scope</td>
-                <td>Future enhancement set</td>
-                <td>Mode-specific risk models, user-adjustable safety tolerance, saved-place defaults.</td>
-                <td>Examples: biking/walking risk factors, max extra minutes for safer route.</td>
-                <td>Deeper personalization if timeline allows.</td>
+                <td>Future enhancements</td>
+                <td>Event calendar integration, email newsletter signup, member spotlight stories.</td>
+                <td>Not essential to the core clarity goal but adds ongoing engagement.</td>
+                <td>Possible expansion if timeline allows.</td>
             </tr>
         </tbody>
     </table>
 </div>
+
+## Site Structure Diagram
+
+```mermaid
+flowchart TD
+    A[Homepage]
+    A --> B[About / Mission]
+    A --> C[Programs]
+    A --> D[Get Involved]
+    D --> D1[Membership]
+    D --> D2[Volunteer]
+    D --> D3[Donate]
+    D --> D4[Upcoming Events]
+    A --> E[Events]
+    A --> F[Contact]
+```
