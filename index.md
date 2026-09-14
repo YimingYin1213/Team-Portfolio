@@ -80,7 +80,7 @@ Hi! Welcome to Team Aquatic CSP
     <a href="{{site.baseurl}}/cs-pathway" class="btn" style="background-color: var(--orange);">
        CS Pathway
     </a>
-     <a href="{{site.baseurl}}/capstone/ideation" class="btn" style="background-color: var(--blue);">
+     <a href="{{site.baseurl}}/capstone/poway-womens-club-ideation/" class="btn" style="background-color: var(--blue);">
          Ideation Page
      </a>
 </div>
